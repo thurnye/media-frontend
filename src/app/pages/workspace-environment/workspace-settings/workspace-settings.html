@@ -106,15 +106,13 @@
               >
                 {{ account.status }}
               </span>
-              @if (account.status !== 'disconnected') {
-                <button
-                  class="wst-btn-disconnect"
-                  (click)="onDisconnect(account.id)"
-                  type="button"
-                >
-                  Disconnect
-                </button>
-              }
+              <button
+                class="wst-btn-disconnect"
+                (click)="onUnlink(account.id)"
+                type="button"
+              >
+                Unlink
+              </button>
             </div>
           </div>
         }

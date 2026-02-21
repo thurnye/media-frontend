@@ -32,5 +32,17 @@ export const PostActions = createActionGroup({
     'Delete Post Failure': props<{ error: string; post: IPost }>(),
 
     'Clear Selected Post': emptyProps(),
+
+    'Submit For Approval':         props<{ postId: string }>(),
+    'Submit For Approval Success': props<{ post: IPost }>(),
+    'Submit For Approval Failure': props<{ error: string }>(),
+
+    'Approve Post':         props<{ postId: string }>(),
+    'Approve Post Success': props<{ post: IPost }>(),
+    'Approve Post Failure': props<{ error: string }>(),
+
+    'Reject Post':         props<{ postId: string; reason: string }>(),
+    'Reject Post Success': props<{ post: IPost }>(),
+    'Reject Post Failure': props<{ error: string }>(),
   },
 });

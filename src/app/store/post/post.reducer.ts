@@ -64,4 +64,19 @@ export const postReducer = createReducer(
   })),
 
   on(PostActions.clearSelectedPost, state => ({ ...state, selectedPost: null })),
+
+  // ── Approval flow ──────────────────────────────────────────────────────────
+  on(PostActions.submitForApproval, PostActions.approvePost, PostActions.rejectPost,
+    state => ({ ...state, loading: true, error: null }),
+  ),
+  on(PostActions.submitForApprovalSuccess, PostActions.approvePostSuccess, PostActions.rejectPostSuccess,
+    (state, { post }) => ({
+      ...state, loading: false,
+      posts: state.posts.map(p => p.id === post.id ? post : p),
+      selectedPost: state.selectedPost?.id === post.id ? post : state.selectedPost,
+    }),
+  ),
+  on(PostActions.submitForApprovalFailure, PostActions.approvePostFailure, PostActions.rejectPostFailure,
+    (state, { error }) => ({ ...state, loading: false, error }),
+  ),
 );

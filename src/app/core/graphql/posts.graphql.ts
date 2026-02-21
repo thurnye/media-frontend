@@ -11,6 +11,16 @@ const POST_FIELDS = `
   status
   priority
   isEvergreen
+  approvalWorkflow {
+    requiredApprovers
+    approvedBy
+    rejectedBy
+    comments {
+      userId
+      message
+      createdAt
+    }
+  }
   isActive
   createdAt
   updatedAt
@@ -91,6 +101,30 @@ export const DELETE_POST = gql`
   mutation DeletePost($id: ID!) {
     deletePost(id: $id) {
       id
+    }
+  }
+`;
+
+export const SUBMIT_FOR_APPROVAL = gql`
+  mutation SubmitForApproval($postId: ID!) {
+    submitForApproval(postId: $postId) {
+      ${POST_FIELDS}
+    }
+  }
+`;
+
+export const APPROVE_POST = gql`
+  mutation ApprovePost($postId: ID!) {
+    approvePost(postId: $postId) {
+      ${POST_FIELDS}
+    }
+  }
+`;
+
+export const REJECT_POST = gql`
+  mutation RejectPost($postId: ID!, $reason: String!) {
+    rejectPost(postId: $postId, reason: $reason) {
+      ${POST_FIELDS}
     }
   }
 `;

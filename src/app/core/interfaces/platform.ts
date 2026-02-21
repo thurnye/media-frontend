@@ -10,7 +10,8 @@ export type AccountStatus = 'active' | 'disconnected' | 'suspended';
 
 export interface IPlatformAccount {
   id:                string;
-  workspaceId:       string;
+  userId:            string;
+  workspaceIds:      string[];
   platform:          PlatformType;
   accountId:         string;
   displayName:       string;
@@ -19,4 +20,45 @@ export interface IPlatformAccount {
   lastSyncAt?:       string;
   createdAt?:        string;
   updatedAt?:        string;
+}
+
+export type PublishingStatus = 'draft' | 'scheduled' | 'publishing' | 'published' | 'failed' | 'cancelled';
+
+export interface IPostContent {
+  caption?: string;
+  hashtags?: string[];
+  firstComment?: string;
+}
+
+export interface IPublishingInfo {
+  status?: PublishingStatus;
+  scheduledAt?: string;
+  publishedAt?: string;
+  timezone?: string;
+  platformPostId?: string;
+}
+
+export interface IPlatformPost {
+  id:         string;
+  postId:     string;
+  platform:   string;
+  accountId:  string;
+  content:    IPostContent;
+  publishing: IPublishingInfo;
+  isActive?:  boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface ICreatePlatformPostBatch {
+  postId:      string;
+  entries:     Array<{
+    platform:     string;
+    accountId:    string;
+    caption:      string;
+    hashtags?:    string[];
+    firstComment?: string;
+  }>;
+  scheduledAt?: string;
+  timezone?:    string;
 }

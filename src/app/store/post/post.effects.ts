@@ -137,4 +137,78 @@ export class PostEffects {
     ),
     { dispatch: false },
   );
+
+  // ── Approval flow ────────────────────────────────────────────────────────────
+
+  submitForApproval$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(PostActions.submitForApproval),
+      switchMap(({ postId }) =>
+        this.postGql.submitForApproval(postId).pipe(
+          map(post => PostActions.submitForApprovalSuccess({ post })),
+          catchError(err => of(PostActions.submitForApprovalFailure({ error: err.message }))),
+        ),
+      ),
+    ),
+  );
+
+  submitForApprovalSuccess$ = createEffect(
+    () => this.actions$.pipe(
+      ofType(PostActions.submitForApprovalSuccess),
+      tap(() => this.toast.show(TOAST.POST_SUBMITTED, 'success')),
+    ),
+    { dispatch: false },
+  );
+
+  approvePost$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(PostActions.approvePost),
+      switchMap(({ postId }) =>
+        this.postGql.approvePost(postId).pipe(
+          map(post => PostActions.approvePostSuccess({ post })),
+          catchError(err => of(PostActions.approvePostFailure({ error: err.message }))),
+        ),
+      ),
+    ),
+  );
+
+  approvePostSuccess$ = createEffect(
+    () => this.actions$.pipe(
+      ofType(PostActions.approvePostSuccess),
+      tap(() => this.toast.show(TOAST.POST_APPROVED, 'success')),
+    ),
+    { dispatch: false },
+  );
+
+  rejectPost$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(PostActions.rejectPost),
+      switchMap(({ postId, reason }) =>
+        this.postGql.rejectPost(postId, reason).pipe(
+          map(post => PostActions.rejectPostSuccess({ post })),
+          catchError(err => of(PostActions.rejectPostFailure({ error: err.message }))),
+        ),
+      ),
+    ),
+  );
+
+  rejectPostSuccess$ = createEffect(
+    () => this.actions$.pipe(
+      ofType(PostActions.rejectPostSuccess),
+      tap(() => this.toast.show(TOAST.POST_REJECTED, 'success')),
+    ),
+    { dispatch: false },
+  );
+
+  approvalFailure$ = createEffect(
+    () => this.actions$.pipe(
+      ofType(
+        PostActions.submitForApprovalFailure,
+        PostActions.approvePostFailure,
+        PostActions.rejectPostFailure,
+      ),
+      tap(() => this.toast.show(TOAST.POST_APPROVAL_FAILED, 'error')),
+    ),
+    { dispatch: false },
+  );
 }

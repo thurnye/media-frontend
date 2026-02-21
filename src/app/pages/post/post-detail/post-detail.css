@@ -201,6 +201,208 @@
   font-style: italic;
 }
 
+/* ── Rejection section ── */
+.pd-rejection-section {
+  padding: 0 2.5rem 1.5rem;
+  border-top: 1px solid #fecaca;
+  margin: 0;
+}
+
+.pd-rejection-title {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #991b1b;
+  margin: 1.25rem 0 0.75rem;
+}
+
+.pd-rejection-comment {
+  background: #fff5f5;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.pd-rejection-reason {
+  margin: 0 0 0.25rem;
+  font-size: 0.875rem;
+  color: #333;
+}
+
+.pd-rejection-date {
+  font-size: 0.75rem;
+  color: #6c757d;
+}
+
+/* ── Approval bar ── */
+.pd-approval-bar {
+  display: flex;
+  gap: 0.5rem;
+  padding: 1.25rem 2.5rem;
+  border-top: 1px solid #f0f0f0;
+}
+
+.pd-approval-bar:empty {
+  display: none;
+}
+
+.pd-btn-submit,
+.pd-btn-approve,
+.pd-btn-reject,
+.pd-btn-publish {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.5rem 1.25rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1.5px solid;
+  transition: background 0.15s, color 0.15s;
+}
+
+.pd-btn-submit {
+  background: #6366f1;
+  border-color: #6366f1;
+  color: #fff;
+}
+
+.pd-btn-submit:hover {
+  background: #4f46e5;
+  border-color: #4f46e5;
+}
+
+.pd-btn-approve {
+  background: #16a34a;
+  border-color: #16a34a;
+  color: #fff;
+}
+
+.pd-btn-approve:hover {
+  background: #15803d;
+  border-color: #15803d;
+}
+
+.pd-btn-publish {
+  background: #6366f1;
+  border-color: #6366f1;
+  color: #fff;
+}
+
+.pd-btn-publish:hover {
+  background: #4f46e5;
+  border-color: #4f46e5;
+}
+
+.pd-btn-reject {
+  background: transparent;
+  border-color: #fecaca;
+  color: #dc3545;
+}
+
+.pd-btn-reject:hover {
+  background: #fff5f5;
+  border-color: #dc3545;
+}
+
+/* ── Reject dialog ── */
+.pd-dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.pd-dialog {
+  background: #fff;
+  border-radius: 12px;
+  padding: 1.75rem;
+  width: 90%;
+  max-width: 440px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+}
+
+.pd-dialog-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #111;
+  margin: 0 0 0.25rem;
+}
+
+.pd-dialog-desc {
+  font-size: 0.85rem;
+  color: #6c757d;
+  margin: 0 0 1rem;
+}
+
+.pd-dialog-textarea {
+  width: 100%;
+  border: 1.5px solid #dee2e6;
+  border-radius: 8px;
+  padding: 0.75rem;
+  font-size: 0.875rem;
+  font-family: inherit;
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.15s;
+  box-sizing: border-box;
+}
+
+.pd-dialog-textarea:focus {
+  border-color: #6366f1;
+}
+
+.pd-dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.pd-btn-cancel {
+  padding: 0.45rem 1rem;
+  border: 1.5px solid #dee2e6;
+  border-radius: 8px;
+  background: transparent;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #495057;
+  cursor: pointer;
+}
+
+.pd-btn-cancel:hover {
+  background: #f8f9fa;
+}
+
+.pd-btn-confirm-reject {
+  padding: 0.45rem 1rem;
+  border: 1.5px solid #dc3545;
+  border-radius: 8px;
+  background: #dc3545;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #fff;
+  cursor: pointer;
+}
+
+.pd-btn-confirm-reject:hover {
+  background: #c82333;
+}
+
+.pd-btn-confirm-reject:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ── Status badge additions ── */
+.pd-status--rejected  { background: #fee2e2; color: #991b1b; }
+.pd-status--publishing { background: #dbeafe; color: #1e40af; }
+.pd-status--cancelled { background: #e5e7eb; color: #4b5563; }
+
 /* ── Error ── */
 .pd-error {
   display: flex;

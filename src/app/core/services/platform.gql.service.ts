@@ -1,22 +1,16 @@
 import { inject, Injectable } from '@angular/core';
 import { Apollo } from 'apollo-angular';
 import { map } from 'rxjs';
-import { IPlatformAccount } from '../interfaces/platform';
+import { ICreatePlatformPostBatch, IPlatformAccount, IPlatformPost } from '../interfaces/platform';
 import {
-  CONNECT_PLATFORM_ACCOUNT_MUTATION,
   DISCONNECT_PLATFORM_ACCOUNT_MUTATION,
   GET_PLATFORM_ACCOUNTS_QUERY,
+  GET_MY_PLATFORM_ACCOUNTS_QUERY,
+  LINK_PLATFORM_ACCOUNT_MUTATION,
+  UNLINK_PLATFORM_ACCOUNT_MUTATION,
+  GET_PLATFORM_POSTS_QUERY,
+  CREATE_PLATFORM_POSTS_BATCH_MUTATION,
 } from '../graphql/platforms.graphql';
-
-export interface IConnectPlatformAccountInput {
-  workspaceId:        string;
-  platform:           string;
-  accountId:          string;
-  displayName:        string;
-  accessToken:        string;
-  refreshToken?:      string;
-  profilePictureUrl?: string;
-}
 
 @Injectable({ providedIn: 'root' })
 export class PlatformGqlService {
@@ -32,13 +26,31 @@ export class PlatformGqlService {
       .pipe(map(r => r.data!.platformAccounts));
   }
 
-  connectPlatformAccount(input: IConnectPlatformAccountInput) {
+  getMyPlatformAccounts() {
     return this.apollo
-      .mutate<{ connectPlatformAccount: IPlatformAccount }>({
-        mutation: CONNECT_PLATFORM_ACCOUNT_MUTATION,
-        variables: input,
+      .query<{ myPlatformAccounts: IPlatformAccount[] }>({
+        query: GET_MY_PLATFORM_ACCOUNTS_QUERY,
+        fetchPolicy: 'no-cache',
       })
-      .pipe(map(r => r.data!.connectPlatformAccount));
+      .pipe(map(r => r.data!.myPlatformAccounts));
+  }
+
+  linkPlatformAccount(accountId: string, workspaceId: string) {
+    return this.apollo
+      .mutate<{ linkPlatformAccount: IPlatformAccount }>({
+        mutation: LINK_PLATFORM_ACCOUNT_MUTATION,
+        variables: { accountId, workspaceId },
+      })
+      .pipe(map(r => r.data!.linkPlatformAccount));
+  }
+
+  unlinkPlatformAccount(accountId: string, workspaceId: string) {
+    return this.apollo
+      .mutate<{ unlinkPlatformAccount: IPlatformAccount }>({
+        mutation: UNLINK_PLATFORM_ACCOUNT_MUTATION,
+        variables: { accountId, workspaceId },
+      })
+      .pipe(map(r => r.data!.unlinkPlatformAccount));
   }
 
   disconnectPlatformAccount(id: string) {
@@ -48,5 +60,24 @@ export class PlatformGqlService {
         variables: { id },
       })
       .pipe(map(r => r.data!.disconnectPlatformAccount));
+  }
+
+  getPlatformPosts(postId: string) {
+    return this.apollo
+      .query<{ platformPosts: IPlatformPost[] }>({
+        query: GET_PLATFORM_POSTS_QUERY,
+        variables: { postId },
+        fetchPolicy: 'no-cache',
+      })
+      .pipe(map(r => r.data!.platformPosts));
+  }
+
+  createPlatformPostsBatch(input: ICreatePlatformPostBatch) {
+    return this.apollo
+      .mutate<{ createPlatformPostsBatch: IPlatformPost[] }>({
+        mutation: CREATE_PLATFORM_POSTS_BATCH_MUTATION,
+        variables: input,
+      })
+      .pipe(map(r => r.data!.createPlatformPostsBatch));
   }
 }

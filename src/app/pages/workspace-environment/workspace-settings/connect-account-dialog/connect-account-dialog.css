@@ -72,7 +72,89 @@
   margin: 0 0 1rem;
 }
 
-/* ── Platform grid (Step 1) ──────────────────────────────────── */
+/* ── Account list (Step 1: select) ───────────────────────────── */
+.cad-account-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+.cad-account-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.625rem 0.75rem;
+  background: #f8f9fa;
+  border: 2px solid transparent;
+  border-radius: 0.625rem;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.cad-account-row:hover {
+  background: #f0f1f3;
+}
+
+.cad-account-row--selected {
+  border-color: #6366f1;
+  background: #eef2ff;
+}
+
+.cad-checkbox {
+  width: 16px;
+  height: 16px;
+  accent-color: #6366f1;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.cad-account-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 0.5rem;
+  color: #fff;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.cad-account-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.cad-account-name {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #1a1a2e;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cad-account-meta {
+  font-size: 0.6875rem;
+  color: #6c757d;
+}
+
+/* ── Secondary button ────────────────────────────────────────── */
+.cad-btn--secondary {
+  background: #f3f4f6;
+  color: #344054;
+}
+
+.cad-btn--secondary:hover {
+  background: #e5e7eb;
+}
+
+/* ── Platform grid (Step 2) ──────────────────────────────────── */
 .cad-platform-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -198,6 +280,34 @@
 .cad-btn--connect:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+/* ── Connecting state ───────────────────────────────────────── */
+.cad-connecting {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 2rem 0;
+}
+
+.cad-spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid #e9ecef;
+  border-top-color: #6366f1;
+  border-radius: 50%;
+  animation: cad-spin 0.7s linear infinite;
+}
+
+@keyframes cad-spin {
+  to { transform: rotate(360deg); }
+}
+
+.cad-connecting-text {
+  font-size: 0.875rem;
+  color: #6c757d;
+  margin: 0;
 }
 
 /* ── Responsive ─────────────────────────────────────────────── */

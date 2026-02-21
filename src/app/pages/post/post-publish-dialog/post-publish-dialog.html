@@ -1,0 +1,172 @@
+<div class="ppd-backdrop" (click)="onBackdropClick($event)">
+  <div class="ppd-dialog">
+
+    <!-- Header -->
+    <div class="ppd-header">
+      @if (step() === 2) {
+        <button class="ppd-back-btn" (click)="goBack()" type="button">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+            <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8"/>
+          </svg>
+        </button>
+      }
+      <h2 class="ppd-title">
+        @if (step() === 1) {
+          Select Accounts
+        } @else {
+          Customize & Schedule
+        }
+      </h2>
+      <button class="ppd-close-btn" (click)="close.emit()" type="button">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
+          <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Step 1: Account Selection -->
+    @if (step() === 1) {
+      <div class="ppd-body">
+        @if (loadingAccounts()) {
+          <div class="ppd-loading">
+            <div class="ppd-spinner"></div>
+            <p>Loading accounts...</p>
+          </div>
+        } @else if (entries().length === 0) {
+          <div class="ppd-empty">
+            <p>No connected accounts found. Connect an account first from workspace settings.</p>
+          </div>
+        } @else {
+          <p class="ppd-hint">Choose which accounts to publish to:</p>
+          <div class="ppd-account-list">
+            @for (entry of entries(); track entry.account.id; let i = $index) {
+              <button
+                class="ppd-account-item"
+                [class.ppd-account-item--selected]="entry.selected"
+                (click)="toggleAccount(i)"
+                type="button"
+              >
+                <span class="ppd-account-icon" [style.background]="entry.account.platform === 'instagram' ? '#e1306c' : entry.account.platform === 'facebook' ? '#1877f2' : entry.account.platform === 'twitter' ? '#1da1f2' : entry.account.platform === 'linkedin' ? '#0a66c2' : entry.account.platform === 'tiktok' ? '#010101' : '#ff0000'">
+                  {{ entry.account.platform.charAt(0).toUpperCase() }}
+                </span>
+                <div class="ppd-account-info">
+                  <span class="ppd-account-name">{{ entry.account.displayName }}</span>
+                  <span class="ppd-account-platform">{{ entry.account.platform }}</span>
+                </div>
+                <span class="ppd-check" [class.ppd-check--active]="entry.selected">
+                  @if (entry.selected) {
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                      <path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0"/>
+                    </svg>
+                  }
+                </span>
+              </button>
+            }
+          </div>
+        }
+      </div>
+      <div class="ppd-footer">
+        <button class="ppd-btn ppd-btn--cancel" (click)="close.emit()" type="button">Cancel</button>
+        <button
+          class="ppd-btn ppd-btn--next"
+          (click)="goToStep2()"
+          [disabled]="selectedCount === 0"
+          type="button"
+        >
+          Next ({{ selectedCount }})
+        </button>
+      </div>
+    }
+
+    <!-- Step 2: Customize & Schedule -->
+    @if (step() === 2) {
+      <div class="ppd-body ppd-body--scroll">
+        @for (entry of entries(); track entry.account.id; let i = $index) {
+          @if (entry.selected) {
+            <div class="ppd-entry-card">
+              <div class="ppd-entry-header">
+                <span class="ppd-account-icon ppd-account-icon--sm" [style.background]="entry.account.platform === 'instagram' ? '#e1306c' : entry.account.platform === 'facebook' ? '#1877f2' : entry.account.platform === 'twitter' ? '#1da1f2' : entry.account.platform === 'linkedin' ? '#0a66c2' : entry.account.platform === 'tiktok' ? '#010101' : '#ff0000'">
+                  {{ entry.account.platform.charAt(0).toUpperCase() }}
+                </span>
+                <span class="ppd-entry-name">{{ entry.account.displayName }}</span>
+              </div>
+              <label class="ppd-label">Caption</label>
+              <textarea
+                class="ppd-textarea"
+                rows="3"
+                placeholder="Write your caption..."
+                [ngModel]="entry.caption"
+                (ngModelChange)="updateCaption(i, $event)"
+              ></textarea>
+              <label class="ppd-label">Hashtags <span class="ppd-optional">(comma-separated)</span></label>
+              <input
+                class="ppd-input"
+                type="text"
+                placeholder="#marketing, #brand"
+                [ngModel]="entry.hashtags"
+                (ngModelChange)="updateHashtags(i, $event)"
+              />
+            </div>
+          }
+        }
+
+        <!-- Schedule options -->
+        <div class="ppd-schedule-section">
+          <h3 class="ppd-schedule-title">Schedule</h3>
+          <div class="ppd-schedule-options">
+            <button
+              class="ppd-schedule-btn"
+              [class.ppd-schedule-btn--active]="scheduleMode() === 'now'"
+              (click)="scheduleMode.set('now')"
+              type="button"
+            >
+              Publish Now
+            </button>
+            <button
+              class="ppd-schedule-btn"
+              [class.ppd-schedule-btn--active]="scheduleMode() === 'schedule'"
+              (click)="scheduleMode.set('schedule')"
+              type="button"
+            >
+              Schedule
+            </button>
+          </div>
+          @if (scheduleMode() === 'schedule') {
+            <div class="ppd-schedule-fields">
+              <input
+                class="ppd-input"
+                type="date"
+                [ngModel]="scheduledDate()"
+                (ngModelChange)="scheduledDate.set($event)"
+              />
+              <input
+                class="ppd-input"
+                type="time"
+                [ngModel]="scheduledTime()"
+                (ngModelChange)="scheduledTime.set($event)"
+              />
+            </div>
+          }
+        </div>
+      </div>
+      <div class="ppd-footer">
+        <button class="ppd-btn ppd-btn--cancel" (click)="goBack()" type="button">Back</button>
+        <button
+          class="ppd-btn ppd-btn--publish"
+          (click)="onPublish()"
+          [disabled]="!canPublish() || publishing()"
+          type="button"
+        >
+          @if (publishing()) {
+            Publishing...
+          } @else if (scheduleMode() === 'schedule') {
+            Schedule
+          } @else {
+            Publish Now
+          }
+        </button>
+      </div>
+    }
+
+  </div>
+</div>

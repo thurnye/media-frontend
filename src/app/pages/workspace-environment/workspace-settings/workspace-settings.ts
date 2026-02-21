@@ -1,4 +1,4 @@
-import { Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
+import { Component, effect, inject, OnDestroy, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { selectSelectedWorkspace } from '../../../store/workspace/workspace.selectors';
@@ -16,8 +16,9 @@ import { ConnectAccountDialog } from './connect-account-dialog/connect-account-d
   templateUrl: './workspace-settings.html',
   styleUrl: './workspace-settings.css',
 })
-export class WorkspaceSettings implements OnInit, OnDestroy {
+export class WorkspaceSettings implements OnDestroy {
   private store = inject(Store);
+  private platformsLoaded = false;
 
   workspace         = this.store.selectSignal(selectSelectedWorkspace);
   accounts          = this.store.selectSignal(selectPlatformAccounts);
@@ -25,20 +26,24 @@ export class WorkspaceSettings implements OnInit, OnDestroy {
   accountsLoading   = this.store.selectSignal(selectPlatformLoading);
   showConnectDialog = signal(false);
 
-  ngOnInit(): void {
+  /** Reactively load platform accounts once workspace signal resolves. */
+  private wsEffect = effect(() => {
     const ws = this.workspace();
-    if (ws) {
+    if (ws && !this.platformsLoaded) {
+      this.platformsLoaded = true;
       this.store.dispatch(PlatformActions.loadPlatformAccounts({ workspaceId: ws.id }));
     }
-  }
+  });
 
   ngOnDestroy(): void {
     this.store.dispatch(PlatformActions.clearPlatformAccounts());
   }
 
-  onDisconnect(id: string): void {
-    if (!confirm('Disconnect this account? You can reconnect it later.')) return;
-    this.store.dispatch(PlatformActions.disconnectPlatformAccount({ id }));
+  onUnlink(accountId: string): void {
+    const ws = this.workspace();
+    if (!ws) return;
+    if (!confirm('Unlink this account from the workspace?')) return;
+    this.store.dispatch(PlatformActions.unlinkPlatformAccount({ accountId, workspaceId: ws.id }));
   }
 
   formatDate(dateStr?: string): string {

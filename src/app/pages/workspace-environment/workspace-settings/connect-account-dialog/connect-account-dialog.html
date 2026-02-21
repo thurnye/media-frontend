@@ -3,20 +3,14 @@
 
     <!-- ── Header ── -->
     <div class="cad-header">
-      @if (step() === 2) {
-        <button class="cad-back-btn" (click)="goBack()" type="button">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-            <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8"/>
+      @if (step() === 'connect') {
+        <button class="cad-back-btn" (click)="step.set('select')" type="button">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
+            <path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0"/>
           </svg>
         </button>
       }
-      <h2 class="cad-title">
-        @if (step() === 1) {
-          Connect Account
-        } @else {
-          Connect {{ selectedPlatform()?.label }}
-        }
-      </h2>
+      <h2 class="cad-title">{{ step() === 'select' ? 'Add Account' : 'Connect New Account' }}</h2>
       <button class="cad-close-btn" (click)="close.emit()" type="button">
         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
           <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708"/>
@@ -24,10 +18,60 @@
       </button>
     </div>
 
-    <!-- ── Step 1: Platform Selection ── -->
-    @if (step() === 1) {
-      <div class="cad-body">
-        <p class="cad-hint">Select a platform to connect:</p>
+    <div class="cad-body">
+      @if (connecting()) {
+        <!-- Redirect spinner -->
+        <div class="cad-connecting">
+          <div class="cad-spinner"></div>
+          <p class="cad-connecting-text">Redirecting to authorization...</p>
+        </div>
+
+      } @else if (step() === 'select') {
+        <!-- Step 1: Existing accounts -->
+        @if (availableAccounts().length > 0) {
+          <p class="cad-hint">Select accounts to link to this workspace:</p>
+          <div class="cad-account-list">
+            @for (account of availableAccounts(); track account.id) {
+              <label class="cad-account-row" [class.cad-account-row--selected]="isSelected(account.id)">
+                <input
+                  type="checkbox"
+                  class="cad-checkbox"
+                  [checked]="isSelected(account.id)"
+                  (change)="toggleSelection(account.id)"
+                />
+                <span class="cad-account-icon" [style.background]="getPlatformColor(account.platform)">
+                  {{ account.platform.charAt(0).toUpperCase() }}
+                </span>
+                <span class="cad-account-info">
+                  <span class="cad-account-name">{{ account.displayName }}</span>
+                  <span class="cad-account-meta">{{ getPlatformLabel(account.platform) }}</span>
+                </span>
+              </label>
+            }
+          </div>
+        } @else {
+          <p class="cad-hint">No existing accounts available to link. Connect a new one below.</p>
+        }
+
+        <div class="cad-footer">
+          @if (availableAccounts().length > 0 && selected().size > 0) {
+            <button
+              class="cad-btn cad-btn--connect"
+              [disabled]="saving()"
+              (click)="linkSelected()"
+              type="button"
+            >
+              Link selected ({{ selected().size }})
+            </button>
+          }
+          <button class="cad-btn cad-btn--secondary" (click)="goToConnect()" type="button">
+            Connect new account
+          </button>
+        </div>
+
+      } @else {
+        <!-- Step 2: Platform OAuth grid -->
+        <p class="cad-hint">Select a platform to connect via OAuth:</p>
         <div class="cad-platform-grid">
           @for (p of platforms; track p.type) {
             <button
@@ -43,71 +87,8 @@
             </button>
           }
         </div>
-      </div>
-    }
-
-    <!-- ── Step 2: Account Details ── -->
-    @if (step() === 2) {
-      <div class="cad-body">
-        <label class="cad-label" for="accountId">Account ID</label>
-        <input
-          id="accountId"
-          class="cad-input"
-          type="text"
-          placeholder="e.g. @yourhandle or numeric ID"
-          [ngModel]="accountId()"
-          (ngModelChange)="accountId.set($event)"
-        />
-
-        <label class="cad-label" for="displayName">Display Name</label>
-        <input
-          id="displayName"
-          class="cad-input"
-          type="text"
-          placeholder="e.g. My Brand Account"
-          [ngModel]="displayName()"
-          (ngModelChange)="displayName.set($event)"
-        />
-
-        <label class="cad-label" for="accessToken">Access Token</label>
-        <input
-          id="accessToken"
-          class="cad-input"
-          type="password"
-          placeholder="Paste your access token"
-          [ngModel]="accessToken()"
-          (ngModelChange)="accessToken.set($event)"
-        />
-
-        <label class="cad-label" for="refreshToken">
-          Refresh Token <span class="cad-optional">(optional)</span>
-        </label>
-        <input
-          id="refreshToken"
-          class="cad-input"
-          type="password"
-          placeholder="Paste refresh token if applicable"
-          [ngModel]="refreshToken()"
-          (ngModelChange)="refreshToken.set($event)"
-        />
-      </div>
-
-      <div class="cad-footer">
-        <button class="cad-btn cad-btn--cancel" (click)="close.emit()" type="button">Cancel</button>
-        <button
-          class="cad-btn cad-btn--connect"
-          (click)="onConnect()"
-          [disabled]="!isFormValid() || saving()"
-          type="button"
-        >
-          @if (saving()) {
-            Connecting...
-          } @else {
-            Connect
-          }
-        </button>
-      </div>
-    }
+      }
+    </div>
 
   </div>
 </div>

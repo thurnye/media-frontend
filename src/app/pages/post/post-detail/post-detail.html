@@ -99,7 +99,75 @@
           }
         </div>
 
+        <!-- Rejection comments -->
+        @if (post()!.status === 'rejected' && post()!.approvalWorkflow?.comments?.length) {
+          <div class="pd-rejection-section">
+            <h3 class="pd-rejection-title">Rejection Feedback</h3>
+            @for (comment of post()!.approvalWorkflow!.comments; track comment.createdAt) {
+              <div class="pd-rejection-comment">
+                <p class="pd-rejection-reason">{{ comment.message }}</p>
+                <span class="pd-rejection-date">{{ comment.createdAt | date:'medium' }}</span>
+              </div>
+            }
+          </div>
+        }
+
+        <!-- Approval actions -->
+        <div class="pd-approval-bar">
+          @if (post()!.status === 'draft' || post()!.status === 'rejected') {
+            <button class="pd-btn-submit" (click)="onSubmitForApproval()">
+              Submit for Approval
+            </button>
+          }
+          @if (post()!.status === 'pending_approval') {
+            <button class="pd-btn-approve" (click)="onApprove()">
+              Approve
+            </button>
+            <button class="pd-btn-reject" (click)="showRejectDialog.set(true)">
+              Reject
+            </button>
+          }
+          @if (post()!.status === 'approved') {
+            <button class="pd-btn-publish" (click)="showPublishDialog.set(true)">
+              Publish
+            </button>
+          }
+        </div>
+
       </article>
+
+      <!-- Reject dialog -->
+      @if (showRejectDialog()) {
+        <div class="pd-dialog-backdrop" (click)="showRejectDialog.set(false)">
+          <div class="pd-dialog" (click)="$event.stopPropagation()">
+            <h3 class="pd-dialog-title">Reject Post</h3>
+            <p class="pd-dialog-desc">Please provide a reason for rejecting this post.</p>
+            <textarea
+              class="pd-dialog-textarea"
+              rows="4"
+              placeholder="Rejection reason..."
+              [ngModel]="rejectReason()"
+              (ngModelChange)="rejectReason.set($event)"
+            ></textarea>
+            <div class="pd-dialog-actions">
+              <button class="pd-btn-cancel" (click)="showRejectDialog.set(false)">Cancel</button>
+              <button class="pd-btn-confirm-reject" [disabled]="!rejectReason().trim()" (click)="onReject()">
+                Reject Post
+              </button>
+            </div>
+          </div>
+        </div>
+      }
+
+      @if (showPublishDialog()) {
+        <app-post-publish-dialog
+          [postId]="post()!.id"
+          [workspaceId]="workspaceId()"
+          [defaultCaption]="post()!.description ?? ''"
+          [defaultHashtags]="post()!.tags ?? []"
+          (close)="showPublishDialog.set(false)"
+        />
+      }
     }
 
   </div>

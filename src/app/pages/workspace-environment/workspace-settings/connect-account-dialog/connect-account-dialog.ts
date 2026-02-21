@@ -1,9 +1,9 @@
-import { Component, EventEmitter, Input, Output, inject, signal } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { Component, computed, EventEmitter, inject, Input, OnInit, Output, signal } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { PlatformType } from '../../../../core/interfaces/platform';
 import { PlatformActions } from '../../../../store/platform/platform.actions';
-import { selectPlatformSaving } from '../../../../store/platform/platform.selectors';
+import { selectMyPlatformAccounts, selectPlatformSaving } from '../../../../store/platform/platform.selectors';
+import { environment } from '../../../../../environments/environment';
 
 interface PlatformOption {
   type:  PlatformType;
@@ -22,25 +22,36 @@ const PLATFORM_OPTIONS: PlatformOption[] = [
 
 @Component({
   selector: 'app-connect-account-dialog',
-  imports: [FormsModule],
+  imports: [],
   templateUrl: './connect-account-dialog.html',
   styleUrl: './connect-account-dialog.css',
 })
-export class ConnectAccountDialog {
+export class ConnectAccountDialog implements OnInit {
   @Input({ required: true }) workspaceId!: string;
   @Output() close = new EventEmitter<void>();
 
   private store = inject(Store);
 
-  saving           = this.store.selectSignal(selectPlatformSaving);
-  step             = signal<1 | 2>(1);
-  selectedPlatform = signal<PlatformOption | null>(null);
-  accountId        = signal('');
-  displayName      = signal('');
-  accessToken      = signal('');
-  refreshToken     = signal('');
+  step        = signal<'select' | 'connect'>('select');
+  connecting  = signal(false);
+
+  myAccounts  = this.store.selectSignal(selectMyPlatformAccounts);
+  saving      = this.store.selectSignal(selectPlatformSaving);
+
+  selected = signal<Set<string>>(new Set());
 
   readonly platforms = PLATFORM_OPTIONS;
+
+  /** Accounts not yet linked to this workspace. */
+  availableAccounts = computed(() =>
+    this.myAccounts().filter(a =>
+      a.status === 'active' && !a.workspaceIds.includes(this.workspaceId),
+    ),
+  );
+
+  ngOnInit(): void {
+    this.store.dispatch(PlatformActions.loadMyPlatformAccounts());
+  }
 
   onBackdropClick(event: MouseEvent): void {
     if ((event.target as HTMLElement).classList.contains('cad-backdrop')) {
@@ -48,40 +59,41 @@ export class ConnectAccountDialog {
     }
   }
 
-  selectPlatform(platform: PlatformOption): void {
-    this.selectedPlatform.set(platform);
-    this.step.set(2);
+  toggleSelection(accountId: string): void {
+    const s = new Set(this.selected());
+    s.has(accountId) ? s.delete(accountId) : s.add(accountId);
+    this.selected.set(s);
   }
 
-  goBack(): void {
-    this.step.set(1);
-    this.selectedPlatform.set(null);
-    this.accountId.set('');
-    this.displayName.set('');
-    this.accessToken.set('');
-    this.refreshToken.set('');
+  isSelected(accountId: string): boolean {
+    return this.selected().has(accountId);
   }
 
-  isFormValid(): boolean {
-    return !!this.accountId().trim()
-        && !!this.displayName().trim()
-        && !!this.accessToken().trim();
-  }
-
-  onConnect(): void {
-    const platform = this.selectedPlatform();
-    if (!platform || !this.isFormValid()) return;
-
-    this.store.dispatch(PlatformActions.connectPlatformAccount({
-      input: {
-        workspaceId:  this.workspaceId,
-        platform:     platform.type,
-        accountId:    this.accountId().trim(),
-        displayName:  this.displayName().trim(),
-        accessToken:  this.accessToken().trim(),
-        refreshToken: this.refreshToken().trim() || undefined,
-      },
-    }));
+  linkSelected(): void {
+    this.selected().forEach(accountId => {
+      this.store.dispatch(PlatformActions.linkPlatformAccount({
+        accountId,
+        workspaceId: this.workspaceId,
+      }));
+    });
     this.close.emit();
+  }
+
+  goToConnect(): void {
+    this.step.set('connect');
+  }
+
+  selectPlatform(platform: PlatformOption): void {
+    this.connecting.set(true);
+    const serverUrl = environment.API_URL.replace('/graphql', '');
+    window.location.href = `${serverUrl}/oauth/${platform.type}/connect?workspaceId=${this.workspaceId}`;
+  }
+
+  getPlatformLabel(type: string): string {
+    return PLATFORM_OPTIONS.find(p => p.type === type)?.label ?? type;
+  }
+
+  getPlatformColor(type: string): string {
+    return PLATFORM_OPTIONS.find(p => p.type === type)?.color ?? '#6c757d';
   }
 }

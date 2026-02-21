@@ -2,7 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { Apollo } from 'apollo-angular';
 import { map } from 'rxjs';
 import { ICreatePost, IPaginatedPosts, IPost, IUpdatePost } from '../interfaces/post';
-import { CREATE_POST, DELETE_POST, GET_POST, GET_POSTS, UPDATE_POST } from '../graphql/posts.graphql';
+import { CREATE_POST, DELETE_POST, GET_POST, GET_POSTS, UPDATE_POST, SUBMIT_FOR_APPROVAL, APPROVE_POST, REJECT_POST } from '../graphql/posts.graphql';
 
 @Injectable({ providedIn: 'root' })
 export class PostGqlService {
@@ -44,5 +44,23 @@ export class PostGqlService {
     return this.apollo
       .mutate<{ deletePost: IPost }>({ mutation: DELETE_POST, variables: { id } })
       .pipe(map(r => r.data!.deletePost));
+  }
+
+  submitForApproval(postId: string) {
+    return this.apollo
+      .mutate<{ submitForApproval: IPost }>({ mutation: SUBMIT_FOR_APPROVAL, variables: { postId } })
+      .pipe(map(r => r.data!.submitForApproval));
+  }
+
+  approvePost(postId: string) {
+    return this.apollo
+      .mutate<{ approvePost: IPost }>({ mutation: APPROVE_POST, variables: { postId } })
+      .pipe(map(r => r.data!.approvePost));
+  }
+
+  rejectPost(postId: string, reason: string) {
+    return this.apollo
+      .mutate<{ rejectPost: IPost }>({ mutation: REJECT_POST, variables: { postId, reason } })
+      .pipe(map(r => r.data!.rejectPost));
   }
 }

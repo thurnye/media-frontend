@@ -23,30 +23,62 @@ export class PlatformEffects {
     ),
   );
 
-  connectPlatformAccount$ = createEffect(() =>
+  loadMyPlatformAccounts$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(PlatformActions.connectPlatformAccount),
-      switchMap(({ input }) =>
-        this.platformGql.connectPlatformAccount(input).pipe(
-          map(account => PlatformActions.connectPlatformAccountSuccess({ account })),
-          catchError(err => of(PlatformActions.connectPlatformAccountFailure({ error: err.message }))),
+      ofType(PlatformActions.loadMyPlatformAccounts),
+      switchMap(() =>
+        this.platformGql.getMyPlatformAccounts().pipe(
+          map(accounts => PlatformActions.loadMyPlatformAccountsSuccess({ accounts })),
+          catchError(err => of(PlatformActions.loadMyPlatformAccountsFailure({ error: err.message }))),
         ),
       ),
     ),
   );
 
-  connectSuccess$ = createEffect(
+  linkPlatformAccount$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(PlatformActions.linkPlatformAccount),
+      switchMap(({ accountId, workspaceId }) =>
+        this.platformGql.linkPlatformAccount(accountId, workspaceId).pipe(
+          map(account => PlatformActions.linkPlatformAccountSuccess({ account })),
+          catchError(err => of(PlatformActions.linkPlatformAccountFailure({ error: err.message }))),
+        ),
+      ),
+    ),
+  );
+
+  linkSuccess$ = createEffect(
     () => this.actions$.pipe(
-      ofType(PlatformActions.connectPlatformAccountSuccess),
-      tap(() => this.toast.show('Account connected successfully!', 'success')),
+      ofType(PlatformActions.linkPlatformAccountSuccess),
+      tap(() => this.toast.show('Account linked to workspace.', 'success')),
     ),
     { dispatch: false },
   );
 
-  connectFailure$ = createEffect(
+  linkFailure$ = createEffect(
     () => this.actions$.pipe(
-      ofType(PlatformActions.connectPlatformAccountFailure),
-      tap(({ error }) => this.toast.show(error || 'Failed to connect account.', 'error')),
+      ofType(PlatformActions.linkPlatformAccountFailure),
+      tap(({ error }) => this.toast.show(error || 'Failed to link account.', 'error')),
+    ),
+    { dispatch: false },
+  );
+
+  unlinkPlatformAccount$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(PlatformActions.unlinkPlatformAccount),
+      switchMap(({ accountId, workspaceId }) =>
+        this.platformGql.unlinkPlatformAccount(accountId, workspaceId).pipe(
+          map(account => PlatformActions.unlinkPlatformAccountSuccess({ account })),
+          catchError(err => of(PlatformActions.unlinkPlatformAccountFailure({ error: err.message }))),
+        ),
+      ),
+    ),
+  );
+
+  unlinkSuccess$ = createEffect(
+    () => this.actions$.pipe(
+      ofType(PlatformActions.unlinkPlatformAccountSuccess),
+      tap(() => this.toast.show('Account unlinked from workspace.', 'info')),
     ),
     { dispatch: false },
   );

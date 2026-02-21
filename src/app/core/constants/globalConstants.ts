@@ -44,6 +44,10 @@ export const GLOBAL_CONSTANTS = {
     POST_UPDATED: 'Post updated successfully!',
     POST_DELETE_FAILED: 'Failed to delete the post. Your changes have been restored.',
     POST_CREATE_FAILED: 'Failed to create the post. Please try again.',
+    POST_SUBMITTED: 'Post submitted for approval.',
+    POST_APPROVED: 'Post approved successfully!',
+    POST_REJECTED: 'Post has been rejected.',
+    POST_APPROVAL_FAILED: 'Failed to update approval status. Please try again.',
   },
   ERROR_PAGE: {
     TITLE: 'Something went wrong',

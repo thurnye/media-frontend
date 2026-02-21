@@ -2,10 +2,13 @@ export type PostStatus =
   | 'draft'
   | 'pending_approval'
   | 'approved'
+  | 'rejected'
   | 'scheduled'
+  | 'publishing'
   | 'partially_published'
   | 'published'
   | 'failed'
+  | 'cancelled'
   | 'archived';
 
 export type PriorityLevel = 'low' | 'medium' | 'high';
@@ -26,6 +29,19 @@ export type PostCategory =
   | 'seasonal'
   | 'others';
 
+export interface IApprovalComment {
+  userId: string;
+  message: string;
+  createdAt: string;
+}
+
+export interface IApprovalWorkflow {
+  requiredApprovers?: string[];
+  approvedBy?: string[];
+  rejectedBy?: string[];
+  comments?: IApprovalComment[];
+}
+
 export interface IPost {
   id:          string;
   workspaceId: string;
@@ -37,6 +53,7 @@ export interface IPost {
   status?:     PostStatus;
   priority?:   PriorityLevel;
   isEvergreen?: boolean;
+  approvalWorkflow?: IApprovalWorkflow;
   isActive?:   boolean;
   createdAt?:  string;
   updatedAt?:  string;

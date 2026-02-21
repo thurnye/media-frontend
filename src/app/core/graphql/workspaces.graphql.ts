@@ -34,6 +34,9 @@ export const GET_WORKSPACE_QUERY = gql`
         userId
         role
         joinedAt
+        firstName
+        lastName
+        avatarUrl
       }
       settings {
         approvalRequired
@@ -113,6 +116,9 @@ export const ADD_WORKSPACE_MEMBER = gql`
         userId
         role
         joinedAt
+        firstName
+        lastName
+        avatarUrl
       }
     }
   }
@@ -126,6 +132,9 @@ export const REMOVE_WORKSPACE_MEMBER = gql`
         userId
         role
         joinedAt
+        firstName
+        lastName
+        avatarUrl
       }
     }
   }
