@@ -1,0 +1,44 @@
+<div class="fb-card">
+
+  <!-- HEADER -->
+  <div class="fb-header">
+    <img [src]="profileImage" alt="profile">
+    <div class="fb-user-info">
+      <strong>{{ profileName }}</strong>
+      <span class="fb-time">Just now · 🌎</span>
+    </div>
+  </div>
+
+  <!-- CAPTION -->
+  <div class="fb-caption" *ngIf="caption">
+    {{ caption }}
+  </div>
+
+  <!-- MEDIA -->
+  <div
+    class="fb-media"
+    [ngClass]="{
+      'feed-vertical': type === 'feed-image',
+      'feed-video': type === 'feed-video',
+      'reel': type === 'reel'
+    }"
+    *ngIf="type !== 'text'"
+  >
+    <!-- IMAGE -->
+    <img *ngIf="type === 'feed-image'" [src]="mediaUrl" />
+
+    <!-- VIDEO -->
+    <video *ngIf="type === 'feed-video'" [src]="mediaUrl" controls></video>
+
+    <!-- REEL -->
+    <video *ngIf="type === 'reel'" [src]="mediaUrl" controls></video>
+  </div>
+
+  <!-- ACTION BAR -->
+  <div class="fb-actions">
+    <span>👍 Like</span>
+    <span>💬 Comment</span>
+    <span>↗ Share</span>
+  </div>
+
+</div>

@@ -17,6 +17,24 @@ export interface IWorkspaceMember {
   avatarUrl?: string;
 }
 
+export interface IWorkspaceInvitation {
+  id:          string;
+  workspaceId: string;
+  email:       string;
+  role:        string;
+  status:      string;
+  expiresAt?:  string;
+  createdAt?:  string;
+}
+
+export interface IMemberSuggestion {
+  userId:    string;
+  email:     string;
+  firstName: string;
+  lastName:  string;
+  avatarUrl?: string;
+}
+
 export interface IWorkspace {
   id:               string;
   name:             string;

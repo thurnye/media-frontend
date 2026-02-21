@@ -4,7 +4,11 @@ import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { PostActions } from '../../../store/post/post.actions';
-import { selectPostError, selectPostLoading, selectSelectedPost } from '../../../store/post/post.selectors';
+import {
+  selectPostError,
+  selectPostLoading,
+  selectSelectedPost,
+} from '../../../store/post/post.selectors';
 import { selectUser } from '../../../store/auth/auth.selectors';
 import { PostPublishDialog } from '../post-publish-dialog/post-publish-dialog';
 
@@ -15,24 +19,26 @@ import { PostPublishDialog } from '../post-publish-dialog/post-publish-dialog';
   styleUrl: './post-detail.css',
 })
 export class PostDetail implements OnInit, OnDestroy {
-  private store  = inject(Store);
-  private route  = inject(ActivatedRoute);
+  private store = inject(Store);
+  private route = inject(ActivatedRoute);
   private router = inject(Router);
 
-  post        = this.store.selectSignal(selectSelectedPost);
-  loading     = this.store.selectSignal(selectPostLoading);
-  error       = this.store.selectSignal(selectPostError);
+  post = this.store.selectSignal(selectSelectedPost);
+  loading = this.store.selectSignal(selectPostLoading);
+  error = this.store.selectSignal(selectPostError);
   currentUser = this.store.selectSignal(selectUser);
   workspaceId = signal('');
 
   showRejectDialog = signal(false);
   showPublishDialog = signal(false);
   rejectReason = signal('');
+  showMenu = signal(false);
 
   ngOnInit(): void {
-    const wsId = this.route.parent?.snapshot.paramMap.get('workspaceId')
-              ?? this.route.snapshot.paramMap.get('workspaceId')
-              ?? '';
+    const wsId =
+      this.route.parent?.snapshot.paramMap.get('workspaceId') ??
+      this.route.snapshot.paramMap.get('workspaceId') ??
+      '';
     this.workspaceId.set(wsId);
 
     const id = this.route.snapshot.paramMap.get('postId')!;
@@ -50,11 +56,25 @@ export class PostDetail implements OnInit, OnDestroy {
 
   getStatusLabel(status?: string): string {
     if (!status) return 'Draft';
-    return status.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+    return status.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+  }
+
+  toggleMenu(): void {
+    this.showMenu.update((v) => !v);
+  }
+
+  closeMenu(): void {
+    this.showMenu.set(false);
   }
 
   onEdit(): void {
-    this.router.navigate(['/dashboard/workspace', this.workspaceId(), 'post', this.post()!.id, 'edit']);
+    this.router.navigate([
+      '/dashboard/workspace',
+      this.workspaceId(),
+      'post',
+      this.post()!.id,
+      'edit',
+    ]);
   }
 
   onDelete(): void {

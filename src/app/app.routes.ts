@@ -15,6 +15,7 @@ import { Workspace } from './pages/workspace-environment/workspace/workspace';
 import { WorkspaceMembers } from './pages/workspace-environment/workspace-members/workspace-members';
 import { WorkspaceAnalytics } from './pages/workspace-environment/workspace-analytics/workspace-analytics';
 import { WorkspaceSettings } from './pages/workspace-environment/workspace-settings/workspace-settings';
+import { AcceptInvite } from './pages/invite/accept-invite';
 
 export const routes: Routes = [
   {
@@ -33,6 +34,10 @@ export const routes: Routes = [
   {
     path: 'signup',
     component: Signup,
+  },
+  {
+    path: 'invite/accept',
+    component: AcceptInvite,
   },
   {
     path: 'error',

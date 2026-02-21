@@ -139,3 +139,57 @@ export const REMOVE_WORKSPACE_MEMBER = gql`
     }
   }
 `;
+
+export const SUGGEST_MEMBERS_QUERY = gql`
+  query SuggestMembers($workspaceId: ID!, $query: String!) {
+    suggestMembers(workspaceId: $workspaceId, query: $query) {
+      userId
+      email
+      firstName
+      lastName
+      avatarUrl
+    }
+  }
+`;
+
+export const INVITE_TO_WORKSPACE_MUTATION = gql`
+  mutation InviteToWorkspace($workspaceId: ID!, $email: String!, $role: String!) {
+    inviteToWorkspace(workspaceId: $workspaceId, email: $email, role: $role) {
+      id
+      email
+      role
+      status
+    }
+  }
+`;
+
+export const GET_WORKSPACE_INVITATIONS_QUERY = gql`
+  query WorkspaceInvitations($workspaceId: ID!) {
+    workspaceInvitations(workspaceId: $workspaceId) {
+      id
+      workspaceId
+      email
+      role
+      status
+      expiresAt
+      createdAt
+    }
+  }
+`;
+
+export const REVOKE_INVITATION_MUTATION = gql`
+  mutation RevokeInvitation($workspaceId: ID!, $email: String!) {
+    revokeInvitation(workspaceId: $workspaceId, email: $email)
+  }
+`;
+
+export const ACCEPT_INVITATION_MUTATION = gql`
+  mutation AcceptInvitation($token: String!) {
+    acceptInvitation(token: $token) {
+      id
+      name
+      slug
+      ownerId
+    }
+  }
+`;

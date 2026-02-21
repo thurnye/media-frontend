@@ -1,15 +1,19 @@
 import { inject, Injectable } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
+import { Store } from '@ngrx/store';
 import { catchError, map, of, switchMap, tap } from 'rxjs';
 import { AuthGqlService } from '../../core/services/auth.gql.service';
 import { AuthActions } from './auth.actions';
+import { WorkspaceActions } from '../workspace/workspace.actions';
 
 @Injectable()
 export class AuthEffects {
   private actions$ = inject(Actions);
   private authGql  = inject(AuthGqlService);
   private router   = inject(Router);
+  private route    = inject(ActivatedRoute);
+  private store    = inject(Store);
 
   restoreSession$ = createEffect(() =>
     this.actions$.pipe(
@@ -38,7 +42,14 @@ export class AuthEffects {
   loginSuccess$ = createEffect(
     () => this.actions$.pipe(
       ofType(AuthActions.loginSuccess),
-      tap(() => this.router.navigate(['/dashboard'])),
+      tap(() => {
+        const invite = this.route.snapshot.queryParamMap.get('invite');
+        if (invite) {
+          this.store.dispatch(WorkspaceActions.acceptInvitation({ token: invite }));
+        } else {
+          this.router.navigate(['/dashboard']);
+        }
+      }),
     ),
     { dispatch: false },
   );
@@ -58,7 +69,14 @@ export class AuthEffects {
   signupSuccess$ = createEffect(
     () => this.actions$.pipe(
       ofType(AuthActions.signupSuccess),
-      tap(() => this.router.navigate(['/dashboard'])),
+      tap(() => {
+        const invite = this.route.snapshot.queryParamMap.get('invite');
+        if (invite) {
+          this.store.dispatch(WorkspaceActions.acceptInvitation({ token: invite }));
+        } else {
+          this.router.navigate(['/dashboard']);
+        }
+      }),
     ),
     { dispatch: false },
   );

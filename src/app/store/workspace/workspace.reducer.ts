@@ -52,6 +52,31 @@ export const workspaceReducer = createReducer(
   })),
   on(WorkspaceActions.removeMemberFailure, (state, { error }) => ({ ...state, saving: false, error })),
 
+  // Invite to workspace
+  on(WorkspaceActions.inviteToWorkspace,        state          => ({ ...state, saving: true,  error: null })),
+  on(WorkspaceActions.inviteToWorkspaceSuccess, state          => ({ ...state, saving: false })),
+  on(WorkspaceActions.inviteToWorkspaceFailure, (state, { error }) => ({ ...state, saving: false, error })),
+
+  // Load pending invitations
+  on(WorkspaceActions.loadInvitationsSuccess, (state, { invitations }) => ({ ...state, invitations })),
+  on(WorkspaceActions.loadInvitationsFailure, (state, { error }) => ({ ...state, error })),
+
+  // Revoke invitation
+  on(WorkspaceActions.revokeInvitation,        state          => ({ ...state, saving: true,  error: null })),
+  on(WorkspaceActions.revokeInvitationSuccess, (state, { email }) => ({
+    ...state, saving: false,
+    invitations: state.invitations.filter(inv => inv.email !== email),
+  })),
+  on(WorkspaceActions.revokeInvitationFailure, (state, { error }) => ({ ...state, saving: false, error })),
+
+  // Accept invitation
+  on(WorkspaceActions.acceptInvitation,        state                  => ({ ...state, loading: true,  error: null })),
+  on(WorkspaceActions.acceptInvitationSuccess, (state, { workspace }) => ({
+    ...state, loading: false,
+    workspaces: [...state.workspaces, { id: workspace.id, name: workspace.name, slug: workspace.slug }],
+  })),
+  on(WorkspaceActions.acceptInvitationFailure, (state, { error })     => ({ ...state, loading: false, error })),
+
   // Logout — clear everything
   on(AuthActions.logout, () => initialWorkspaceState),
 );

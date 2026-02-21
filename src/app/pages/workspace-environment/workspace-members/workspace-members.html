@@ -22,20 +22,24 @@
   </div>
 
   <!-- Owner row -->
-  @if (workspace()?.ownerId) {
+  @if (ownerMember(); as owner) {
     <div class="wm-row">
       <div class="wm-cell wm-cell--user">
-        <span class="wm-avatar">O</span>
+        @if (owner.avatarUrl) {
+          <img class="wm-avatar wm-avatar--img" [src]="owner.avatarUrl" [alt]="getFullName(owner)" />
+        } @else {
+          <span class="wm-avatar">{{ getInitials(owner) }}</span>
+        }
         <div class="wm-user-info">
-          <span class="wm-user-name">{{ workspace()!.ownerId }}</span>
-          <span class="wm-user-email">Owner</span>
+          <span class="wm-user-name">{{ getFullName(owner) }}</span>
+          <span class="wm-user-email">Admin</span>
         </div>
       </div>
       <div class="wm-cell wm-cell--role">
-        <span class="wm-role-badge wm-role-badge--owner">Owner</span>
+        <span class="wm-role-badge wm-role-badge--admin">Admin</span>
       </div>
       <div class="wm-cell wm-cell--joined">
-        <span class="wm-date">{{ formatDate(workspace()!.createdAt) }}</span>
+        <span class="wm-date">{{ formatDate(owner.joinedAt) }}</span>
       </div>
       <div class="wm-cell wm-cell--actions">
         <span class="wm-actions-placeholder">—</span>
@@ -44,12 +48,16 @@
   }
 
   <!-- Member rows -->
-  @for (member of workspace()?.members; track member.userId) {
+  @for (member of otherMembers(); track member.userId) {
     <div class="wm-row">
       <div class="wm-cell wm-cell--user">
-        <span class="wm-avatar wm-avatar--blue">{{ getInitials(member.userId) }}</span>
+        @if (member.avatarUrl) {
+          <img class="wm-avatar wm-avatar--img" [src]="member.avatarUrl" [alt]="getFullName(member)" />
+        } @else {
+          <span class="wm-avatar wm-avatar--blue">{{ getInitials(member) }}</span>
+        }
         <div class="wm-user-info">
-          <span class="wm-user-name">{{ member.userId }}</span>
+          <span class="wm-user-name">{{ getFullName(member) }}</span>
           <span class="wm-user-email">{{ member.role }}</span>
         </div>
       </div>
@@ -73,23 +81,76 @@
       </div>
     </div>
   } @empty {
-    @if (!workspace()?.ownerId) {
+    @if (!ownerMember()) {
       <div class="wm-empty">No members yet. Invite someone to get started.</div>
     }
   }
 </div>
 
+<!-- ── Pending invitations ── -->
+@if (pendingInvitations().length > 0) {
+  <div class="wm-card">
+    <div class="wm-section-header">
+      <h2 class="wm-section-title">Pending Invitations</h2>
+      <span class="wm-section-count">{{ pendingInvitations().length }}</span>
+    </div>
+    <div class="wm-table-head">
+      <span class="wm-th wm-th--user">Email</span>
+      <span class="wm-th wm-th--role">Role</span>
+      <span class="wm-th wm-th--joined">Sent</span>
+      <span class="wm-th wm-th--actions"></span>
+    </div>
+    @for (inv of pendingInvitations(); track inv.id) {
+      <div class="wm-row">
+        <div class="wm-cell wm-cell--user">
+          <span class="wm-avatar wm-avatar--pending">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+              <path d="M2 2a2 2 0 0 0-2 2v8.01A2 2 0 0 0 2 14h5.5a.5.5 0 0 0 0-1H2a1 1 0 0 1-.966-.741l5.64-3.471L8 9.583l7-4.2V8.5a.5.5 0 0 0 1 0V4a2 2 0 0 0-2-2zm3.708 6.208L1 11.105V5.383zM1 4.217V4a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v.217l-7 4.2z"/>
+              <path d="M16 12.5a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0m-3.5-2a.5.5 0 0 0-.5.5v1.5a.5.5 0 0 0 1 0V11a.5.5 0 0 0-.5-.5m0 4a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1"/>
+            </svg>
+          </span>
+          <div class="wm-user-info">
+            <span class="wm-user-name">{{ inv.email }}</span>
+            <span class="wm-user-email wm-status-pending">Pending</span>
+          </div>
+        </div>
+        <div class="wm-cell wm-cell--role">
+          <span class="wm-role-badge" [class]="'wm-role-badge wm-role-badge--' + inv.role">
+            {{ inv.role }}
+          </span>
+        </div>
+        <div class="wm-cell wm-cell--joined">
+          <span class="wm-date">{{ formatDate(inv.createdAt) }}</span>
+        </div>
+        <div class="wm-cell wm-cell--actions">
+          @if (isOwner()) {
+            <button
+              class="wm-action-btn wm-action-btn--remove"
+              title="Cancel invitation"
+              (click)="onRevokeInvitation(inv.email)"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
+                <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708"/>
+              </svg>
+            </button>
+          }
+        </div>
+      </div>
+    }
+  </div>
+}
+
 <!-- ── Roles legend ── -->
 <div class="wm-legend-card">
   <h2 class="wm-legend-title">Role Permissions</h2>
   <div class="wm-legend-grid">
-    <div class="wm-legend-item">
+    <!-- <div class="wm-legend-item">
       <span class="wm-role-badge wm-role-badge--owner">Owner</span>
       <span class="wm-legend-desc">Full access. Can manage billing, delete workspace, and transfer ownership.</span>
-    </div>
+    </div> -->
     <div class="wm-legend-item">
       <span class="wm-role-badge wm-role-badge--admin">Admin</span>
-      <span class="wm-legend-desc">Can manage members, settings, and all content within the workspace.</span>
+      <span class="wm-legend-desc">Full access. Can manage members, settings, transfer ownership and all content within the workspace.</span>
     </div>
     <div class="wm-legend-item">
       <span class="wm-role-badge wm-role-badge--manager">Manager</span>

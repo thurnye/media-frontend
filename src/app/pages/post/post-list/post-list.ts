@@ -1,4 +1,14 @@
-import { AfterViewInit, Component, effect, ElementRef, inject, OnDestroy, OnInit, signal, ViewChild } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  effect,
+  ElementRef,
+  inject,
+  OnDestroy,
+  OnInit,
+  signal,
+  ViewChild,
+} from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { PostActions } from '../../../store/post/post.actions';
@@ -20,25 +30,26 @@ import { selectUser } from '../../../store/auth/auth.selectors';
   styleUrl: './post-list.css',
 })
 export class PostList implements OnInit, AfterViewInit, OnDestroy {
-  private store  = inject(Store);
+  private store = inject(Store);
   private router = inject(Router);
-  private route  = inject(ActivatedRoute);
+  private route = inject(ActivatedRoute);
 
-  posts        = this.store.selectSignal(selectPosts);
-  loading      = this.store.selectSignal(selectPostLoading);
-  loadingMore  = this.store.selectSignal(selectPostLoadingMore);
-  error        = this.store.selectSignal(selectPostError);
-  page         = this.store.selectSignal(selectPostsPage);
-  hasMore      = this.store.selectSignal(selectPostsHasMore);
-  currentUser  = this.store.selectSignal(selectUser);
+  posts = this.store.selectSignal(selectPosts);
+  loading = this.store.selectSignal(selectPostLoading);
+  loadingMore = this.store.selectSignal(selectPostLoadingMore);
+  error = this.store.selectSignal(selectPostError);
+  page = this.store.selectSignal(selectPostsPage);
+  hasMore = this.store.selectSignal(selectPostsHasMore);
+  currentUser = this.store.selectSignal(selectUser);
   selectedPost = this.store.selectSignal(selectSelectedPost);
 
   /** ID of the post whose detail panel is open (desktop only) */
   selectedPostId = signal<string | null>(null);
-  panelLoading   = signal(false);
-  workspaceId    = signal('');
+  panelLoading = signal(false);
+  workspaceId = signal('');
 
   readonly limit = 6;
+  showMenu = signal(false);
 
   @ViewChild('scrollSentinel') private sentinelRef!: ElementRef<HTMLElement>;
   private observer: IntersectionObserver | null = null;
@@ -54,9 +65,10 @@ export class PostList implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    const wsId = this.route.parent?.snapshot.paramMap.get('workspaceId')
-              ?? this.route.snapshot.paramMap.get('workspaceId')
-              ?? '';
+    const wsId =
+      this.route.parent?.snapshot.paramMap.get('workspaceId') ??
+      this.route.snapshot.paramMap.get('workspaceId') ??
+      '';
     this.workspaceId.set(wsId);
     this.store.dispatch(PostActions.loadPosts({ workspaceId: wsId, page: 1, limit: this.limit }));
   }
@@ -66,11 +78,13 @@ export class PostList implements OnInit, AfterViewInit, OnDestroy {
       (entries) => {
         const entry = entries[0];
         if (entry.isIntersecting && this.hasMore() && !this.loading() && !this.loadingMore()) {
-          this.store.dispatch(PostActions.loadMorePosts({
-            workspaceId: this.workspaceId(),
-            page: this.page() + 1,
-            limit: this.limit,
-          }));
+          this.store.dispatch(
+            PostActions.loadMorePosts({
+              workspaceId: this.workspaceId(),
+              page: this.page() + 1,
+              limit: this.limit,
+            }),
+          );
         }
       },
       { threshold: 0.1 },
@@ -90,8 +104,8 @@ export class PostList implements OnInit, AfterViewInit, OnDestroy {
   }
 
   /** Desktop: open split panel. Mobile: navigate to detail page. */
-  onCardClick(id: string): void {
-    if (window.innerWidth >= 768) {
+  onCardClick(id: string, bypass?: boolean): void {
+    if (window.innerWidth >= 768 && !bypass) {
       this.selectedPostId.set(id);
       this.panelLoading.set(true);
       this.store.dispatch(PostActions.clearSelectedPost());
@@ -106,11 +120,19 @@ export class PostList implements OnInit, AfterViewInit, OnDestroy {
     this.store.dispatch(PostActions.clearSelectedPost());
   }
 
+  toggleMenu(): void {
+    this.showMenu.update((v) => !v);
+  }
+
+  closeMenu(): void {
+    this.showMenu.set(false);
+  }
+
   onDelete(id: string, event: Event): void {
     event.stopPropagation();
     if (!confirm('Delete this post? This cannot be undone.')) return;
 
-    const post = this.posts().find(p => p.id === id);
+    const post = this.posts().find((p) => p.id === id);
     if (!post) return;
 
     this.store.dispatch(PostActions.deletePost({ id, post }));
@@ -126,6 +148,6 @@ export class PostList implements OnInit, AfterViewInit, OnDestroy {
 
   getStatusLabel(status?: string): string {
     if (!status) return 'Draft';
-    return status.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+    return status.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
   }
 }

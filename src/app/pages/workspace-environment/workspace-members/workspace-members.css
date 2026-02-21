@@ -102,6 +102,11 @@
 .wm-avatar--blue  { background: #3b82f6; }
 .wm-avatar--green { background: #22c55e; }
 
+.wm-avatar--img {
+  object-fit: cover;
+  background: none;
+}
+
 .wm-user-name {
   display: block;
   font-size: 0.875rem;
@@ -169,6 +174,45 @@
 .wm-action-btn--remove:hover {
   color: #dc2626;
   background: #fef2f2;
+}
+
+/* ── Section header (pending invitations) ───────────────────── */
+.wm-section-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.875rem 1.25rem;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.wm-section-title {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin: 0;
+}
+
+.wm-section-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 0.375rem;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: #92400e;
+  background: #fef3c7;
+  border-radius: 999px;
+}
+
+.wm-avatar--pending {
+  background: #f3f4f6;
+  color: #6c757d;
+}
+
+.wm-status-pending {
+  color: #d97706;
 }
 
 /* ── Empty state ────────────────────────────────────────────── */

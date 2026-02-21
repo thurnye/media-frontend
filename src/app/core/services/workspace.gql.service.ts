@@ -2,12 +2,18 @@ import { inject, Injectable } from '@angular/core';
 import { Apollo } from 'apollo-angular';
 import { map } from 'rxjs';
 import { IWorkspace } from '../interfaces/workspace';
+import { IMemberSuggestion, IWorkspaceInvitation } from '../interfaces/workspace';
 import {
+  ACCEPT_INVITATION_MUTATION,
   ADD_WORKSPACE_MEMBER,
   CREATE_WORKSPACE_MUTATION,
+  GET_WORKSPACE_INVITATIONS_QUERY,
   GET_WORKSPACE_QUERY,
   GET_WORKSPACES_QUERY,
+  INVITE_TO_WORKSPACE_MUTATION,
   REMOVE_WORKSPACE_MEMBER,
+  REVOKE_INVITATION_MUTATION,
+  SUGGEST_MEMBERS_QUERY,
   UPDATE_WORKSPACE_MUTATION,
 } from '../graphql/workspaces.graphql';
 
@@ -87,5 +93,52 @@ export class WorkspaceGqlService {
         variables: { workspaceId, userId },
       })
       .pipe(map(r => r.data!.removeWorkspaceMember));
+  }
+
+  suggestMembers(workspaceId: string, query: string) {
+    return this.apollo
+      .query<{ suggestMembers: IMemberSuggestion[] }>({
+        query: SUGGEST_MEMBERS_QUERY,
+        variables: { workspaceId, query },
+        fetchPolicy: 'no-cache',
+      })
+      .pipe(map(r => r.data!.suggestMembers));
+  }
+
+  inviteToWorkspace(workspaceId: string, email: string, role: string) {
+    return this.apollo
+      .mutate<{ inviteToWorkspace: IWorkspaceInvitation }>({
+        mutation: INVITE_TO_WORKSPACE_MUTATION,
+        variables: { workspaceId, email, role },
+      })
+      .pipe(map(r => r.data!.inviteToWorkspace));
+  }
+
+  getWorkspaceInvitations(workspaceId: string) {
+    return this.apollo
+      .query<{ workspaceInvitations: IWorkspaceInvitation[] }>({
+        query: GET_WORKSPACE_INVITATIONS_QUERY,
+        variables: { workspaceId },
+        fetchPolicy: 'no-cache',
+      })
+      .pipe(map(r => r.data!.workspaceInvitations));
+  }
+
+  revokeInvitation(workspaceId: string, email: string) {
+    return this.apollo
+      .mutate<{ revokeInvitation: boolean }>({
+        mutation: REVOKE_INVITATION_MUTATION,
+        variables: { workspaceId, email },
+      })
+      .pipe(map(r => r.data!.revokeInvitation));
+  }
+
+  acceptInvitation(token: string) {
+    return this.apollo
+      .mutate<{ acceptInvitation: IWorkspace }>({
+        mutation: ACCEPT_INVITATION_MUTATION,
+        variables: { token },
+      })
+      .pipe(map(r => r.data!.acceptInvitation));
   }
 }

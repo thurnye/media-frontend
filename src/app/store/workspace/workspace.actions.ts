@@ -1,5 +1,5 @@
 import { createActionGroup, emptyProps, props } from '@ngrx/store';
-import { IWorkspace } from '../../core/interfaces/workspace';
+import { IWorkspace, IWorkspaceInvitation } from '../../core/interfaces/workspace';
 import { ICreateWorkspaceInput, IUpdateWorkspaceInput } from '../../core/services/workspace.gql.service';
 
 export const WorkspaceActions = createActionGroup({
@@ -33,5 +33,25 @@ export const WorkspaceActions = createActionGroup({
     'Remove Member':         props<{ workspaceId: string; userId: string }>(),
     'Remove Member Success': props<{ workspace: IWorkspace }>(),
     'Remove Member Failure': props<{ error: string }>(),
+
+    // Invite to workspace
+    'Invite To Workspace':         props<{ workspaceId: string; email: string; role: string }>(),
+    'Invite To Workspace Success': props<{ workspaceId: string }>(),
+    'Invite To Workspace Failure': props<{ error: string }>(),
+
+    // Load pending invitations
+    'Load Invitations':         props<{ workspaceId: string }>(),
+    'Load Invitations Success': props<{ invitations: IWorkspaceInvitation[] }>(),
+    'Load Invitations Failure': props<{ error: string }>(),
+
+    // Revoke invitation
+    'Revoke Invitation':         props<{ workspaceId: string; email: string }>(),
+    'Revoke Invitation Success': props<{ email: string }>(),
+    'Revoke Invitation Failure': props<{ error: string }>(),
+
+    // Accept invitation
+    'Accept Invitation':         props<{ token: string }>(),
+    'Accept Invitation Success': props<{ workspace: IWorkspace }>(),
+    'Accept Invitation Failure': props<{ error: string }>(),
   },
 });

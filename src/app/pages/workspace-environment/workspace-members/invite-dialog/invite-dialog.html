@@ -10,17 +10,46 @@
     </div>
 
     <div class="id-body">
-      <label class="id-label" for="userId">User ID</label>
-      <input
-        id="userId"
-        class="id-input"
-        type="text"
-        placeholder="Enter user ID"
-        [ngModel]="userId()"
-        (ngModelChange)="userId.set($event)"
-      />
+      <label class="id-label" for="email">Email address</label>
+      <div class="id-autocomplete">
+        <input
+          id="email"
+          class="id-input"
+          type="email"
+          placeholder="Enter email address"
+          autocomplete="off"
+          [ngModel]="email()"
+          (ngModelChange)="onEmailInput($event)"
+          (blur)="onInputBlur()"
+          (focus)="onInputFocus()"
+        />
 
-      <label class="id-label" for="role">Role</label>
+        @if (showDropdown()) {
+          <div class="id-suggestions">
+            @for (s of suggestions(); track s.userId) {
+              <button
+                class="id-suggestion"
+                type="button"
+                (mousedown)="onSelectSuggestion(s)"
+              >
+                <div class="id-suggestion-avatar">
+                  @if (s.avatarUrl) {
+                    <img [src]="s.avatarUrl" [alt]="s.firstName" class="id-suggestion-avatar-img" />
+                  } @else {
+                    <span class="id-suggestion-initials">{{ getInitials(s) }}</span>
+                  }
+                </div>
+                <div class="id-suggestion-info">
+                  <span class="id-suggestion-name">{{ s.firstName }} {{ s.lastName }}</span>
+                  <span class="id-suggestion-email">{{ s.email }}</span>
+                </div>
+              </button>
+            }
+          </div>
+        }
+      </div>
+
+      <label class="id-label id-label--role" for="role">Role</label>
       <select
         id="role"
         class="id-select"
@@ -38,13 +67,13 @@
       <button
         class="id-btn id-btn--invite"
         (click)="onInvite()"
-        [disabled]="!userId().trim() || saving()"
+        [disabled]="!email().trim() || saving()"
         type="button"
       >
         @if (saving()) {
-          Inviting...
+          Sending...
         } @else {
-          Invite
+          Send Invitation
         }
       </button>
     </div>

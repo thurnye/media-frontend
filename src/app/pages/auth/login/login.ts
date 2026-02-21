@@ -1,7 +1,7 @@
 import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { form, FormField } from '@angular/forms/signals';
-import { RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { ILogin } from '../../../core/interfaces/auth';
 import { loginFormValidation } from '../../../shared/validation/authValidation';
@@ -16,12 +16,16 @@ import { selectError, selectLoading } from '../../../store/auth/auth.selectors';
 })
 export class Login {
   private store = inject(Store);
+  private route = inject(ActivatedRoute);
 
   loginModel = signal<ILogin>({ email: '', password: '' });
   loginForm  = form(this.loginModel, loginFormValidation);
 
   loading = this.store.selectSignal(selectLoading);
   error   = this.store.selectSignal(selectError);
+
+  /** Preserve invite token for signup link */
+  inviteToken = this.route.snapshot.queryParamMap.get('invite');
 
   onLogin() {
     if (this.loginForm().invalid()) return;
