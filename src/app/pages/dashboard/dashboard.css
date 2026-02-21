@@ -1,0 +1,359 @@
+/* ── Shell ── */
+.ds-shell {
+  display: flex;
+  height: calc(100vh - 56px);   /* full viewport minus Bootstrap navbar */
+  margin: 0 -0.75rem;           /* cancel container-fluid gutter */
+  overflow: hidden;
+  background: #f4f5f7;
+}
+
+/* ── Sidebar ── */
+.ds-sidebar {
+  width: 260px;
+  flex-shrink: 0;
+  background: #fff;
+  border-right: 1.5px solid #e9ecef;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  z-index: 100;
+}
+
+/* ── Brand ── */
+.ds-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 1.1rem 1.25rem 1rem;
+  border-bottom: 1px solid #f0f0f0;
+  flex-shrink: 0;
+}
+
+.ds-brand-logo {
+  width: 32px;
+  height: 32px;
+  background: #212529;
+  color: #fff;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.ds-brand-name {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #212529;
+  flex: 1;
+}
+
+.ds-close-btn {
+  display: none;
+  border: none;
+  background: none;
+  color: #6c757d;
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 6px;
+  line-height: 1;
+  align-items: center;
+  justify-content: center;
+}
+
+.ds-close-btn:hover { background: #f3f4f6; color: #212529; }
+
+/* ── Navigation ── */
+.ds-nav {
+  flex: 1;
+  padding: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  overflow-y: auto;
+}
+
+.ds-nav-section {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #adb5bd;
+  padding: 0.75rem 0.75rem 0.3rem;
+}
+
+/* ── Workspace section header row ── */
+.ds-nav-section-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-right: 0.5rem;
+}
+
+.ds-nav-section-row .ds-nav-section {
+  padding-right: 0;
+  flex: 1;
+}
+
+.ds-nav-add-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  color: #adb5bd;
+  text-decoration: none;
+  transition: background 0.15s, color 0.15s;
+}
+
+.ds-nav-add-btn:hover { background: #f3f4f6; color: #212529; }
+
+/* ── Workspace nav links ── */
+.ds-nav-link--ws { padding: 0.45rem 0.75rem; }
+
+.ds-ws-icon {
+  width: 22px;
+  height: 22px;
+  background: #e9ecef;
+  color: #495057;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.72rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.ds-nav-link--active .ds-ws-icon { background: rgba(255,255,255,0.2); color: #fff; }
+
+.ds-ws-name {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 0.845rem;
+}
+
+/* ── Empty state ── */
+.ds-ws-empty {
+  font-size: 0.78rem;
+  color: #adb5bd;
+  padding: 0.4rem 0.75rem 0.6rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.ds-ws-empty-link {
+  color: #6c757d;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.78rem;
+}
+
+.ds-ws-empty-link:hover { color: #212529; text-decoration: underline; }
+
+/* ── Loading dots ── */
+.ds-ws-loading {
+  display: flex;
+  gap: 0.3rem;
+  padding: 0.5rem 0.75rem;
+}
+
+.ds-ws-dot {
+  width: 6px;
+  height: 6px;
+  background: #dee2e6;
+  border-radius: 50%;
+  animation: ds-pulse 1.2s ease-in-out infinite;
+}
+
+.ds-ws-dot:nth-child(2) { animation-delay: 0.2s; }
+.ds-ws-dot:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes ds-pulse {
+  0%, 100% { opacity: 0.3; }
+  50%       { opacity: 1; }
+}
+
+.ds-nav-link {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.55rem 0.75rem;
+  border-radius: 8px;
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #495057;
+  transition: background 0.15s, color 0.15s;
+  cursor: pointer;
+}
+
+.ds-nav-link:hover { background: #f3f4f6; color: #212529; }
+
+.ds-nav-link--active { background: #212529 !important; color: #fff !important; }
+.ds-nav-link--active:hover { background: #212529; color: #fff; }
+
+/* ── Sidebar Footer ── */
+.ds-sidebar-footer {
+  padding: 0.75rem 1rem;
+  border-top: 1px solid #f0f0f0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.ds-user {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.ds-user-avatar {
+  width: 34px;
+  height: 34px;
+  background: #212529;
+  color: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.72rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.ds-user-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.ds-user-name {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #212529;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ds-user-email {
+  font-size: 0.72rem;
+  color: #9ca3af;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ds-logout-btn {
+  border: none;
+  background: none;
+  color: #9ca3af;
+  cursor: pointer;
+  padding: 0.35rem;
+  border-radius: 6px;
+  line-height: 1;
+  flex-shrink: 0;
+  transition: background 0.15s, color 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ds-logout-btn:hover { background: #fee2e2; color: #ef4444; }
+
+/* ── Backdrop (mobile) ── */
+.ds-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 99;
+  opacity: 0;
+  pointer-events: none;   /* don't block clicks when invisible */
+  transition: opacity 0.25s;
+}
+
+.ds-backdrop.visible {
+  opacity: 1;
+  pointer-events: auto;   /* capture clicks to close sidebar */
+}
+
+/* ── Main area ── */
+.ds-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+/* ── Topbar (mobile only) ── */
+.ds-topbar {
+  display: none;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  background: #fff;
+  border-bottom: 1.5px solid #e9ecef;
+  flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+.ds-hamburger {
+  border: none;
+  background: none;
+  color: #495057;
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 6px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+}
+
+.ds-hamburger:hover { background: #f3f4f6; }
+
+.ds-topbar-title {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #212529;
+}
+
+.ds-topbar-spacer { flex: 1; }
+
+/* ── Content ── */
+.ds-content {
+  flex: 1;
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .ds-sidebar {
+    position: fixed;
+    top: 0;
+    left: -280px;
+    height: 100%;
+    width: 260px;
+    z-index: 200;
+    transition: left 0.28s ease;
+    box-shadow: none;
+  }
+
+  .ds-sidebar.open {
+    left: 0;
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.12);
+  }
+
+  .ds-close-btn { display: flex; }
+  .ds-topbar    { display: flex; }
+  .ds-backdrop  { display: block; }
+}

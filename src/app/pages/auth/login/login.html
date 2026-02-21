@@ -1,0 +1,96 @@
+<div class="auth-wrapper">
+
+  <!-- Left: Decorative panel -->
+  <div class="auth-panel d-none d-lg-flex">
+    <div class="auth-panel-inner">
+      <div class="auth-brand mb-5">
+        <span class="brand-dot"></span>
+        <span class="brand-name">POST Manager</span>
+      </div>
+      <h2 class="text-white fw-bold mb-3">Welcome back!</h2>
+      <p class="text-white-75 mb-5">
+        Sign in to manage your posts, track your content, and stay productive.
+      </p>
+      <ul class="auth-features list-unstyled">
+        <li><span class="check-icon">✓</span> Manage all posts in one place</li>
+        <li><span class="check-icon">✓</span> Secure HttpOnly cookie auth</li>
+        <li><span class="check-icon">✓</span> GraphQL powered API</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Right: Form panel -->
+  <div class="auth-form-panel">
+    <div class="auth-form-inner">
+
+      <div class="mb-4">
+        <h1 class="fw-bold h2 mb-1">Sign in</h1>
+        <p class="text-muted">
+          No account?
+          <a routerLink="/signup" class="text-primary fw-semibold text-decoration-none">Create one free</a>
+        </p>
+      </div>
+
+      @if (error()) {
+        <div class="alert alert-danger rounded-3 py-2 small">{{ error() }}</div>
+      }
+
+      <form (ngSubmit)="onLogin()">
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Email address</label>
+          <input
+            type="email"
+            class="form-control form-control-lg auth-input"
+            placeholder="you@example.com"
+            [formField]="loginForm.email"
+          />
+          @if (loginForm.email().touched() && loginForm.email().invalid()) {
+            @for (e of loginForm.email().errors(); track e.kind) {
+              <div class="form-text text-danger">{{ e.message }}</div>
+            }
+          }
+        </div>
+
+        <div class="mb-4">
+          <div class="d-flex justify-content-between align-items-center">
+            <label class="form-label fw-semibold mb-0">Password</label>
+            <a href="#" class="text-primary text-decoration-none small">Forgot password?</a>
+          </div>
+          <input
+            type="password"
+            class="form-control form-control-lg auth-input mt-1"
+            placeholder="••••••••"
+            [formField]="loginForm.password"
+          />
+          @if (loginForm.password().touched() && loginForm.password().invalid()) {
+            @for (e of loginForm.password().errors(); track e.kind) {
+              <div class="form-text text-danger">{{ e.message }}</div>
+            }
+          }
+        </div>
+
+        <button
+          type="submit"
+          class="btn auth-btn btn-lg w-100"
+          [disabled]="loginForm().invalid() || loading()"
+        >
+          @if (loading()) {
+            <span class="spinner-border spinner-border-sm me-2"></span>Signing in…
+          } @else {
+            Sign In →
+          }
+        </button>
+      </form>
+
+      <div class="auth-divider my-4"><span>or continue with</span></div>
+
+      <div class="d-flex gap-2">
+        <button class="social-btn flex-fill">G</button>
+        <button class="social-btn flex-fill">in</button>
+        <button class="social-btn flex-fill">gh</button>
+      </div>
+
+    </div>
+  </div>
+
+</div>

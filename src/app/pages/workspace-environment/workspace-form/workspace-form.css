@@ -1,0 +1,393 @@
+/* ── Page layout ──────────────────────────────────────────────── */
+.wf-page {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 2rem 1rem 4rem;
+}
+
+/* ── Header ───────────────────────────────────────────────────── */
+.wf-breadcrumb {
+  margin-bottom: 1rem;
+}
+
+.wf-bc-link {
+  color: var(--bs-secondary);
+  text-decoration: none;
+  font-size: 0.875rem;
+}
+
+.wf-bc-link:hover {
+  color: var(--bs-primary);
+  text-decoration: underline;
+}
+
+.breadcrumb-item.active {
+  font-size: 0.875rem;
+}
+
+.wf-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin-bottom: 0.375rem;
+}
+
+.wf-subtitle {
+  font-size: 0.9375rem;
+  color: #6c757d;
+  margin-bottom: 2rem;
+}
+
+/* ── Loading skeleton ─────────────────────────────────────────── */
+.wf-skeleton-card {
+  background: #fff;
+  border: 1px solid #e9ecef;
+  border-radius: 1rem;
+  padding: 2rem;
+}
+
+.sk-line {
+  height: 14px;
+  border-radius: 6px;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+  margin-bottom: 0.75rem;
+}
+
+.sk-title  { height: 20px; width: 40%; }
+.sk-short  { width: 60%; }
+.sk-full   { width: 100%; }
+.sk-half   { width: 50%; }
+
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ── Form card ────────────────────────────────────────────────── */
+.wf-card {
+  background: #fff;
+  border: 1px solid #e9ecef;
+  border-radius: 1rem;
+  padding: 2rem;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+}
+
+/* ── Alert ────────────────────────────────────────────────────── */
+.wf-alert {
+  border-radius: 0.625rem;
+  font-size: 0.9rem;
+}
+
+/* ── Section titles ──────────────────────────────────────────── */
+.wf-section-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #6366f1;
+  margin-bottom: 1.25rem;
+}
+
+/* ── Labels & hints ───────────────────────────────────────────── */
+.wf-label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #212529;
+  margin-bottom: 0.5rem;
+}
+
+.wf-required {
+  color: #dc3545;
+  margin-left: 2px;
+}
+
+.wf-optional {
+  font-weight: 400;
+  color: #6c757d;
+  font-size: 0.8125rem;
+  margin-left: 4px;
+}
+
+.wf-hint {
+  font-size: 0.8125rem;
+  color: #6c757d;
+  margin-top: 0.375rem;
+}
+
+.wf-char-count {
+  font-size: 0.8125rem;
+  color: #adb5bd;
+  text-align: right;
+  margin-top: 0.25rem;
+}
+
+/* ── Inputs ───────────────────────────────────────────────────── */
+.wf-input {
+  border-radius: 0.5rem;
+  border-color: #dee2e6;
+  font-size: 0.9375rem;
+  padding: 0.625rem 0.875rem;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.wf-input:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+}
+
+.wf-textarea {
+  resize: vertical;
+  min-height: 90px;
+}
+
+/* ── Slug group ──────────────────────────────────────────────── */
+.wf-slug-group {
+  display: flex;
+  align-items: stretch;
+}
+
+.wf-slug-prefix {
+  display: flex;
+  align-items: center;
+  padding: 0 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #6c757d;
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-right: 0;
+  border-radius: 0.5rem 0 0 0.5rem;
+  white-space: nowrap;
+}
+
+.wf-slug-input {
+  border-radius: 0 0.5rem 0.5rem 0 !important;
+}
+
+.wf-slug-input[readonly] {
+  background: #f8f9fa;
+  color: #6c757d;
+  cursor: not-allowed;
+}
+
+/* ── Select wrapper ───────────────────────────────────────────── */
+.wf-select-wrap {
+  position: relative;
+}
+
+/* ── Plan cards ──────────────────────────────────────────────── */
+.wf-plan-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+}
+
+.wf-plan-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 1.25rem 0.75rem;
+  border: 2px solid #e9ecef;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  background: #fff;
+}
+
+.wf-plan-card:hover {
+  border-color: #c7d2fe;
+}
+
+.wf-plan-card--active {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+}
+
+.wf-plan-radio {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.wf-plan-check {
+  display: none;
+  color: #6366f1;
+  margin-bottom: 0.375rem;
+}
+
+.wf-plan-card--active .wf-plan-check {
+  display: block;
+}
+
+.wf-plan-name {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin-bottom: 0.25rem;
+}
+
+.wf-plan-desc {
+  font-size: 0.75rem;
+  color: #6c757d;
+  line-height: 1.35;
+}
+
+/* ── Toggle list ─────────────────────────────────────────────── */
+.wf-toggle-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin-bottom: 1.5rem;
+}
+
+.wf-toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 0;
+  border-bottom: 1px solid #f0f0f0;
+  cursor: pointer;
+}
+
+.wf-toggle-row:last-child {
+  border-bottom: none;
+}
+
+.wf-toggle-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.wf-toggle-name {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #212529;
+  margin-bottom: 0.125rem;
+}
+
+.wf-toggle-desc {
+  display: block;
+  font-size: 0.8125rem;
+  color: #6c757d;
+  line-height: 1.4;
+}
+
+/* ── Toggle switch ───────────────────────────────────────────── */
+.wf-switch {
+  position: relative;
+  flex-shrink: 0;
+  width: 44px;
+  height: 24px;
+}
+
+.wf-switch-input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.wf-switch-slider {
+  position: absolute;
+  inset: 0;
+  background: #dee2e6;
+  border-radius: 24px;
+  transition: background 0.2s ease;
+  cursor: pointer;
+}
+
+.wf-switch-slider::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  background: #fff;
+  border-radius: 50%;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+  transition: transform 0.2s ease;
+}
+
+.wf-switch-input:checked + .wf-switch-slider {
+  background: #6366f1;
+}
+
+.wf-switch-input:checked + .wf-switch-slider::after {
+  transform: translateX(20px);
+}
+
+.wf-switch-input:focus-visible + .wf-switch-slider {
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25);
+}
+
+/* ── Divider ──────────────────────────────────────────────────── */
+.wf-divider {
+  border-color: #f0f0f0;
+  margin: 0.5rem 0 1.5rem;
+}
+
+/* ── Actions ──────────────────────────────────────────────────── */
+.wf-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.wf-btn-cancel {
+  border-radius: 0.5rem;
+  font-size: 0.9rem;
+  padding: 0.5rem 1.25rem;
+}
+
+.wf-btn-save {
+  background: #6366f1;
+  color: #fff;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: 0.5rem 1.5rem;
+  transition: background 0.15s ease, opacity 0.15s ease;
+}
+
+.wf-btn-save:hover:not(:disabled) {
+  background: #4f46e5;
+  color: #fff;
+}
+
+.wf-btn-save:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ── Responsive ──────────────────────────────────────────────── */
+@media (max-width: 576px) {
+  .wf-plan-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .wf-slug-group {
+    flex-direction: column;
+  }
+
+  .wf-slug-prefix {
+    border-right: 1px solid #dee2e6;
+    border-bottom: 0;
+    border-radius: 0.5rem 0.5rem 0 0;
+    padding: 0.5rem 0.75rem;
+  }
+
+  .wf-slug-input {
+    border-radius: 0 0 0.5rem 0.5rem !important;
+  }
+}

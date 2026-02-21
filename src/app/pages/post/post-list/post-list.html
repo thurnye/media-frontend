@@ -1,0 +1,324 @@
+<div class="pl-page" role="main">
+
+  <!-- Page Header (always full width, outside the split) -->
+  <div class="pl-header">
+    <div>
+      <h1 class="pl-title" id="pl-heading">Posts</h1>
+      <p class="pl-subtitle">Manage and organize your workspace posts.</p>
+    </div>
+    <a
+      class="pl-btn-new"
+      [routerLink]="['/dashboard/workspace', workspaceId(), 'post', 'new']"
+      aria-label="Create new post"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
+        <path d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2"/>
+      </svg>
+      New Post
+    </a>
+  </div>
+
+  <!-- Error (full width, outside the split) -->
+  @if (error() && !selectedPostId()) {
+    <div class="pl-error" role="alert" aria-live="assertive">{{ error() }}</div>
+  }
+
+  <!-- Split wrapper: becomes two-column on large screens when a post is selected -->
+  <div
+    class="pl-split"
+    [class.is-split]="selectedPostId()"
+    role="region"
+    aria-label="Posts split view"
+  >
+
+    <!-- ── Left: list column ── -->
+    <div
+      class="pl-split-list"
+      role="region"
+      aria-label="Post list"
+      aria-labelledby="pl-heading"
+      [attr.aria-busy]="loading()"
+    >
+
+      <!-- Loading skeleton -->
+      @if (loading() && !selectedPostId()) {
+        <div class="pl-grid" aria-hidden="true">
+          @for (n of [1,2,3,4,5,6]; track n) {
+            <div class="pl-card pl-card-skeleton">
+              <div class="sk-line tall"></div>
+              <div class="sk-line short"></div>
+              <div class="pl-card-footer">
+                <div class="sk-pill"></div>
+              </div>
+            </div>
+          }
+        </div>
+        <span class="visually-hidden">Loading posts…</span>
+      } @else if (posts().length === 0 && !loading()) {
+        <!-- Empty state -->
+        <div class="pl-empty" role="status">
+          <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="#adb5bd" viewBox="0 0 16 16" aria-hidden="true">
+            <path d="M14.5 3a.5.5 0 0 1 .5.5v9a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5zm-13-1A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2z"/>
+            <path d="M3 5.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5M3 8a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9A.5.5 0 0 1 3 8m0 2.5a.5.5 0 0 1 .5-.5h6a.5.5 0 0 1 0 1h-6a.5.5 0 0 1-.5-.5"/>
+          </svg>
+          <p>No posts yet. Create your first post to get started!</p>
+          <a
+            class="pl-btn-new"
+            [routerLink]="['/dashboard/workspace', workspaceId(), 'post', 'new']"
+            aria-label="Create your first post"
+          >
+            Create a Post
+          </a>
+        </div>
+      } @else {
+
+        <!-- ── Toolbar: search, filter, sort ── -->
+        <div class="pl-toolbar" role="search" aria-label="Search and filter posts">
+          <div class="pl-toolbar-search">
+            <svg class="pl-toolbar-search-icon" xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
+              <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.099zm-5.242 1.656a5.5 5.5 0 1 1 0-11 5.5 5.5 0 0 1 0 11"/>
+            </svg>
+            <input
+              class="pl-search-input"
+              type="search"
+              placeholder="Search posts…"
+              aria-label="Search posts by title"
+            />
+          </div>
+
+          <div class="pl-toolbar-controls">
+            <div class="pl-select-wrap">
+              <svg class="pl-select-icon" xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
+                <path d="M1.5 1.5A.5.5 0 0 1 2 1h12a.5.5 0 0 1 .354.854l-4.5 4.5a.5.5 0 0 1-.354.146h-3a.5.5 0 0 1-.354-.146l-4.5-4.5A.5.5 0 0 1 1.5 1.5M2.793 2 6.5 5.707h3L13.207 2zM6 7.5v6a.5.5 0 0 0 .757.429l3-1.5A.5.5 0 0 0 10 12V7.5a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5"/>
+              </svg>
+              <select class="pl-select" aria-label="Filter posts by status">
+                <option value="all">All Statuses</option>
+                <option value="draft">Draft</option>
+                <option value="published">Published</option>
+                <option value="scheduled">Scheduled</option>
+                <option value="archived">Archived</option>
+              </select>
+              <svg class="pl-select-chevron" xmlns="http://www.w3.org/2000/svg" width="11" height="11" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
+                <path d="M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z"/>
+              </svg>
+            </div>
+
+            <div class="pl-select-wrap">
+              <svg class="pl-select-icon" xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
+                <path d="M3.5 3.5a.5.5 0 0 0-1 0v8.793l-1.146-1.147a.5.5 0 0 0-.708.708l2 1.999.007.007a.497.497 0 0 0 .7-.006l2-2a.5.5 0 0 0-.707-.708L3.5 12.293zm4 .5a.5.5 0 0 1 0-1h1a.5.5 0 0 1 0 1zm0 3a.5.5 0 0 1 0-1h3a.5.5 0 0 1 0 1zm0 3a.5.5 0 0 1 0-1h5a.5.5 0 0 1 0 1zM7 12.5a.5.5 0 0 0 .5.5h7a.5.5 0 0 0 0-1h-7a.5.5 0 0 0-.5.5"/>
+              </svg>
+              <select class="pl-select" aria-label="Sort posts">
+                <option value="default">Newest First</option>
+                <option value="title-asc">Title A–Z</option>
+                <option value="title-desc">Title Z–A</option>
+                <option value="priority-desc">Highest Priority</option>
+              </select>
+              <svg class="pl-select-chevron" xmlns="http://www.w3.org/2000/svg" width="11" height="11" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
+                <path d="M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- Result count -->
+        <p class="pl-result-count">{{ posts().length }} posts</p>
+
+        <!-- Posts grid -->
+        <ul class="pl-grid" role="list" aria-label="Posts">
+          @for (post of posts(); track post.id) {
+            <li
+              class="pl-card"
+              role="listitem"
+              [class.pl-card--active]="selectedPostId() === post.id"
+              [attr.aria-selected]="selectedPostId() === post.id"
+              tabindex="0"
+              (click)="onCardClick(post.id)"
+              (keydown.enter)="onCardClick(post.id)"
+              (keydown.space)="onCardClick(post.id)"
+              [attr.aria-label]="'View post: ' + post.title"
+            >
+              <div class="pl-card-body">
+                <h2 class="pl-card-title">{{ post.title }}</h2>
+                @if (post.description) {
+                  <p class="pl-card-desc">{{ post.description }}</p>
+                }
+              </div>
+              <div class="pl-card-footer">
+                <div class="pl-card-badges">
+                  <span class="pl-status-badge pl-status--{{ post.status ?? 'draft' }}">
+                    {{ getStatusLabel(post.status) }}
+                  </span>
+                  @if (post.priority) {
+                    <span class="pl-priority-badge pl-priority--{{ post.priority }}">
+                      {{ post.priority }}
+                    </span>
+                  }
+                </div>
+
+                @if (isOwner(post.createdBy)) {
+                  <div class="pl-card-actions" role="group" [attr.aria-label]="'Actions for ' + post.title">
+                    <button
+                      class="pl-btn-icon edit"
+                      (click)="onEdit(post.id, $event)"
+                      [attr.aria-label]="'Edit post: ' + post.title"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
+                        <path d="M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.499.499 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11z"/>
+                      </svg>
+                    </button>
+                    <button
+                      class="pl-btn-icon delete"
+                      (click)="onDelete(post.id, $event)"
+                      [attr.aria-label]="'Delete post: ' + post.title"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
+                        <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"/>
+                        <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"/>
+                      </svg>
+                    </button>
+                  </div>
+                }
+              </div>
+            </li>
+          }
+        </ul>
+
+        <!-- Infinite scroll sentinel + loading indicator -->
+        <div #scrollSentinel class="pl-scroll-sentinel" aria-hidden="true"></div>
+        @if (loadingMore()) {
+          <div class="pl-load-more" role="status" aria-label="Loading more posts">
+            <span class="pl-load-more-spinner" aria-hidden="true"></span>
+          </div>
+        }
+      }
+
+    </div><!-- /.pl-split-list -->
+
+    <!-- ── Right: detail panel (large screen only, shown when a post is selected) ── -->
+    <div
+      class="pl-split-detail"
+      role="region"
+      aria-label="Post details"
+      [attr.aria-hidden]="!selectedPostId()"
+    >
+      <div class="pl-panel">
+
+        <!-- Panel header -->
+        <div class="pl-panel-head">
+          <span class="pl-panel-tag">Post Details</span>
+          <button
+            class="pl-panel-close"
+            (click)="onCloseDetail()"
+            aria-label="Close post details panel"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
+              <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Skeleton while loading -->
+        @if (panelLoading()) {
+          <div class="pl-panel-body pl-panel-skeleton" aria-hidden="true">
+            <div class="sk-line tall" style="width: 80%"></div>
+            <div class="sk-line" style="width: 40%; height: 14px;"></div>
+            <div class="sk-line" style="height: 1px; background: #f0f0f0; animation: none;"></div>
+            <div class="sk-line"></div>
+            <div class="sk-line"></div>
+            <div class="sk-line short"></div>
+          </div>
+          <span class="visually-hidden">Loading post details…</span>
+        }
+
+        <!-- Error -->
+        @if (!panelLoading() && !selectedPost()) {
+          <div class="pl-panel-body">
+            <div class="pl-panel-error" role="alert">Could not load post. Please try again.</div>
+          </div>
+        }
+
+        <!-- Content -->
+        @if (!panelLoading() && selectedPost()) {
+          <div class="pl-panel-body">
+            <h2 class="pl-panel-title" id="pl-panel-title">{{ selectedPost()!.title }}</h2>
+
+            <div class="pl-panel-meta">
+              <div class="pl-card-badges">
+                <span class="pl-status-badge pl-status--{{ selectedPost()!.status ?? 'draft' }}">
+                  {{ getStatusLabel(selectedPost()!.status) }}
+                </span>
+                @if (selectedPost()!.priority) {
+                  <span class="pl-priority-badge pl-priority--{{ selectedPost()!.priority }}">
+                    {{ selectedPost()!.priority }}
+                  </span>
+                }
+                @if (selectedPost()!.category) {
+                  <span class="pl-category-badge">{{ selectedPost()!.category }}</span>
+                }
+              </div>
+
+              @if (isOwner(selectedPost()!.createdBy)) {
+                <div class="pl-panel-actions" role="group" [attr.aria-label]="'Actions for ' + selectedPost()!.title">
+                  <button
+                    class="pl-panel-btn-edit"
+                    (click)="onEdit(selectedPost()!.id, $event)"
+                    [attr.aria-label]="'Edit post: ' + selectedPost()!.title"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
+                      <path d="M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.499.499 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11z"/>
+                    </svg>
+                    Edit
+                  </button>
+                  <button
+                    class="pl-panel-btn-delete"
+                    (click)="onDelete(selectedPost()!.id, $event)"
+                    [attr.aria-label]="'Delete post: ' + selectedPost()!.title"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
+                      <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"/>
+                      <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"/>
+                    </svg>
+                    Delete
+                  </button>
+                </div>
+              }
+            </div>
+
+            <!-- Tags -->
+            @if (selectedPost()!.tags && selectedPost()!.tags!.length > 0) {
+              <div class="pl-panel-tags">
+                @for (tag of selectedPost()!.tags; track tag) {
+                  <span class="pl-tag">{{ tag }}</span>
+                }
+              </div>
+            }
+
+            <hr class="pl-panel-divider" />
+
+            <div class="pl-panel-content">
+              @if (selectedPost()!.description) {
+                <p>{{ selectedPost()!.description }}</p>
+              } @else {
+                <p class="pl-panel-no-content">No description was provided for this post.</p>
+              }
+            </div>
+
+            <!-- Metadata footer -->
+            @if (selectedPost()!.isEvergreen) {
+              <div class="pl-panel-evergreen">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
+                  <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16m.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.399l-.254.014-.051-.248 1.544-.374z"/>
+                  <path d="M8 5.5a1 1 0 1 0 0-2 1 1 0 0 0 0 2"/>
+                </svg>
+                Evergreen content
+              </div>
+            }
+          </div>
+        }
+
+      </div><!-- /.pl-panel -->
+    </div><!-- /.pl-split-detail -->
+
+  </div><!-- /.pl-split -->
+
+</div><!-- /.pl-page -->

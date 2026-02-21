@@ -1,0 +1,138 @@
+<div class="pf-wrapper">
+  <div class="pf-card">
+
+    <!-- Header -->
+    <div class="pf-header">
+      <span class="pf-badge">{{ isEdit() ? 'Edit Post' : 'New Post' }}</span>
+      <h1 class="pf-heading">{{ isEdit() ? 'Update your post' : 'Create a new post' }}</h1>
+      <p class="pf-subheading">Fill in the details for your post.</p>
+    </div>
+
+    <!-- Error -->
+    @if (error()) {
+      <div class="pf-error">{{ error() }}</div>
+    }
+
+    <!-- Loading skeleton in edit mode while fetching post -->
+    @if (isEdit() && loading() && !selectedPost()) {
+      <div class="pf-form pf-skeleton">
+        <div class="pf-skeleton-line tall"></div>
+        <div class="pf-skeleton-line short"></div>
+        <div class="pf-skeleton-area"></div>
+        <div class="pf-skeleton-line tall"></div>
+        <div class="pf-skeleton-line tall"></div>
+      </div>
+    } @else {
+      <!-- Form -->
+      <form class="pf-form" (ngSubmit)="onSubmit()" novalidate>
+
+        <!-- Title -->
+        <div class="pf-field">
+          <label class="pf-label" for="title">Title <span class="pf-required">*</span></label>
+          <input
+            id="title"
+            type="text"
+            class="pf-input"
+            placeholder="Give your post a compelling title…"
+            autocomplete="off"
+            [(ngModel)]="title"
+            name="title"
+            required
+          />
+          <span class="pf-hint">Required · Keep it clear and concise</span>
+        </div>
+
+        <!-- Description -->
+        <div class="pf-field">
+          <label class="pf-label" for="description">Description</label>
+          <textarea
+            id="description"
+            class="pf-textarea"
+            rows="6"
+            placeholder="Describe your post content…"
+            [(ngModel)]="description"
+            name="description"
+          ></textarea>
+          <span class="pf-hint">Optional · Add context or details about this post</span>
+        </div>
+
+        <!-- Category & Priority row -->
+        <div class="pf-row">
+          <div class="pf-field pf-field--half">
+            <label class="pf-label" for="category">Category</label>
+            <select
+              id="category"
+              class="pf-input"
+              [(ngModel)]="category"
+              name="category"
+            >
+              <option value="">Select a category</option>
+              @for (cat of categories; track cat.value) {
+                <option [value]="cat.value">{{ cat.label }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="pf-field pf-field--half">
+            <label class="pf-label" for="priority">Priority</label>
+            <select
+              id="priority"
+              class="pf-input"
+              [(ngModel)]="priority"
+              name="priority"
+            >
+              <option value="">Select priority</option>
+              @for (p of priorities; track p.value) {
+                <option [value]="p.value">{{ p.label }}</option>
+              }
+            </select>
+          </div>
+        </div>
+
+        <!-- Tags -->
+        <div class="pf-field">
+          <label class="pf-label" for="tags">Tags</label>
+          <input
+            id="tags"
+            type="text"
+            class="pf-input"
+            placeholder="marketing, launch, update"
+            autocomplete="off"
+            [(ngModel)]="tags"
+            name="tags"
+          />
+          <span class="pf-hint">Optional · Comma-separated list of tags</span>
+        </div>
+
+        <!-- Evergreen toggle -->
+        <div class="pf-toggle-row">
+          <div class="pf-toggle-info">
+            <span class="pf-label">Evergreen Content</span>
+            <span class="pf-hint">Mark this post as timeless, reusable content</span>
+          </div>
+          <label class="pf-switch">
+            <input type="checkbox" [(ngModel)]="isEvergreen" name="isEvergreen" />
+            <span class="pf-slider"></span>
+          </label>
+        </div>
+
+        <!-- Actions -->
+        <div class="pf-actions">
+          <button type="button" class="pf-btn-ghost" (click)="onCancel()">Cancel</button>
+          <button type="submit" class="pf-btn-primary" [disabled]="loading() || !title.trim()">
+            @if (loading()) {
+              <span class="pf-spinner"></span>
+              {{ isEdit() ? 'Saving…' : 'Creating…' }}
+            } @else {
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                <path d="M15.854.146a.5.5 0 0 1 .11.54l-5.819 14.547a.75.75 0 0 1-1.329.124l-3.178-4.995L.643 7.184a.75.75 0 0 1 .124-1.33L15.314.037a.5.5 0 0 1 .54.11ZM6.636 10.07l2.761 4.338L14.13 2.576zm6.787-8.201L1.591 6.602l4.339 2.76z"/>
+              </svg>
+              {{ isEdit() ? 'Save Changes' : 'Create Post' }}
+            }
+          </button>
+        </div>
+
+      </form>
+    }
+  </div>
+</div>

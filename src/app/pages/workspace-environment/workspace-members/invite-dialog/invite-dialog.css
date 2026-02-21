@@ -1,0 +1,160 @@
+/* ── Backdrop ────────────────────────────────────────────────── */
+.id-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+/* ── Dialog ──────────────────────────────────────────────────── */
+.id-dialog {
+  background: #fff;
+  border-radius: 0.75rem;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+  animation: id-fade-in 0.15s ease;
+}
+
+@keyframes id-fade-in {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Header ──────────────────────────────────────────────────── */
+.id-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.id-title {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin: 0;
+}
+
+.id-close-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: none;
+  border-radius: 0.375rem;
+  color: #6c757d;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.id-close-btn:hover {
+  background: #f0f0f0;
+}
+
+/* ── Body ────────────────────────────────────────────────────── */
+.id-body {
+  padding: 1.5rem;
+}
+
+.id-label {
+  display: block;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #344054;
+  margin-bottom: 0.375rem;
+}
+
+.id-label + .id-label {
+  margin-top: 1rem;
+}
+
+.id-input,
+.id-select {
+  display: block;
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  color: #212529;
+  background: #fff;
+  border: 1px solid #d0d5dd;
+  border-radius: 0.5rem;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  box-sizing: border-box;
+}
+
+.id-input:focus,
+.id-select:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+}
+
+.id-input::placeholder {
+  color: #adb5bd;
+}
+
+.id-select {
+  margin-top: 0;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%236c757d' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  padding-right: 2rem;
+}
+
+/* ── Footer ──────────────────────────────────────────────────── */
+.id-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.625rem;
+  padding: 1rem 1.5rem;
+  border-top: 1px solid #e9ecef;
+}
+
+.id-btn {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s ease, opacity 0.15s ease;
+}
+
+.id-btn--cancel {
+  background: #f3f4f6;
+  color: #344054;
+}
+
+.id-btn--cancel:hover {
+  background: #e5e7eb;
+}
+
+.id-btn--invite {
+  background: #6366f1;
+  color: #fff;
+}
+
+.id-btn--invite:hover:not(:disabled) {
+  background: #4f46e5;
+}
+
+.id-btn--invite:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ── Responsive ─────────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .id-dialog {
+    margin: 1rem;
+  }
+}

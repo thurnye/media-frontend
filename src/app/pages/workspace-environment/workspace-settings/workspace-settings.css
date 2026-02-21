@@ -1,0 +1,410 @@
+/* ── Header ───────────────────────────────────────────────────── */
+.wst-header {
+  margin-bottom: 1.5rem;
+}
+
+.wst-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin: 0 0 0.25rem;
+}
+
+.wst-subtitle {
+  font-size: 0.9rem;
+  color: #6c757d;
+  margin: 0;
+}
+
+/* ── Card ────────────────────────────────────────────────────── */
+.wst-card {
+  background: #fff;
+  border: 1px solid #e9ecef;
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+}
+
+.wst-card--danger {
+  border-color: #fecaca;
+}
+
+.wst-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.wst-card-title {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin: 0;
+}
+
+.wst-card-title--danger {
+  color: #dc2626;
+}
+
+.wst-edit-link {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: #6366f1;
+  text-decoration: none;
+}
+
+.wst-edit-link:hover {
+  text-decoration: underline;
+}
+
+/* ── Detail grid ─────────────────────────────────────────────── */
+.wst-detail-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem 2rem;
+}
+
+.wst-detail-label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #6c757d;
+  margin-bottom: 0.125rem;
+}
+
+.wst-detail-value {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #212529;
+}
+
+/* ── Plan row ────────────────────────────────────────────────── */
+.wst-plan-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #f0f0f0;
+  margin-bottom: 1rem;
+}
+
+.wst-plan-info {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.wst-plan-badge {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #6366f1;
+  background: #eef2ff;
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+}
+
+.wst-plan-desc {
+  font-size: 0.8125rem;
+  color: #6c757d;
+}
+
+.wst-btn-outline {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: #6366f1;
+  background: #fff;
+  border: 1px solid #6366f1;
+  border-radius: 0.5rem;
+  padding: 0.375rem 1rem;
+  white-space: nowrap;
+}
+
+.wst-btn-outline:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ── Billing grid ────────────────────────────────────────────── */
+.wst-billing-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem 2rem;
+}
+
+.wst-billing-label {
+  font-size: 0.8125rem;
+  color: #6c757d;
+}
+
+.wst-billing-value {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #212529;
+  margin-left: 0.25rem;
+}
+
+/* ── Toggle list ─────────────────────────────────────────────── */
+.wst-toggle-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.wst-toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #f5f5f5;
+}
+
+.wst-toggle-row:last-child {
+  border-bottom: none;
+}
+
+.wst-toggle-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.wst-toggle-name {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #212529;
+}
+
+.wst-toggle-desc {
+  display: block;
+  font-size: 0.8125rem;
+  color: #6c757d;
+}
+
+.wst-toggle-status {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.125rem 0.625rem;
+  border-radius: 999px;
+  background: #f3f4f6;
+  color: #6c757d;
+  white-space: nowrap;
+}
+
+.wst-toggle-status--on {
+  background: #ecfdf5;
+  color: #16a34a;
+}
+
+/* ── Danger zone ─────────────────────────────────────────────── */
+.wst-danger-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.wst-danger-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.875rem 0;
+  border-bottom: 1px solid #fee2e2;
+}
+
+.wst-danger-row:last-child {
+  border-bottom: none;
+}
+
+.wst-danger-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.wst-danger-name {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #212529;
+}
+
+.wst-danger-desc {
+  display: block;
+  font-size: 0.8125rem;
+  color: #6c757d;
+  line-height: 1.4;
+}
+
+.wst-btn-danger-outline {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: #dc2626;
+  background: #fff;
+  border: 1px solid #fca5a5;
+  border-radius: 0.5rem;
+  padding: 0.375rem 1rem;
+  white-space: nowrap;
+}
+
+.wst-btn-danger-outline:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.wst-btn-danger {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #fff;
+  background: #dc2626;
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.375rem 1rem;
+  white-space: nowrap;
+}
+
+.wst-btn-danger:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ── Connected accounts ─────────────────────────────────────── */
+.wst-btn-connect {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #fff;
+  background: #6366f1;
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.4rem 0.875rem;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.wst-btn-connect:hover {
+  background: #4f46e5;
+}
+
+.wst-accounts-empty {
+  font-size: 0.875rem;
+  color: #6c757d;
+  text-align: center;
+  padding: 1.25rem 0 0.25rem;
+}
+
+.wst-account-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.wst-account-row {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #f5f5f5;
+}
+
+.wst-account-row:last-child {
+  border-bottom: none;
+}
+
+.wst-account-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 0.5rem;
+  color: #fff;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.wst-account-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.wst-account-name {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #212529;
+}
+
+.wst-account-meta {
+  display: block;
+  font-size: 0.75rem;
+  color: #6c757d;
+  margin-top: 0.125rem;
+}
+
+.wst-account-right {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  flex-shrink: 0;
+}
+
+.wst-account-status {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: capitalize;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  background: #f3f4f6;
+  color: #6c757d;
+}
+
+.wst-account-status--active       { background: #ecfdf5; color: #16a34a; }
+.wst-account-status--disconnected { background: #f3f4f6; color: #6c757d; }
+.wst-account-status--suspended    { background: #fef2f2; color: #dc2626; }
+
+.wst-btn-disconnect {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #dc2626;
+  background: #fff;
+  border: 1px solid #fca5a5;
+  border-radius: 0.375rem;
+  padding: 0.25rem 0.625rem;
+  cursor: pointer;
+  transition: background 0.15s ease;
+  white-space: nowrap;
+}
+
+.wst-btn-disconnect:hover {
+  background: #fef2f2;
+}
+
+/* ── Responsive ──────────────────────────────────────────────── */
+@media (max-width: 576px) {
+  .wst-detail-grid,
+  .wst-billing-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .wst-plan-row,
+  .wst-danger-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .wst-account-row {
+    flex-wrap: wrap;
+  }
+
+  .wst-account-right {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+}

@@ -1,0 +1,260 @@
+<div class="wf-page">
+
+  <!-- ── Page header ─────────────────────────────────────────── -->
+  <div class="wf-header">
+    <nav aria-label="breadcrumb" class="wf-breadcrumb">
+      <ol class="breadcrumb mb-0">
+        <li class="breadcrumb-item">
+          <a routerLink="/dashboard" class="wf-bc-link">Dashboard</a>
+        </li>
+        <li class="breadcrumb-item active" aria-current="page">
+          {{ isEdit() ? 'Edit workspace' : 'New workspace' }}
+        </li>
+      </ol>
+    </nav>
+
+    <h1 class="wf-title">
+      {{ isEdit() ? 'Edit workspace' : 'Create a workspace' }}
+    </h1>
+    <p class="wf-subtitle">
+      {{ isEdit()
+          ? 'Update the details for this workspace.'
+          : 'Workspaces help you organize your projects and collaborate with your team.' }}
+    </p>
+  </div>
+
+  <!-- ── Loading skeleton (edit mode only) ────────────────────── -->
+  @if (loading()) {
+    <div class="wf-skeleton-card">
+      <div class="sk-line sk-title"></div>
+      <div class="sk-line sk-short"></div>
+      <div class="sk-line sk-full mt-3"></div>
+      <div class="sk-line sk-full"></div>
+      <div class="sk-line sk-half mt-3"></div>
+    </div>
+  }
+
+  <!-- ── Form card ─────────────────────────────────────────────── -->
+  @if (!loading()) {
+    <div class="wf-card">
+
+      <!-- Error banner -->
+      @if (error()) {
+        <div class="alert alert-danger d-flex align-items-center gap-2 mb-4 wf-alert" role="alert">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
+            <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+          </svg>
+          <span>{{ error() }}</span>
+        </div>
+      }
+
+      <form #f="ngForm" (ngSubmit)="onSubmit()" novalidate>
+
+        <!-- ── Section: General ── -->
+        <div class="wf-section-title">General</div>
+
+        <!-- Workspace name -->
+        <div class="mb-4">
+          <label for="ws-name" class="wf-label">
+            Workspace name <span class="wf-required">*</span>
+          </label>
+          <input
+            id="ws-name"
+            name="name"
+            type="text"
+            class="form-control wf-input"
+            placeholder="e.g. Acme Corp"
+            maxlength="100"
+            required
+            [(ngModel)]="name"
+            (ngModelChange)="generateSlug()"
+            #nameCtrl="ngModel"
+            [class.is-invalid]="nameCtrl.invalid && nameCtrl.touched"
+          />
+          @if (nameCtrl.invalid && nameCtrl.touched) {
+            <div class="invalid-feedback">Workspace name is required.</div>
+          }
+          <div class="wf-hint">This is the name your team will see.</div>
+        </div>
+
+        <!-- Slug -->
+        <div class="mb-4">
+          <label for="ws-slug" class="wf-label">
+            Slug <span class="wf-required">*</span>
+          </label>
+          <div class="wf-slug-group">
+            <span class="wf-slug-prefix">/workspace/</span>
+            <input
+              id="ws-slug"
+              name="slug"
+              type="text"
+              class="form-control wf-input wf-slug-input"
+              placeholder="acme-corp"
+              maxlength="100"
+              required
+              [(ngModel)]="slug"
+              #slugCtrl="ngModel"
+              [class.is-invalid]="slugCtrl.invalid && slugCtrl.touched"
+              [readonly]="isEdit()"
+            />
+          </div>
+          @if (slugCtrl.invalid && slugCtrl.touched) {
+            <div class="invalid-feedback d-block">Slug is required.</div>
+          }
+          <div class="wf-hint">URL-friendly identifier. Auto-generated from the name{{ isEdit() ? ' (read-only)' : '' }}.</div>
+        </div>
+
+        <!-- Description -->
+        <div class="mb-4">
+          <label for="ws-desc" class="wf-label">
+            Description
+            <span class="wf-optional">(optional)</span>
+          </label>
+          <textarea
+            id="ws-desc"
+            name="description"
+            class="form-control wf-input wf-textarea"
+            placeholder="What is this workspace for?"
+            maxlength="500"
+            rows="3"
+            [(ngModel)]="description"
+          ></textarea>
+          <div class="wf-char-count">{{ description.length }} / 500</div>
+        </div>
+
+        <hr class="wf-divider" />
+
+        <!-- ── Section: Plan ── -->
+        <div class="wf-section-title">Plan</div>
+
+        <div class="wf-plan-grid mb-4">
+          @for (p of plans; track p.value) {
+            <label
+              class="wf-plan-card"
+              [class.wf-plan-card--active]="plan === p.value"
+            >
+              <input
+                type="radio"
+                name="plan"
+                [value]="p.value"
+                [(ngModel)]="plan"
+                class="wf-plan-radio"
+              />
+              <span class="wf-plan-check">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
+                  <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0m-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+                </svg>
+              </span>
+              <span class="wf-plan-name">{{ p.label }}</span>
+              <span class="wf-plan-desc">{{ p.desc }}</span>
+            </label>
+          }
+        </div>
+
+        <hr class="wf-divider" />
+
+        <!-- ── Section: Configuration ── -->
+        <div class="wf-section-title">Configuration</div>
+
+        <!-- Default timezone -->
+        <div class="mb-4">
+          <label for="ws-tz" class="wf-label">Default timezone</label>
+          <div class="wf-select-wrap">
+            <select
+              id="ws-tz"
+              name="defaultTimezone"
+              class="form-select wf-input"
+              [(ngModel)]="defaultTimezone"
+            >
+              @for (tz of timezones; track tz.value) {
+                <option [value]="tz.value">{{ tz.label }}</option>
+              }
+            </select>
+          </div>
+          <div class="wf-hint">Sets the default time zone for dates and scheduling in this workspace.</div>
+        </div>
+
+        <hr class="wf-divider" />
+
+        <!-- ── Section: Settings ── -->
+        <div class="wf-section-title">Workflow Settings</div>
+
+        <div class="wf-toggle-list">
+          <!-- Approval required -->
+          <label class="wf-toggle-row">
+            <div class="wf-toggle-text">
+              <span class="wf-toggle-name">Require approval</span>
+              <span class="wf-toggle-desc">Posts must be approved by an admin or editor before publishing.</span>
+            </div>
+            <div class="wf-switch">
+              <input
+                type="checkbox"
+                name="approvalRequired"
+                [(ngModel)]="approvalRequired"
+                class="wf-switch-input"
+              />
+              <span class="wf-switch-slider"></span>
+            </div>
+          </label>
+
+          <!-- Evergreen enabled -->
+          <label class="wf-toggle-row">
+            <div class="wf-toggle-text">
+              <span class="wf-toggle-name">Evergreen content</span>
+              <span class="wf-toggle-desc">Mark posts as evergreen to keep them relevant and auto-resurface them.</span>
+            </div>
+            <div class="wf-switch">
+              <input
+                type="checkbox"
+                name="evergreenEnabled"
+                [(ngModel)]="evergreenEnabled"
+                class="wf-switch-input"
+              />
+              <span class="wf-switch-slider"></span>
+            </div>
+          </label>
+
+          <!-- Auto publish -->
+          <label class="wf-toggle-row">
+            <div class="wf-toggle-text">
+              <span class="wf-toggle-name">Auto-publish</span>
+              <span class="wf-toggle-desc">Automatically publish scheduled posts at the configured date and time.</span>
+            </div>
+            <div class="wf-switch">
+              <input
+                type="checkbox"
+                name="autoPublishEnabled"
+                [(ngModel)]="autoPublishEnabled"
+                class="wf-switch-input"
+              />
+              <span class="wf-switch-slider"></span>
+            </div>
+          </label>
+        </div>
+
+        <hr class="wf-divider" />
+
+        <!-- ── Actions ── -->
+        <div class="wf-actions">
+          <a routerLink="/dashboard" class="btn btn-outline-secondary wf-btn-cancel">
+            Cancel
+          </a>
+          <button
+            type="submit"
+            class="btn wf-btn-save"
+            [disabled]="saving() || f.invalid"
+          >
+            @if (saving()) {
+              <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+              Saving…
+            } @else {
+              {{ isEdit() ? 'Save changes' : 'Create workspace' }}
+            }
+          </button>
+        </div>
+
+      </form>
+    </div>
+  }
+
+</div>

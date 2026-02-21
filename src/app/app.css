@@ -1,0 +1,9 @@
+.app-spinner-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #212529;
+  z-index: 9999;
+}

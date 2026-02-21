@@ -1,0 +1,61 @@
+.ep-wrapper {
+  min-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 2rem;
+  gap: 1rem;
+}
+
+.ep-icon {
+  color: #ef4444;
+  margin-bottom: 0.5rem;
+}
+
+.ep-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0;
+}
+
+.ep-subtitle {
+  font-size: 1rem;
+  color: #64748b;
+  margin: 0;
+}
+
+.ep-suggestion {
+  font-size: 0.875rem;
+  color: #94a3b8;
+  margin: 0;
+  max-width: 420px;
+}
+
+.ep-actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 0.5rem;
+}
+
+.ep-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.6rem 1.4rem;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  border: none;
+  transition: opacity 0.15s;
+}
+.ep-btn:hover { opacity: 0.85; }
+
+.ep-btn--primary   { background: #3b82f6; color: #fff; }
+.ep-btn--secondary { background: #e2e8f0; color: #334155; }

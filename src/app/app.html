@@ -1,0 +1,54 @@
+<!-- Toast outlet — lives outside the @if so it renders regardless of auth state -->
+<app-toast />
+
+@if (!initialized()) {
+  <!-- Full-page spinner while session is being restored -->
+  <div class="app-spinner-overlay">
+    <div class="spinner-border text-light" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+} @else {
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+      <a class="navbar-brand" routerLink="/home">POST Management</a>
+      <button
+        class="navbar-toggler"
+        type="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#navbarNav"
+      >
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav me-auto">
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/home" routerLinkActive="active">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
+          </li>
+        </ul>
+
+        @if (loggedInUser()) {
+          <!-- Logged-in -->
+          <div class="d-flex align-items-center">
+            <span class="text-light me-3">Welcome, {{ loggedInUser() }}</span>
+            <!-- <button class="btn btn-outline-danger" (click)="onLogout()">Logout</button> -->
+          </div>
+        } @else {
+          <!-- Not logged in -->
+          <div class="d-flex align-items-center gap-2">
+            <button class="btn btn-outline-light" routerLink="/login">Login</button>
+            <button class="btn btn-light" routerLink="/signup">Sign Up</button>
+          </div>
+        }
+      </div>
+    </div>
+  </nav>
+
+  <div class="container-fluid">
+    <router-outlet />
+  </div>
+}

@@ -1,0 +1,236 @@
+/* ── Header ───────────────────────────────────────────────────── */
+.wm-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.wm-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin: 0 0 0.25rem;
+}
+
+.wm-subtitle {
+  font-size: 0.9rem;
+  color: #6c757d;
+  margin: 0;
+}
+
+.wm-btn-invite {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #fff;
+  background: #6366f1;
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.5rem 1rem;
+  white-space: nowrap;
+}
+
+.wm-btn-invite:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ── Card / table ────────────────────────────────────────────── */
+.wm-card {
+  background: #fff;
+  border: 1px solid #e9ecef;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+}
+
+.wm-table-head {
+  display: grid;
+  grid-template-columns: 1fr 120px 130px 50px;
+  align-items: center;
+  padding: 0.75rem 1.25rem;
+  background: #f8f9fa;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.wm-th {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #6c757d;
+}
+
+.wm-row {
+  display: grid;
+  grid-template-columns: 1fr 120px 130px 50px;
+  align-items: center;
+  padding: 0.875rem 1.25rem;
+  border-bottom: 1px solid #f5f5f5;
+}
+
+.wm-row:last-child {
+  border-bottom: none;
+}
+
+/* ── User cell ───────────────────────────────────────────────── */
+.wm-cell--user {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+.wm-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #6366f1;
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.wm-avatar--blue  { background: #3b82f6; }
+.wm-avatar--green { background: #22c55e; }
+
+.wm-user-name {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #212529;
+}
+
+.wm-user-email {
+  display: block;
+  font-size: 0.75rem;
+  color: #6c757d;
+}
+
+/* ── Role badges ─────────────────────────────────────────────── */
+.wm-role-badge {
+  display: inline-block;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.wm-role-badge--owner   { background: #fef3c7; color: #92400e; }
+.wm-role-badge--admin   { background: #ede9fe; color: #6d28d9; }
+.wm-role-badge--manager { background: #dbeafe; color: #1d4ed8; }
+.wm-role-badge--member  { background: #f3f4f6; color: #4b5563; }
+
+/* ── Date & actions ──────────────────────────────────────────── */
+.wm-date {
+  font-size: 0.8125rem;
+  color: #6c757d;
+}
+
+.wm-actions-placeholder {
+  font-size: 0.8125rem;
+  color: #adb5bd;
+}
+
+.wm-action-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border: none;
+  background: none;
+  border-radius: 0.375rem;
+  color: #6c757d;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.wm-action-btn:hover:not(:disabled) {
+  background: #f0f0f0;
+}
+
+.wm-action-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.wm-action-btn--remove:hover {
+  color: #dc2626;
+  background: #fef2f2;
+}
+
+/* ── Empty state ────────────────────────────────────────────── */
+.wm-empty {
+  padding: 2rem 1.25rem;
+  text-align: center;
+  font-size: 0.875rem;
+  color: #6c757d;
+}
+
+/* ── Legend card ──────────────────────────────────────────────── */
+.wm-legend-card {
+  background: #fff;
+  border: 1px solid #e9ecef;
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+}
+
+.wm-legend-title {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin: 0 0 1rem;
+}
+
+.wm-legend-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.wm-legend-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.625rem;
+}
+
+.wm-legend-desc {
+  font-size: 0.8125rem;
+  color: #6c757d;
+  line-height: 1.4;
+}
+
+/* ── Responsive ──────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .wm-header {
+    flex-direction: column;
+  }
+
+  .wm-table-head,
+  .wm-row {
+    grid-template-columns: 1fr 90px;
+  }
+
+  .wm-th--joined,
+  .wm-th--actions,
+  .wm-cell--joined,
+  .wm-cell--actions {
+    display: none;
+  }
+
+  .wm-legend-grid {
+    grid-template-columns: 1fr;
+  }
+}

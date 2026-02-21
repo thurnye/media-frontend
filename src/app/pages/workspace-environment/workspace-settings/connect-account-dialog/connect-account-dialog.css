@@ -1,0 +1,212 @@
+/* ── Backdrop ────────────────────────────────────────────────── */
+.cad-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+/* ── Dialog ──────────────────────────────────────────────────── */
+.cad-dialog {
+  background: #fff;
+  border-radius: 0.75rem;
+  width: 100%;
+  max-width: 480px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+  animation: cad-fade-in 0.15s ease;
+}
+
+@keyframes cad-fade-in {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Header ──────────────────────────────────────────────────── */
+.cad-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.cad-title {
+  flex: 1;
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin: 0;
+}
+
+.cad-back-btn,
+.cad-close-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: none;
+  border-radius: 0.375rem;
+  color: #6c757d;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.cad-back-btn:hover,
+.cad-close-btn:hover {
+  background: #f0f0f0;
+}
+
+/* ── Body ────────────────────────────────────────────────────── */
+.cad-body {
+  padding: 1.5rem;
+}
+
+.cad-hint {
+  font-size: 0.875rem;
+  color: #6c757d;
+  margin: 0 0 1rem;
+}
+
+/* ── Platform grid (Step 1) ──────────────────────────────────── */
+.cad-platform-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+}
+
+.cad-platform-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 1.125rem 0.5rem;
+  background: #f8f9fa;
+  border: 2px solid transparent;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease, transform 0.1s ease;
+}
+
+.cad-platform-btn:hover {
+  border-color: var(--platform-color);
+  background: #fff;
+  transform: translateY(-1px);
+}
+
+.cad-platform-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 0.625rem;
+  color: #fff;
+  font-size: 1.125rem;
+  font-weight: 700;
+}
+
+.cad-platform-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #344054;
+}
+
+/* ── Form fields (Step 2) ────────────────────────────────────── */
+.cad-label {
+  display: block;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #344054;
+  margin-bottom: 0.375rem;
+}
+
+.cad-label + .cad-input + .cad-label {
+  margin-top: 1rem;
+}
+
+.cad-optional {
+  font-weight: 400;
+  color: #9ca3af;
+}
+
+.cad-input {
+  display: block;
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  color: #212529;
+  background: #fff;
+  border: 1px solid #d0d5dd;
+  border-radius: 0.5rem;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  box-sizing: border-box;
+}
+
+.cad-input:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+}
+
+.cad-input::placeholder {
+  color: #adb5bd;
+}
+
+/* ── Footer ──────────────────────────────────────────────────── */
+.cad-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.625rem;
+  padding: 1rem 1.5rem;
+  border-top: 1px solid #e9ecef;
+}
+
+.cad-btn {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s ease, opacity 0.15s ease;
+}
+
+.cad-btn--cancel {
+  background: #f3f4f6;
+  color: #344054;
+}
+
+.cad-btn--cancel:hover {
+  background: #e5e7eb;
+}
+
+.cad-btn--connect {
+  background: #6366f1;
+  color: #fff;
+}
+
+.cad-btn--connect:hover:not(:disabled) {
+  background: #4f46e5;
+}
+
+.cad-btn--connect:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ── Responsive ─────────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .cad-dialog {
+    margin: 1rem;
+  }
+
+  .cad-platform-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

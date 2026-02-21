@@ -1,0 +1,145 @@
+<div class="auth-wrapper">
+
+  <!-- Left: Form panel -->
+  <div class="auth-form-panel">
+    <div class="auth-form-inner">
+
+      <div class="mb-4">
+        <h1 class="fw-bold h2 mb-1">Create account</h1>
+        <p class="text-muted">
+          Already have one?
+          <a routerLink="/login" class="text-primary fw-semibold text-decoration-none">Sign in</a>
+        </p>
+      </div>
+
+      @if (error()) {
+        <div class="alert alert-danger rounded-3 py-2 small">{{ error() }}</div>
+      }
+
+      <form (ngSubmit)="onSignup()">
+
+        <!-- First + Last name side by side -->
+        <div class="row g-3 mb-3">
+          <div class="col-6">
+            <label class="form-label fw-semibold">First name</label>
+            <input
+              type="text"
+              class="form-control form-control-lg auth-input"
+              placeholder="John"
+              [formField]="signupForm.firstName"
+            />
+            @if (signupForm.firstName().touched() && signupForm.firstName().invalid()) {
+              @for (e of signupForm.firstName().errors(); track e.kind) {
+                <div class="form-text text-danger">{{ e.message }}</div>
+              }
+            }
+          </div>
+          <div class="col-6">
+            <label class="form-label fw-semibold">Last name</label>
+            <input
+              type="text"
+              class="form-control form-control-lg auth-input"
+              placeholder="Doe"
+              [formField]="signupForm.lastName"
+            />
+            @if (signupForm.lastName().touched() && signupForm.lastName().invalid()) {
+              @for (e of signupForm.lastName().errors(); track e.kind) {
+                <div class="form-text text-danger">{{ e.message }}</div>
+              }
+            }
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Email address</label>
+          <input
+            type="email"
+            class="form-control form-control-lg auth-input"
+            placeholder="you@example.com"
+            [formField]="signupForm.email"
+          />
+          @if (signupForm.email().touched() && signupForm.email().invalid()) {
+            @for (e of signupForm.email().errors(); track e.kind) {
+              <div class="form-text text-danger">{{ e.message }}</div>
+            }
+          }
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Password</label>
+          <input
+            type="password"
+            class="form-control form-control-lg auth-input"
+            placeholder="Min. 6 characters"
+            [formField]="signupForm.password"
+          />
+          @if (signupForm.password().touched() && signupForm.password().invalid()) {
+            @for (e of signupForm.password().errors(); track e.kind) {
+              <div class="form-text text-danger">{{ e.message }}</div>
+            }
+          }
+        </div>
+
+        <div class="mb-4">
+          <label class="form-label fw-semibold">Date of birth</label>
+          <input
+            type="date"
+            class="form-control form-control-lg auth-input"
+            [formField]="signupForm.dateOfBirth"
+          />
+          @if (signupForm.dateOfBirth().touched() && signupForm.dateOfBirth().invalid()) {
+            @for (e of signupForm.dateOfBirth().errors(); track e.kind) {
+              <div class="form-text text-danger">{{ e.message }}</div>
+            }
+          }
+        </div>
+
+        <p class="text-muted small mb-3">
+          By signing up, you agree to our <a href="#" class="text-primary">Terms</a> and
+          <a href="#" class="text-primary">Privacy Policy</a>.
+        </p>
+
+        <button
+          type="submit"
+          class="btn auth-btn btn-lg w-100"
+          [disabled]="signupForm().invalid() || loading()"
+        >
+          @if (loading()) {
+            <span class="spinner-border spinner-border-sm me-2"></span>Creating account…
+          } @else {
+            Create Account →
+          }
+        </button>
+      </form>
+
+      <div class="auth-divider my-4"><span>or sign up with</span></div>
+
+      <div class="d-flex gap-2">
+        <button class="social-btn flex-fill">G</button>
+        <button class="social-btn flex-fill">in</button>
+        <button class="social-btn flex-fill">gh</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Right: Decorative panel -->
+  <div class="auth-panel d-none d-lg-flex">
+    <div class="auth-panel-inner">
+      <div class="auth-brand mb-5">
+        <span class="brand-dot"></span>
+        <span class="brand-name">POST Manager</span>
+      </div>
+      <h2 class="text-white fw-bold mb-3">Start writing today.</h2>
+      <p class="text-white-75 mb-5">
+        Create an account and get instant access to a clean, powerful post management dashboard.
+      </p>
+      <ul class="auth-features list-unstyled">
+        <li><span class="check-icon">✓</span> Free to get started</li>
+        <li><span class="check-icon">✓</span> Create unlimited posts</li>
+        <li><span class="check-icon">✓</span> Secure &amp; private</li>
+      </ul>
+    </div>
+  </div>
+
+</div>

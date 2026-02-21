@@ -1,0 +1,300 @@
+/* ── Layout ── */
+.pf-wrapper {
+  min-height: calc(100vh - 56px);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 3rem 1rem;
+  background: #f5f5f5;
+}
+
+.pf-card {
+  width: 100%;
+  max-width: 720px;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+/* ── Header ── */
+.pf-header {
+  padding: 2.5rem 2.5rem 0;
+}
+
+.pf-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  background: #212529;
+  color: #fff;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+}
+
+.pf-heading {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #111;
+  margin: 0 0 0.4rem;
+  line-height: 1.25;
+}
+
+.pf-subheading {
+  color: #6c757d;
+  font-size: 0.95rem;
+  margin: 0 0 2rem;
+}
+
+/* ── Form ── */
+.pf-form {
+  padding: 2rem 2.5rem 2.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.pf-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.pf-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #212529;
+}
+
+.pf-required {
+  color: #dc3545;
+  margin-left: 2px;
+}
+
+.pf-input,
+.pf-textarea {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1.5px solid #dee2e6;
+  border-radius: 10px;
+  font-size: 1rem;
+  color: #212529;
+  background: #fafafa;
+  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+  resize: none;
+  font-family: inherit;
+}
+
+.pf-input:focus,
+.pf-textarea:focus {
+  outline: none;
+  border-color: #212529;
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(33, 37, 41, 0.08);
+}
+
+.pf-input::placeholder,
+.pf-textarea::placeholder {
+  color: #adb5bd;
+}
+
+.pf-hint {
+  font-size: 0.78rem;
+  color: #adb5bd;
+}
+
+/* ── Row layout (side-by-side fields) ── */
+.pf-row {
+  display: flex;
+  gap: 1rem;
+}
+
+.pf-field--half {
+  flex: 1;
+}
+
+select.pf-input {
+  appearance: none;
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%236c757d' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.9rem center;
+  padding-right: 2.5rem;
+}
+
+/* ── Toggle row ── */
+.pf-toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  background: #fafafa;
+  border: 1.5px solid #f0f0f0;
+  border-radius: 10px;
+}
+
+.pf-toggle-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.pf-switch {
+  position: relative;
+  width: 44px;
+  height: 24px;
+  flex-shrink: 0;
+}
+
+.pf-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.pf-slider {
+  position: absolute;
+  inset: 0;
+  background: #dee2e6;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.pf-slider::before {
+  content: '';
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  left: 3px;
+  bottom: 3px;
+  background: #fff;
+  border-radius: 50%;
+  transition: transform 0.2s;
+}
+
+.pf-switch input:checked + .pf-slider {
+  background: #212529;
+}
+
+.pf-switch input:checked + .pf-slider::before {
+  transform: translateX(20px);
+}
+
+/* ── Actions ── */
+.pf-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 0.75rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid #f0f0f0;
+}
+
+.pf-btn-ghost {
+  padding: 0.6rem 1.4rem;
+  border: 1.5px solid #dee2e6;
+  border-radius: 8px;
+  background: transparent;
+  color: #6c757d;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s;
+}
+
+.pf-btn-ghost:hover {
+  border-color: #adb5bd;
+  color: #212529;
+}
+
+.pf-btn-primary {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.6rem;
+  border: none;
+  border-radius: 8px;
+  background: #212529;
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+}
+
+.pf-btn-primary:hover {
+  background: #343a40;
+}
+
+.pf-btn-primary:active {
+  transform: scale(0.98);
+}
+
+.pf-btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ── Error ── */
+.pf-error {
+  margin: 0 2.5rem;
+  padding: 0.75rem 1rem;
+  background: #fff5f5;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  color: #dc3545;
+  font-size: 0.875rem;
+}
+
+/* ── Skeleton (edit loading state) ── */
+@keyframes shimmer {
+  0%   { background-position: -400px 0; }
+  100% { background-position:  400px 0; }
+}
+
+.pf-skeleton-line,
+.pf-skeleton-area {
+  border-radius: 8px;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 800px 100%;
+  animation: shimmer 1.4s infinite;
+}
+
+.pf-skeleton-line.tall  { height: 44px; }
+.pf-skeleton-line.short { height: 44px; width: 60%; }
+.pf-skeleton-area       { height: 180px; }
+
+/* ── Responsive ── */
+@media (max-width: 600px) {
+  .pf-wrapper { padding: 1.5rem 0.75rem; align-items: flex-start; }
+  .pf-card { border-radius: 12px; }
+  .pf-header { padding: 1.5rem 1.25rem 0; }
+  .pf-heading { font-size: 1.35rem; }
+  .pf-form { padding: 1.25rem; gap: 1.1rem; }
+  .pf-error { margin: 0 1.25rem; }
+  .pf-row { flex-direction: column; gap: 1.1rem; }
+  .pf-actions { flex-direction: column-reverse; gap: 0.5rem; }
+  .pf-btn-ghost,
+  .pf-btn-primary { width: 100%; justify-content: center; padding: 0.7rem 1rem; }
+}
+
+/* ── Button spinner ── */
+.pf-spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255,255,255,0.4);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  display: inline-block;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}

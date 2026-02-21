@@ -1,0 +1,251 @@
+<div class="ds-shell">
+  <!-- ── Sidebar ── -->
+  <aside
+    id="ds-sidebar"
+    class="ds-sidebar"
+    [class.open]="sidebarOpen()"
+    aria-label="Main navigation"
+    [attr.aria-hidden]="!sidebarOpen() ? 'true' : null"
+  >
+    <div class="ds-brand">
+      <div class="ds-brand-logo" aria-hidden="true">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="20"
+          height="20"
+          fill="currentColor"
+          viewBox="0 0 16 16"
+        >
+          <path
+            d="M14.5 3a.5.5 0 0 1 .5.5v9a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5zm-13-1A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2z"
+          />
+          <path
+            d="M3 5.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5M3 8a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9A.5.5 0 0 1 3 8m0 2.5a.5.5 0 0 1 .5-.5h6a.5.5 0 0 1 0 1h-6a.5.5 0 0 1-.5-.5"
+          />
+        </svg>
+      </div>
+      <span class="ds-brand-name">POST Manager</span>
+      <button class="ds-close-btn" (click)="closeSidebar()" aria-label="Close navigation menu">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="18"
+          height="18"
+          fill="currentColor"
+          viewBox="0 0 16 16"
+          aria-hidden="true"
+        >
+          <path
+            d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"
+          />
+        </svg>
+      </button>
+    </div>
+
+    <nav class="ds-nav" role="navigation" aria-label="Sidebar links">
+      <!-- Overview -->
+      <a
+        routerLink="/dashboard"
+        [routerLinkActiveOptions]="{ exact: true }"
+        routerLinkActive="ds-nav-link--active"
+        class="ds-nav-link"
+        (click)="closeSidebar()"
+        aria-label="Overview"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="16"
+          height="16"
+          fill="currentColor"
+          viewBox="0 0 16 16"
+          aria-hidden="true"
+        >
+          <path
+            d="M8 4a.5.5 0 0 1 .5.5V6a.5.5 0 0 1-1 0V4.5A.5.5 0 0 1 8 4M3.732 5.732a.5.5 0 0 1 .707 0l.915.914a.5.5 0 1 1-.708.708l-.914-.915a.5.5 0 0 1 0-.707M2 10a.5.5 0 0 1 .5-.5h1.586a.5.5 0 0 1 0 1H2.5A.5.5 0 0 1 2 10m9.5 0a.5.5 0 0 1 .5-.5h1.5a.5.5 0 0 1 0 1H12a.5.5 0 0 1-.5-.5m.754-4.246a.39.39 0 0 0-.527-.02L7.547 9.31a.91.91 0 1 0 1.302 1.258l3.434-4.297a.39.39 0 0 0-.029-.518z"
+          />
+          <path
+            fill-rule="evenodd"
+            d="M0 10a8 8 0 1 1 15.547 2.661c-.442 1.253-1.845 1.602-2.932 1.25C11.309 13.488 9.475 13 8 13c-1.474 0-3.31.488-4.615.911-1.087.352-2.49.003-2.932-1.25A8 8 0 0 1 0 10m8-7a7 7 0 0 0-6.603 9.329c.203.575.923.876 1.68.63C4.397 12.533 6.358 12 8 12s3.604.532 4.923.96c.757.245 1.477-.056 1.68-.631A7 7 0 0 0 8 3"
+          />
+        </svg>
+        Overview
+      </a>
+
+      <!-- ── Workspaces ── -->
+      <div class="ds-nav-section-row">
+        <span class="ds-nav-section" role="separator">Workspaces</span>
+        <a
+          routerLink="/dashboard/workspace/new"
+          class="ds-nav-add-btn"
+          title="Create new workspace"
+          aria-label="Create new workspace"
+          (click)="closeSidebar()"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="14"
+            height="14"
+            fill="currentColor"
+            viewBox="0 0 16 16"
+            aria-hidden="true"
+          >
+            <path
+              d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"
+            />
+          </svg>
+        </a>
+      </div>
+
+      @if (workspaces().length === 0) {
+        <div class="ds-ws-empty">
+          No workspaces yet.
+          <a routerLink="/dashboard/workspace/new" class="ds-ws-empty-link" (click)="closeSidebar()"
+            >Create one →</a
+          >
+        </div>
+      } @else {
+        @for (ws of workspaces(); track ws.id) {
+          <a
+            [routerLink]="['/dashboard/workspace', ws.id]"
+            routerLinkActive="ds-nav-link--active"
+            class="ds-nav-link ds-nav-link--ws"
+            (click)="closeSidebar()"
+          >
+            <span class="ds-ws-icon">{{ ws.name[0].toUpperCase() }}</span>
+            <span class="ds-ws-name">{{ ws.name }}</span>
+          </a>
+        }
+      }
+
+      <!-- <div class="ds-nav-section" role="separator" aria-label="Content section">Content</div> -->
+
+      <!-- New Post -->
+      <!-- <a
+        routerLink="/dashboard/post/new"
+        routerLinkActive="ds-nav-link--active"
+        class="ds-nav-link"
+        (click)="closeSidebar()"
+        aria-label="Create new post"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="16"
+          height="16"
+          fill="currentColor"
+          viewBox="0 0 16 16"
+          aria-hidden="true"
+        >
+          <path
+            d="M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.499.499 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11z"
+          />
+        </svg>
+        New Post
+      </a> -->
+      <!-- Posts -->
+      <!-- <a
+        routerLink="/dashboard/posts"
+        routerLinkActive="ds-nav-link--active"
+        class="ds-nav-link"
+        (click)="closeSidebar()"
+        aria-label="All posts"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="16"
+          height="16"
+          fill="currentColor"
+          viewBox="0 0 16 16"
+          aria-hidden="true"
+        >
+          <path
+            d="M14.5 3a.5.5 0 0 1 .5.5v9a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5zm-13-1A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2z"
+          />
+          <path
+            d="M3 5.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5M3 8a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9A.5.5 0 0 1 3 8m0 2.5a.5.5 0 0 1 .5-.5h6a.5.5 0 0 1 0 1h-6a.5.5 0 0 1-.5-.5"
+          />
+        </svg>
+        Posts
+      </a> -->
+    </nav>
+
+    <!-- Sidebar Footer: User -->
+    <div class="ds-sidebar-footer">
+      @if (user()) {
+        <div
+          class="ds-user"
+          role="status"
+          aria-label="Logged in as {{ user()!.firstName }} {{ user()!.lastName }}"
+        >
+          <div class="ds-user-avatar" aria-hidden="true">{{ initials() }}</div>
+          <div class="ds-user-info">
+            <div class="ds-user-name">{{ user()!.firstName }} {{ user()!.lastName }}</div>
+            <div class="ds-user-email">{{ user()!.email }}</div>
+          </div>
+        </div>
+        <button class="ds-logout-btn" (click)="onLogout()" aria-label="Log out">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="15"
+            height="15"
+            fill="currentColor"
+            viewBox="0 0 16 16"
+            aria-hidden="true"
+          >
+            <path
+              fill-rule="evenodd"
+              d="M10 12.5a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v2a.5.5 0 0 0 1 0v-2A1.5 1.5 0 0 0 9.5 2h-8A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-2a.5.5 0 0 0-1 0z"
+            />
+            <path
+              fill-rule="evenodd"
+              d="M15.854 8.354a.5.5 0 0 0 0-.708l-3-3a.5.5 0 0 0-.708.708L14.293 7.5H5.5a.5.5 0 0 0 0 1h8.793l-2.147 2.146a.5.5 0 0 0 .708.708z"
+            />
+          </svg>
+        </button>
+      }
+    </div>
+  </aside>
+
+  <!-- ── Backdrop (mobile) ── -->
+  <div
+    class="ds-backdrop"
+    [class.visible]="sidebarOpen()"
+    (click)="closeSidebar()"
+    (keydown.escape)="closeSidebar()"
+    role="presentation"
+    [attr.aria-hidden]="true"
+  ></div>
+
+  <!-- ── Main area ── -->
+  <div class="ds-main">
+    <!-- Mobile topbar -->
+    <header class="ds-topbar" role="banner">
+      <button
+        class="ds-hamburger"
+        (click)="toggleSidebar()"
+        aria-label="Open navigation menu"
+        aria-controls="ds-sidebar"
+        [attr.aria-expanded]="sidebarOpen()"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="20"
+          height="20"
+          fill="currentColor"
+          viewBox="0 0 16 16"
+          aria-hidden="true"
+        >
+          <path
+            fill-rule="evenodd"
+            d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5"
+          />
+        </svg>
+      </button>
+      <span class="ds-topbar-title">POST Manager</span>
+      <div class="ds-topbar-spacer"></div>
+    </header>
+
+    <!-- Routed content -->
+    <div class="ds-content" role="main">
+      <router-outlet />
+    </div>
+  </div>
+</div>

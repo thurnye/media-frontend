@@ -1,0 +1,189 @@
+@if (loading()) {
+  <!-- ── Loading skeleton ── -->
+  <div class="wh-skeleton">
+    <div class="sk-line sk-title"></div>
+    <div class="sk-line sk-short"></div>
+    <div class="row g-3 mt-3">
+      <div class="col-md-4"><div class="sk-card"></div></div>
+      <div class="col-md-4"><div class="sk-card"></div></div>
+      <div class="col-md-4"><div class="sk-card"></div></div>
+    </div>
+  </div>
+} @else if (workspace(); as ws) {
+  <!-- ── Page header ── -->
+  <div class="wh-header">
+    <div>
+      <h1 class="wh-title">{{ ws.name }}</h1>
+      <p class="wh-subtitle">
+        @if (ws.description) {
+          {{ ws.description }}
+        } @else {
+          Workspace overview and quick actions.
+        }
+      </p>
+    </div>
+    <div class="wh-menu-wrapper">
+      <button type="button" class="wh-btn-ellipsis" (click)="toggleMenu()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
+          <path d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3"/>
+        </svg>
+      </button>
+      @if (showMenu()) {
+        <div class="wh-menu-backdrop" (click)="closeMenu()"></div>
+        <div class="wh-menu-dropdown">
+          <a class="wh-menu-item" routerLink="post/new" (click)="closeMenu()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
+              <path d="M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.499.499 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11z"/>
+            </svg>
+            Create post
+          </a>
+          <button type="button" class="wh-menu-item" (click)="showInviteDialog.set(true); closeMenu()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
+              <path d="M6 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6m-5 6s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zM11 3.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1h-4a.5.5 0 0 1-.5-.5m.5 2.5a.5.5 0 0 0 0 1h4a.5.5 0 0 0 0-1zm2 3a.5.5 0 0 0 0 1h2a.5.5 0 0 0 0-1zm-2 3a.5.5 0 0 0 0 1h4a.5.5 0 0 0 0-1z"/>
+            </svg>
+            Invite members
+          </button>
+          <button type="button" class="wh-menu-item" (click)="showConnectDialog.set(true); closeMenu()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
+              <path d="M0 1.5A1.5 1.5 0 0 1 1.5 0h2A1.5 1.5 0 0 1 5 1.5v2A1.5 1.5 0 0 1 3.5 5h-2A1.5 1.5 0 0 1 0 3.5zM1.5 1a.5.5 0 0 0-.5.5v2a.5.5 0 0 0 .5.5h2a.5.5 0 0 0 .5-.5v-2a.5.5 0 0 0-.5-.5zM0 8a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2zm1 3v2a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2zm14-1V8a1 1 0 0 0-1-1H2a1 1 0 0 0-1 1v2zM2 8.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5m0 4a.5.5 0 0 1 .5-.5h6a.5.5 0 0 1 0 1h-6a.5.5 0 0 1-.5-.5"/>
+            </svg>
+            Connect account
+          </button>
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- ── Quick stats ── -->
+  <div class="row g-3 mb-4">
+    <div class="col-md-4">
+      <div class="wh-stat-card">
+        <div class="wh-stat-icon wh-stat-icon--blue">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="18"
+            height="18"
+            fill="currentColor"
+            viewBox="0 0 16 16"
+          >
+            <path
+              d="M14.5 3a.5.5 0 0 1 .5.5v9a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5zm-13-1A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2z"
+            />
+            <path
+              d="M3 5.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5M3 8a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9A.5.5 0 0 1 3 8m0 2.5a.5.5 0 0 1 .5-.5h6a.5.5 0 0 1 0 1h-6a.5.5 0 0 1-.5-.5"
+            />
+          </svg>
+        </div>
+        <div class="wh-stat-body">
+          <div class="wh-stat-value">0</div>
+          <div class="wh-stat-label">Posts</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="wh-stat-card">
+        <div class="wh-stat-icon wh-stat-icon--green">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="18"
+            height="18"
+            fill="currentColor"
+            viewBox="0 0 16 16"
+          >
+            <path
+              d="M15 14s1 0 1-1-1-4-5-4-5 3-5 4 1 1 1 1zm-7.978-1L7 12.996c.001-.264.167-1.03.76-1.72C8.312 10.629 9.282 10 11 10c1.717 0 2.687.63 3.24 1.276.593.69.758 1.457.76 1.72l-.008.002-.014.002zM11 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4m3-2a3 3 0 1 1-6 0 3 3 0 0 1 6 0M6.936 9.28a6 6 0 0 0-1.23-.247A7 7 0 0 0 5 9c-4 0-5 3-5 4 0 .667.333 1 1 1h4.216A2.24 2.24 0 0 1 5 13c0-.53.217-1.306.658-2.063a5.4 5.4 0 0 1 1.278-1.658"
+            />
+          </svg>
+        </div>
+        <div class="wh-stat-body">
+          <div class="wh-stat-value">1</div>
+          <div class="wh-stat-label">Members</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="wh-stat-card">
+        <div class="wh-stat-icon wh-stat-icon--purple">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="18"
+            height="18"
+            fill="currentColor"
+            viewBox="0 0 16 16"
+          >
+            <path
+              d="M5.5 9.511c.076.954.83 1.697 2.182 1.785V12h.6v-.709c1.4-.098 2.218-.846 2.218-1.932 0-.987-.626-1.496-1.745-1.76l-.473-.112V5.57c.6.068.982.396 1.074.85h1.052c-.076-.919-.864-1.638-2.126-1.716V4h-.6v.719c-1.195.117-2.01.836-2.01 1.853 0 .9.606 1.472 1.613 1.707l.397.098v2.034c-.615-.093-1.022-.43-1.114-.9zm2.177-2.166c-.59-.137-.91-.416-.91-.836 0-.47.345-.822.915-.925v1.76h-.005zm.692 1.193c.717.166 1.048.435 1.048.91 0 .542-.412.914-1.135.982V8.518z"
+            />
+            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16" />
+          </svg>
+        </div>
+        <div class="wh-stat-body">
+          <div class="wh-stat-value wh-stat-value--cap">{{ ws.plan ?? 'free' }}</div>
+          <div class="wh-stat-label">Plan</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Details card ── -->
+  <div class="wh-card mb-4">
+    <h2 class="wh-card-title">Workspace Details</h2>
+    <div class="wh-detail-grid">
+      <div class="wh-detail-item">
+        <span class="wh-detail-label">Slug</span>
+        <span class="wh-detail-value">/workspace/{{ ws.slug }}</span>
+      </div>
+      <div class="wh-detail-item">
+        <span class="wh-detail-label">Timezone</span>
+        <span class="wh-detail-value">{{ ws.defaultTimezone ?? 'Etc/UTC' }}</span>
+      </div>
+      <div class="wh-detail-item">
+        <span class="wh-detail-label">Created</span>
+        <span class="wh-detail-value">{{ ws.createdAt ?? '—' }}</span>
+      </div>
+      <div class="wh-detail-item">
+        <span class="wh-detail-label">Status</span>
+        <span class="wh-detail-value">
+          <span class="wh-status-dot wh-status-dot--active"></span>
+          Active
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Settings overview ── -->
+  <div class="wh-card mb-4">
+    <h2 class="wh-card-title">Workflow Settings</h2>
+    <div class="wh-settings-list">
+      <div class="wh-setting-row">
+        <span class="wh-setting-name">Require approval</span>
+        <span class="wh-setting-badge" [class.wh-setting-badge--on]="ws.settings?.approvalRequired">
+          {{ ws.settings?.approvalRequired ? 'On' : 'Off' }}
+        </span>
+      </div>
+      <div class="wh-setting-row">
+        <span class="wh-setting-name">Evergreen content</span>
+        <span class="wh-setting-badge" [class.wh-setting-badge--on]="ws.settings?.evergreenEnabled">
+          {{ ws.settings?.evergreenEnabled ? 'On' : 'Off' }}
+        </span>
+      </div>
+      <div class="wh-setting-row">
+        <span class="wh-setting-name">Auto-publish</span>
+        <span
+          class="wh-setting-badge"
+          [class.wh-setting-badge--on]="ws.settings?.autoPublishEnabled"
+        >
+          {{ ws.settings?.autoPublishEnabled ? 'On' : 'Off' }}
+        </span>
+      </div>
+    </div>
+  </div>
+
+  @if (showInviteDialog()) {
+    <app-invite-dialog [workspaceId]="ws.id" (close)="showInviteDialog.set(false)" />
+  }
+
+  @if (showConnectDialog()) {
+    <app-connect-account-dialog [workspaceId]="ws.id" (close)="showConnectDialog.set(false)" />
+  }
+}

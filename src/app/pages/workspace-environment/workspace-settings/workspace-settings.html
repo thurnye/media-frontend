@@ -1,0 +1,193 @@
+@if (workspace(); as ws) {
+
+  <!-- ── Header ── -->
+  <div class="wst-header">
+    <h1 class="wst-title">Settings</h1>
+    <p class="wst-subtitle">Manage workspace configuration, preferences, and danger zone actions.</p>
+  </div>
+
+  <!-- ── General settings ── -->
+  <div class="wst-card mb-4">
+    <div class="wst-card-head">
+      <h2 class="wst-card-title">General</h2>
+      <a [routerLink]="['/dashboard/workspace', ws.id, 'edit']" class="wst-edit-link">Edit</a>
+    </div>
+    <div class="wst-detail-grid">
+      <div class="wst-detail-item">
+        <span class="wst-detail-label">Workspace name</span>
+        <span class="wst-detail-value">{{ ws.name }}</span>
+      </div>
+      <div class="wst-detail-item">
+        <span class="wst-detail-label">Slug</span>
+        <span class="wst-detail-value">/workspace/{{ ws.slug }}</span>
+      </div>
+      <div class="wst-detail-item">
+        <span class="wst-detail-label">Description</span>
+        <span class="wst-detail-value">{{ ws.description || '—' }}</span>
+      </div>
+      <div class="wst-detail-item">
+        <span class="wst-detail-label">Timezone</span>
+        <span class="wst-detail-value">{{ ws.defaultTimezone ?? 'Etc/UTC' }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Plan & billing ── -->
+  <div class="wst-card mb-4">
+    <div class="wst-card-head">
+      <h2 class="wst-card-title">Plan & Billing</h2>
+    </div>
+    <div class="wst-plan-row">
+      <div class="wst-plan-info">
+        <span class="wst-plan-badge">{{ ws.plan ?? 'free' }}</span>
+        <span class="wst-plan-desc">
+          @switch (ws.plan) {
+            @case ('pro') { Advanced features and more storage. }
+            @case ('enterprise') { Custom limits and dedicated support. }
+            @default { For individuals and small teams. }
+          }
+        </span>
+      </div>
+      <button class="btn wst-btn-outline" disabled>Upgrade plan</button>
+    </div>
+    <div class="wst-billing-grid">
+      <div class="wst-billing-item">
+        <span class="wst-billing-label">Members</span>
+        <span class="wst-billing-value">1 / unlimited</span>
+      </div>
+      <div class="wst-billing-item">
+        <span class="wst-billing-label">Posts</span>
+        <span class="wst-billing-value">0 / unlimited</span>
+      </div>
+      <div class="wst-billing-item">
+        <span class="wst-billing-label">Social accounts</span>
+        <span class="wst-billing-value">{{ activeCount() }} / 3</span>
+      </div>
+      <div class="wst-billing-item">
+        <span class="wst-billing-label">Storage used</span>
+        <span class="wst-billing-value">0 MB</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Connected Accounts ── -->
+  <div class="wst-card mb-4">
+    <div class="wst-card-head">
+      <h2 class="wst-card-title">Connected Accounts</h2>
+      <button class="wst-btn-connect" (click)="showConnectDialog.set(true)">
+        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="currentColor" viewBox="0 0 16 16">
+          <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"/>
+        </svg>
+        Connect account
+      </button>
+    </div>
+
+    @if (accountsLoading()) {
+      <div class="wst-accounts-empty">Loading accounts...</div>
+    } @else if (accounts().length === 0) {
+      <div class="wst-accounts-empty">No accounts connected yet. Connect a social media account to get started.</div>
+    } @else {
+      <div class="wst-account-list">
+        @for (account of accounts(); track account.id) {
+          <div class="wst-account-row">
+            <div class="wst-account-icon" [style.background]="getPlatformColor(account.platform)">
+              {{ getPlatformLabel(account.platform).charAt(0) }}
+            </div>
+            <div class="wst-account-info">
+              <span class="wst-account-name">{{ account.displayName }}</span>
+              <span class="wst-account-meta">{{ getPlatformLabel(account.platform) }} · {{ account.accountId }}</span>
+            </div>
+            <div class="wst-account-right">
+              <span
+                class="wst-account-status"
+                [class.wst-account-status--active]="account.status === 'active'"
+                [class.wst-account-status--disconnected]="account.status === 'disconnected'"
+                [class.wst-account-status--suspended]="account.status === 'suspended'"
+              >
+                {{ account.status }}
+              </span>
+              @if (account.status !== 'disconnected') {
+                <button
+                  class="wst-btn-disconnect"
+                  (click)="onDisconnect(account.id)"
+                  type="button"
+                >
+                  Disconnect
+                </button>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </div>
+
+  <!-- ── Workflow settings ── -->
+  <div class="wst-card mb-4">
+    <div class="wst-card-head">
+      <h2 class="wst-card-title">Workflow</h2>
+      <a [routerLink]="['/dashboard/workspace', ws.id, 'edit']" class="wst-edit-link">Edit</a>
+    </div>
+    <div class="wst-toggle-list">
+      <div class="wst-toggle-row">
+        <div class="wst-toggle-text">
+          <span class="wst-toggle-name">Require approval</span>
+          <span class="wst-toggle-desc">Posts must be approved before publishing.</span>
+        </div>
+        <span class="wst-toggle-status" [class.wst-toggle-status--on]="ws.settings?.approvalRequired">
+          {{ ws.settings?.approvalRequired ? 'On' : 'Off' }}
+        </span>
+      </div>
+      <div class="wst-toggle-row">
+        <div class="wst-toggle-text">
+          <span class="wst-toggle-name">Evergreen content</span>
+          <span class="wst-toggle-desc">Auto-resurface relevant posts periodically.</span>
+        </div>
+        <span class="wst-toggle-status" [class.wst-toggle-status--on]="ws.settings?.evergreenEnabled">
+          {{ ws.settings?.evergreenEnabled ? 'On' : 'Off' }}
+        </span>
+      </div>
+      <div class="wst-toggle-row">
+        <div class="wst-toggle-text">
+          <span class="wst-toggle-name">Auto-publish</span>
+          <span class="wst-toggle-desc">Publish scheduled posts automatically.</span>
+        </div>
+        <span class="wst-toggle-status" [class.wst-toggle-status--on]="ws.settings?.autoPublishEnabled">
+          {{ ws.settings?.autoPublishEnabled ? 'On' : 'Off' }}
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Danger zone ── -->
+  <div class="wst-card wst-card--danger">
+    <div class="wst-card-head">
+      <h2 class="wst-card-title wst-card-title--danger">Danger Zone</h2>
+    </div>
+    <div class="wst-danger-list">
+      <div class="wst-danger-row">
+        <div class="wst-danger-text">
+          <span class="wst-danger-name">Transfer ownership</span>
+          <span class="wst-danger-desc">Transfer this workspace to another user. You will lose owner privileges.</span>
+        </div>
+        <button class="btn wst-btn-danger-outline" disabled>Transfer</button>
+      </div>
+      <div class="wst-danger-row">
+        <div class="wst-danger-text">
+          <span class="wst-danger-name">Delete workspace</span>
+          <span class="wst-danger-desc">Permanently delete this workspace and all its data. This action cannot be undone.</span>
+        </div>
+        <button class="btn wst-btn-danger" disabled>Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Connect Account Dialog ── -->
+  @if (showConnectDialog()) {
+    <app-connect-account-dialog
+      [workspaceId]="ws.id"
+      (close)="showConnectDialog.set(false)"
+    />
+  }
+
+}
