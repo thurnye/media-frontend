@@ -167,7 +167,7 @@ export class PostDetail implements OnInit, OnDestroy {
     this.closeReviewerDecisionMenu();
     const post = this.post();
     if (!post) return;
-    if (post.status !== 'pending_approval') return;
+    if (post.status !== 'pending_approval' && post.status !== 'rejected') return;
     if (!decision) return;
 
     if (decision === 'approved') {
