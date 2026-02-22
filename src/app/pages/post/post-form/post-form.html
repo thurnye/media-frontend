@@ -1,138 +1,319 @@
-<div class="pf-wrapper">
-  <div class="pf-card">
+<div class="pf-layout">
+  <!-- Forms -->
+  <div class="pf-left">
+    <div class="pf-wrapper">
+      <div class="pf-card">
+        <!-- Header -->
+        <div class="pf-header">
+          <span class="pf-badge">{{ isEdit() ? 'Edit Post' : 'New Post' }}</span>
+          <h1 class="pf-heading">{{ isEdit() ? 'Update your post' : 'Create a new post' }}</h1>
+          <p class="pf-subheading">Fill in the details for your post.</p>
+        </div>
 
-    <!-- Header -->
-    <div class="pf-header">
-      <span class="pf-badge">{{ isEdit() ? 'Edit Post' : 'New Post' }}</span>
-      <h1 class="pf-heading">{{ isEdit() ? 'Update your post' : 'Create a new post' }}</h1>
-      <p class="pf-subheading">Fill in the details for your post.</p>
-    </div>
+        <!-- Error -->
+        @if (error()) {
+          <div class="pf-error">{{ error() }}</div>
+        }
 
-    <!-- Error -->
-    @if (error()) {
-      <div class="pf-error">{{ error() }}</div>
-    }
+        <!-- Loading skeleton in edit mode while fetching post -->
+        @if (isEdit() && loading() && !selectedPost()) {
+          <div class="pf-form pf-skeleton">
+            <div class="pf-skeleton-line tall"></div>
+            <div class="pf-skeleton-line short"></div>
+            <div class="pf-skeleton-area"></div>
+            <div class="pf-skeleton-line tall"></div>
+            <div class="pf-skeleton-line tall"></div>
+          </div>
+        } @else {
+          <!-- Form -->
+          <form class="pf-form" (ngSubmit)="onSubmit()" novalidate>
+            <!-- Title -->
+            <div class="pf-field">
+              <label class="pf-label" for="title">Title <span class="pf-required">*</span></label>
+              <input
+                id="title"
+                type="text"
+                class="pf-input"
+                placeholder="Give your post a compelling title…"
+                autocomplete="off"
+                [(ngModel)]="title"
+                name="title"
+                required
+              />
+              <span class="pf-hint">Required · Keep it clear and concise</span>
+            </div>
 
-    <!-- Loading skeleton in edit mode while fetching post -->
-    @if (isEdit() && loading() && !selectedPost()) {
-      <div class="pf-form pf-skeleton">
-        <div class="pf-skeleton-line tall"></div>
-        <div class="pf-skeleton-line short"></div>
-        <div class="pf-skeleton-area"></div>
-        <div class="pf-skeleton-line tall"></div>
-        <div class="pf-skeleton-line tall"></div>
+            <!-- Description -->
+            <div class="pf-field">
+              <label class="pf-label" for="description">Description</label>
+              <textarea
+                id="description"
+                class="pf-textarea"
+                rows="6"
+                placeholder="Describe your post content…"
+                [(ngModel)]="description"
+                name="description"
+              ></textarea>
+              <span class="pf-hint">Optional · Add context or details about this post</span>
+            </div>
+
+            <!-- Media Upload -->
+            <div class="pf-field">
+              <label class="pf-label">Media</label>
+              <div
+                class="pf-dropzone"
+                [class.pf-dropzone--active]="isDragging()"
+                (dragover)="onDragOver($event)"
+                (dragleave)="onDragLeave($event)"
+                (drop)="onDrop($event)"
+                (click)="fileInput.click()"
+              >
+                <input
+                  #fileInput
+                  type="file"
+                  [accept]="acceptedTypes"
+                  multiple
+                  hidden
+                  (change)="onFileSelected($event)"
+                />
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="32"
+                  height="32"
+                  fill="#adb5bd"
+                  viewBox="0 0 16 16"
+                >
+                  <path
+                    d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5"
+                  />
+                  <path
+                    d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708z"
+                  />
+                </svg>
+                <p class="pf-dropzone-text">
+                  Drag & drop images or videos here, or <span class="pf-dropzone-link">browse</span>
+                </p>
+                <span class="pf-hint"
+                  >JPEG, PNG, GIF, WebP, MP4, WebM &mdash; Max 10MB images, 100MB videos</span
+                >
+              </div>
+
+              @if (uploadedMedia().length) {
+                <div class="pf-media-grid">
+                  @for (item of uploadedMedia(); track $index) {
+                    <div
+                      class="pf-media-item"
+                      [class.pf-media-item--error]="item.status === 'error'"
+                    >
+                      @if (item.preview) {
+                        <img [src]="item.preview" alt="Preview" class="pf-media-thumb" />
+                      } @else {
+                        <div class="pf-media-video-icon">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            fill="#6c757d"
+                            viewBox="0 0 16 16"
+                          >
+                            <path
+                              d="M0 12V4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2m6.79-6.907A.5.5 0 0 0 6 5.5v5a.5.5 0 0 0 .79.407l3.5-2.5a.5.5 0 0 0 0-.814z"
+                            />
+                          </svg>
+                        </div>
+                      }
+
+                      @if (item.status === 'uploading') {
+                        <div class="pf-media-progress">
+                          <div class="pf-media-progress-bar" [style.width.%]="item.progress"></div>
+                        </div>
+                      }
+
+                      @if (item.status === 'error') {
+                        <span class="pf-media-error-label">Failed</span>
+                      }
+
+                      <button
+                        type="button"
+                        class="pf-media-remove"
+                        (click)="removeMedia($index); $event.stopPropagation()"
+                        title="Remove"
+                      >
+                        &times;
+                      </button>
+
+                      <span class="pf-media-name">{{ item.file.name }}</span>
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+
+            <!-- Category & Priority row -->
+            <div class="pf-row">
+              <div class="pf-field pf-field--half">
+                <label class="pf-label" for="category">Category</label>
+                <select id="category" class="pf-input" [(ngModel)]="category" name="category">
+                  <option value="">Select a category</option>
+                  @for (cat of categories; track cat.value) {
+                    <option [value]="cat.value">{{ cat.label }}</option>
+                  }
+                </select>
+              </div>
+
+              <div class="pf-field pf-field--half">
+                <label class="pf-label" for="priority">Priority</label>
+                <select id="priority" class="pf-input" [(ngModel)]="priority" name="priority">
+                  <option value="">Select priority</option>
+                  @for (p of priorities; track p.value) {
+                    <option [value]="p.value">{{ p.label }}</option>
+                  }
+                </select>
+              </div>
+            </div>
+
+            <!-- Tags -->
+            <div class="pf-field">
+              <label class="pf-label" for="tags">Tags</label>
+              <input
+                id="tags"
+                type="text"
+                class="pf-input"
+                placeholder="marketing, launch, update"
+                autocomplete="off"
+                [(ngModel)]="tags"
+                name="tags"
+              />
+              <span class="pf-hint">Optional · Comma-separated list of tags</span>
+            </div>
+
+            <!-- Evergreen toggle -->
+            <div class="pf-toggle-row">
+              <div class="pf-toggle-info">
+                <span class="pf-label">Evergreen Content</span>
+                <span class="pf-hint">Mark this post as timeless, reusable content</span>
+              </div>
+              <label class="pf-switch">
+                <input type="checkbox" [(ngModel)]="isEvergreen" name="isEvergreen" />
+                <span class="pf-slider"></span>
+              </label>
+            </div>
+
+            <!-- Actions -->
+            <div class="pf-actions">
+              <button type="button" class="pf-btn-ghost" (click)="onCancel()">Cancel</button>
+              <button
+                type="submit"
+                class="pf-btn-primary"
+                [disabled]="loading() || isSubmitting() || !title.trim()"
+              >
+                @if (loading() || isSubmitting()) {
+                  <span class="pf-spinner"></span>
+                  {{ isEdit() ? 'Saving…' : 'Creating…' }}
+                } @else {
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    fill="currentColor"
+                    viewBox="0 0 16 16"
+                  >
+                    <path
+                      d="M15.854.146a.5.5 0 0 1 .11.54l-5.819 14.547a.75.75 0 0 1-1.329.124l-3.178-4.995L.643 7.184a.75.75 0 0 1 .124-1.33L15.314.037a.5.5 0 0 1 .54.11ZM6.636 10.07l2.761 4.338L14.13 2.576zm6.787-8.201L1.591 6.602l4.339 2.76z"
+                    />
+                  </svg>
+                  {{ isEdit() ? 'Save Changes' : 'Create Post' }}
+                }
+              </button>
+            </div>
+          </form>
+        }
       </div>
-    } @else {
-      <!-- Form -->
-      <form class="pf-form" (ngSubmit)="onSubmit()" novalidate>
-
-        <!-- Title -->
-        <div class="pf-field">
-          <label class="pf-label" for="title">Title <span class="pf-required">*</span></label>
-          <input
-            id="title"
-            type="text"
-            class="pf-input"
-            placeholder="Give your post a compelling title…"
-            autocomplete="off"
-            [(ngModel)]="title"
-            name="title"
-            required
-          />
-          <span class="pf-hint">Required · Keep it clear and concise</span>
-        </div>
-
-        <!-- Description -->
-        <div class="pf-field">
-          <label class="pf-label" for="description">Description</label>
-          <textarea
-            id="description"
-            class="pf-textarea"
-            rows="6"
-            placeholder="Describe your post content…"
-            [(ngModel)]="description"
-            name="description"
-          ></textarea>
-          <span class="pf-hint">Optional · Add context or details about this post</span>
-        </div>
-
-        <!-- Category & Priority row -->
-        <div class="pf-row">
-          <div class="pf-field pf-field--half">
-            <label class="pf-label" for="category">Category</label>
-            <select
-              id="category"
-              class="pf-input"
-              [(ngModel)]="category"
-              name="category"
-            >
-              <option value="">Select a category</option>
-              @for (cat of categories; track cat.value) {
-                <option [value]="cat.value">{{ cat.label }}</option>
-              }
-            </select>
-          </div>
-
-          <div class="pf-field pf-field--half">
-            <label class="pf-label" for="priority">Priority</label>
-            <select
-              id="priority"
-              class="pf-input"
-              [(ngModel)]="priority"
-              name="priority"
-            >
-              <option value="">Select priority</option>
-              @for (p of priorities; track p.value) {
-                <option [value]="p.value">{{ p.label }}</option>
-              }
-            </select>
-          </div>
-        </div>
-
-        <!-- Tags -->
-        <div class="pf-field">
-          <label class="pf-label" for="tags">Tags</label>
-          <input
-            id="tags"
-            type="text"
-            class="pf-input"
-            placeholder="marketing, launch, update"
-            autocomplete="off"
-            [(ngModel)]="tags"
-            name="tags"
-          />
-          <span class="pf-hint">Optional · Comma-separated list of tags</span>
-        </div>
-
-        <!-- Evergreen toggle -->
-        <div class="pf-toggle-row">
-          <div class="pf-toggle-info">
-            <span class="pf-label">Evergreen Content</span>
-            <span class="pf-hint">Mark this post as timeless, reusable content</span>
-          </div>
-          <label class="pf-switch">
-            <input type="checkbox" [(ngModel)]="isEvergreen" name="isEvergreen" />
-            <span class="pf-slider"></span>
-          </label>
-        </div>
-
-        <!-- Actions -->
-        <div class="pf-actions">
-          <button type="button" class="pf-btn-ghost" (click)="onCancel()">Cancel</button>
-          <button type="submit" class="pf-btn-primary" [disabled]="loading() || !title.trim()">
-            @if (loading()) {
-              <span class="pf-spinner"></span>
-              {{ isEdit() ? 'Saving…' : 'Creating…' }}
-            } @else {
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                <path d="M15.854.146a.5.5 0 0 1 .11.54l-5.819 14.547a.75.75 0 0 1-1.329.124l-3.178-4.995L.643 7.184a.75.75 0 0 1 .124-1.33L15.314.037a.5.5 0 0 1 .54.11ZM6.636 10.07l2.761 4.338L14.13 2.576zm6.787-8.201L1.591 6.602l4.339 2.76z"/>
-              </svg>
-              {{ isEdit() ? 'Save Changes' : 'Create Post' }}
+    </div>
+  </div>
+  <!-- PREVIEW -->
+  <div class="pf-right">
+    <div class="pf-preview-panel">
+      <div class="pf-preview-controls">
+        <div class="pf-preview-control">
+          <span class="pf-preview-label">Platform</span>
+          <div class="pf-chip-group">
+            @for (platform of previewPlatforms; track platform.value) {
+              <button
+                type="button"
+                class="pf-chip"
+                [class.pf-chip--active]="previewPlatform() === platform.value"
+                [disabled]="isPlatformDisabled(platform.value)"
+                (click)="setPreviewPlatform(platform.value)"
+              >
+                {{ platform.label }}
+              </button>
             }
-          </button>
+          </div>
         </div>
 
-      </form>
-    }
+        <div class="pf-preview-control">
+          <span class="pf-preview-label">Post Type</span>
+          <div class="pf-chip-group">
+            <button
+              type="button"
+              class="pf-chip"
+              [class.pf-chip--active]="previewMode() === 'feed'"
+              (click)="setPreviewMode('feed')"
+            >
+              Feed
+            </button>
+            <button
+              type="button"
+              class="pf-chip"
+              [class.pf-chip--active]="previewMode() === 'reel'"
+              [disabled]="isModeDisabled('reel')"
+              (click)="setPreviewMode('reel')"
+            >
+              Reel
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <app-mobile-shell [platform]="previewPlatform()" [mode]="previewMode()">
+        @switch (previewPlatform()) {
+          @case ('facebook') {
+            <app-facebook-preview
+              [profileName]="currentUser()?.firstName || 'Preview Brand'"
+              [title]="title"
+              [caption]="description"
+              [type]="previewPostType"
+              [mediaUrl]="previewMediaUrl"
+              [useVideo]="previewHasVideo"
+              [mediaItems]="previewMediaItems"
+            />
+          }
+
+          @case ('instagram') {
+            <app-instagram-preview
+              [profileName]="currentUser()?.firstName || 'Preview Brand'"
+              [title]="title"
+              [caption]="description"
+              [type]="previewPostType"
+              [mediaUrl]="previewMediaUrl"
+              [useVideo]="previewHasVideo"
+              [mediaItems]="previewMediaItems"
+            />
+          }
+
+          @default {
+            <app-ticktok-preview
+              [profileName]="currentUser()?.firstName || 'Preview Brand'"
+              [title]="title"
+              [caption]="description"
+              [type]="previewPostType"
+              [mediaUrl]="previewMediaUrl"
+              [useVideo]="previewHasVideo"
+            />
+          }
+        }
+      </app-mobile-shell>
+    </div>
   </div>
 </div>

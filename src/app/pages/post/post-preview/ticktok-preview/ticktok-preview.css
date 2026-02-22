@@ -1,0 +1,64 @@
+:host {
+  display: block;
+  width: 100%;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.tt-shell {
+  width: 100%;
+  background: #000;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.3);
+}
+
+.tt-media {
+  width: 100%;
+  position: relative;
+  background: #000;
+}
+
+.tt-media.feed,
+.tt-media.reel {
+  aspect-ratio: 9/16;
+}
+
+.tt-media img,
+.tt-media video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.tt-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 0.82rem;
+  text-align: center;
+  padding: 1rem;
+}
+
+.tt-overlay {
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  bottom: 14px;
+  color: #fff;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.65);
+}
+
+.tt-overlay strong {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 0.9rem;
+}
+
+.tt-overlay p {
+  margin: 0 0 4px;
+  font-size: 0.8rem;
+  line-height: 1.25;
+}

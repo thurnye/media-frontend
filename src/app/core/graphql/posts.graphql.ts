@@ -6,6 +6,7 @@ const POST_FIELDS = `
   createdBy
   title
   description
+  mediaIds
   category
   tags
   status
@@ -52,6 +53,7 @@ export const CREATE_POST = gql`
     $workspaceId: ID!
     $title: String!
     $description: String
+    $mediaIds: [ID]
     $category: String
     $tags: [String]
     $priority: String
@@ -61,6 +63,7 @@ export const CREATE_POST = gql`
       workspaceId: $workspaceId
       title: $title
       description: $description
+      mediaIds: $mediaIds
       category: $category
       tags: $tags
       priority: $priority
@@ -76,6 +79,7 @@ export const UPDATE_POST = gql`
     $id: ID!
     $title: String
     $description: String
+    $mediaIds: [ID]
     $category: String
     $tags: [String]
     $priority: String
@@ -86,6 +90,7 @@ export const UPDATE_POST = gql`
       id: $id
       title: $title
       description: $description
+      mediaIds: $mediaIds
       category: $category
       tags: $tags
       priority: $priority

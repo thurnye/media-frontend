@@ -48,6 +48,7 @@ export interface IPost {
   createdBy:   string;
   title:       string;
   description?: string;
+  mediaIds?:   string[];
   category?:   PostCategory;
   tags?:       string[];
   status?:     PostStatus;
@@ -63,6 +64,7 @@ export interface ICreatePost {
   workspaceId: string;
   title:       string;
   description?: string;
+  mediaIds?:   string[];
   category?:   string;
   tags?:       string[];
   priority?:   string;
@@ -73,6 +75,7 @@ export interface IUpdatePost {
   id:          string;
   title?:      string;
   description?: string;
+  mediaIds?:   string[];
   category?:   string;
   tags?:       string[];
   priority?:   string;

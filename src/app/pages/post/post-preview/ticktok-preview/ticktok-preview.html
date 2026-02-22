@@ -1,1 +1,19 @@
-<p>ticktok-preview works!</p>
+<div class="tt-shell">
+  <div class="tt-media" [ngClass]="{ reel: type === 'reel', feed: type !== 'reel' }" *ngIf="type !== 'text'">
+    <ng-container *ngIf="mediaUrl; else ttPlaceholder">
+      <video *ngIf="isVideo" [src]="mediaUrl" controls muted></video>
+      <img *ngIf="!isVideo" [src]="mediaUrl" alt="TikTok preview media" />
+    </ng-container>
+    <ng-template #ttPlaceholder>
+      <div class="tt-placeholder">
+        <span>{{ type === 'reel' ? 'TikTok Reel Preview' : 'TikTok Feed Preview' }}</span>
+      </div>
+    </ng-template>
+
+    <div class="tt-overlay">
+      <strong>{{ handleName }}</strong>
+      <p *ngIf="title">{{ title }}</p>
+      <p *ngIf="caption">{{ caption }}</p>
+    </div>
+  </div>
+</div>

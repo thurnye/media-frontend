@@ -1,4 +1,46 @@
 /* ── Layout ── */
+/* Main Layout */
+.pf-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  min-height: 100vh;
+}
+
+/* Left side always visible */
+.pf-left {
+  width: 100%;
+}
+
+/* Preview hidden by default (mobile first) */
+.pf-right {
+  display: none;
+  background: #f4f6f9;
+  justify-content: center;
+  align-items: start;
+  padding: 40px;
+}
+
+/* Large screens (1024px and up) */
+@media (min-width: 1024px) {
+  .pf-layout {
+    grid-template-columns: 1fr 480px;
+  }
+
+  .pf-right {
+    display: flex;
+    border-left: 1px solid #e5e7eb;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  .pf-wrapper {
+    padding-right: 40px;
+  }
+}
+
 .pf-wrapper {
   min-height: calc(100vh - 56px);
   display: flex;
@@ -10,7 +52,7 @@
 
 .pf-card {
   width: 100%;
-  max-width: 720px;
+  /* max-width: 720px; */
   background: #fff;
   border-radius: 16px;
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
@@ -297,4 +339,219 @@ select.pf-input {
 
 @keyframes spin {
   to { transform: rotate(360deg); }
+}
+
+/* ── Media Upload Zone ── */
+.pf-dropzone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 2rem;
+  border: 2px dashed #dee2e6;
+  border-radius: 10px;
+  background: #fafafa;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+  text-align: center;
+}
+
+.pf-dropzone:hover {
+  border-color: #adb5bd;
+  background: #f5f5f5;
+}
+
+.pf-dropzone--active {
+  border-color: #212529;
+  background: #f0f0f0;
+}
+
+.pf-dropzone-text {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #6c757d;
+}
+
+.pf-dropzone-link {
+  color: #212529;
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+/* ── Media Preview Grid ── */
+.pf-media-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+}
+
+.pf-media-item {
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1.5px solid #e5e7eb;
+  background: #fafafa;
+  aspect-ratio: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.pf-media-item--error {
+  border-color: #fecaca;
+  background: #fff5f5;
+}
+
+.pf-media-thumb {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.pf-media-video-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  background: #f0f0f0;
+}
+
+/* ── Upload Progress ── */
+.pf-media-progress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: #e5e7eb;
+}
+
+.pf-media-progress-bar {
+  height: 100%;
+  background: #212529;
+  transition: width 0.2s ease;
+}
+
+.pf-media-error-label {
+  position: absolute;
+  bottom: 4px;
+  left: 4px;
+  font-size: 0.65rem;
+  color: #dc3545;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.85);
+  padding: 1px 4px;
+  border-radius: 4px;
+}
+
+/* ── Remove Button ── */
+.pf-media-remove {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 20px;
+  height: 20px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.55);
+  color: #fff;
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.pf-media-item:hover .pf-media-remove {
+  opacity: 1;
+}
+
+.pf-media-name {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 2px 4px;
+  font-size: 0.6rem;
+  color: #fff;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.6));
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pf-preview-panel {
+  width: 100%;
+  max-width: 380px;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding-bottom: 1.5rem;
+}
+
+.pf-preview-controls {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 0.9rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.pf-preview-control {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.pf-preview-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.pf-chip-group {
+  display: flex;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+}
+
+.pf-chip {
+  border: 1px solid #d1d5db;
+  background: #fff;
+  color: #374151;
+  font-size: 0.83rem;
+  font-weight: 600;
+  border-radius: 999px;
+  padding: 0.34rem 0.7rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.pf-chip:hover {
+  border-color: #111827;
+  color: #111827;
+}
+
+.pf-chip--active {
+  background: #111827;
+  border-color: #111827;
+  color: #fff;
+}
+
+.pf-chip:disabled {
+  border-color: #e5e7eb;
+  color: #9ca3af;
+  background: #f9fafb;
+  cursor: not-allowed;
 }

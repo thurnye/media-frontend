@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { Store } from '@ngrx/store';
 import { catchError, map, of, switchMap, tap } from 'rxjs';
@@ -12,7 +12,6 @@ export class AuthEffects {
   private actions$ = inject(Actions);
   private authGql  = inject(AuthGqlService);
   private router   = inject(Router);
-  private route    = inject(ActivatedRoute);
   private store    = inject(Store);
 
   restoreSession$ = createEffect(() =>
@@ -43,7 +42,7 @@ export class AuthEffects {
     () => this.actions$.pipe(
       ofType(AuthActions.loginSuccess),
       tap(() => {
-        const invite = this.route.snapshot.queryParamMap.get('invite');
+        const invite = this.getQueryParam('invite');
         if (invite) {
           this.store.dispatch(WorkspaceActions.acceptInvitation({ token: invite }));
         } else {
@@ -70,7 +69,7 @@ export class AuthEffects {
     () => this.actions$.pipe(
       ofType(AuthActions.signupSuccess),
       tap(() => {
-        const invite = this.route.snapshot.queryParamMap.get('invite');
+        const invite = this.getQueryParam('invite');
         if (invite) {
           this.store.dispatch(WorkspaceActions.acceptInvitation({ token: invite }));
         } else {
@@ -80,4 +79,10 @@ export class AuthEffects {
     ),
     { dispatch: false },
   );
+
+  /** Read a query param from the current router URL (not a stale snapshot). */
+  private getQueryParam(key: string): string | null {
+    const tree = this.router.parseUrl(this.router.url);
+    return tree.queryParamMap.get(key);
+  }
 }

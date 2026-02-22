@@ -21,5 +21,6 @@ export interface IUser {
   firstName:  string;
   lastName:   string;
   email:      string;
+  avatarUrl:  string;
   workspaces?: IUserWorkspace[];
 }

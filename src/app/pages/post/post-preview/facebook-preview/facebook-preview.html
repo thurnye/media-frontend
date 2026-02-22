@@ -2,14 +2,17 @@
 
   <!-- HEADER -->
   <div class="fb-header">
-    <img [src]="profileImage" alt="profile">
+    <img [src]="currentUser()?.avatarUrl" alt="profile">
     <div class="fb-user-info">
-      <strong>{{ profileName }}</strong>
+      <strong>{{ currentUser()?.firstName  }} {{ currentUser()?.lastName  }}</strong>
       <span class="fb-time">Just now · 🌎</span>
     </div>
   </div>
 
   <!-- CAPTION -->
+  <div class="fb-caption" *ngIf="title">
+    {{ title }}
+  </div>
   <div class="fb-caption" *ngIf="caption">
     {{ caption }}
   </div>
@@ -24,14 +27,36 @@
     }"
     *ngIf="type !== 'text'"
   >
-    <!-- IMAGE -->
-    <img *ngIf="type === 'feed-image'" [src]="mediaUrl" />
+    <ng-container *ngIf="type !== 'reel' && mediaItems.length > 1; else singleItemPreview">
+      <div class="fb-media-grid" [class.fb-media-grid--three]="gridMediaItems.length === 3">
+        <div class="fb-grid-item" *ngFor="let item of gridMediaItems; let i = index">
+          <video *ngIf="item.isVideo" [src]="item.url" controls muted></video>
+          <img *ngIf="!item.isVideo" [src]="item.url" />
+          <div class="fb-grid-more-overlay" *ngIf="i === 3 && remainingMediaCount > 0">
+            +{{ remainingMediaCount }}
+          </div>
+        </div>
+      </div>
+    </ng-container>
 
-    <!-- VIDEO -->
-    <video *ngIf="type === 'feed-video'" [src]="mediaUrl" controls></video>
+    <ng-template #singleItemPreview>
+      <ng-container *ngIf="mediaUrl; else fbPlaceholder">
+        <!-- IMAGE -->
+        <img *ngIf="type === 'feed-image'" [src]="mediaUrl" />
 
-    <!-- REEL -->
-    <video *ngIf="type === 'reel'" [src]="mediaUrl" controls></video>
+        <!-- VIDEO -->
+        <video *ngIf="type === 'feed-video'" [src]="mediaUrl" controls muted></video>
+
+        <!-- REEL -->
+        <video *ngIf="type === 'reel' && useVideo" [src]="mediaUrl" controls muted></video>
+        <img *ngIf="type === 'reel' && !useVideo" [src]="mediaUrl" />
+      </ng-container>
+      <ng-template #fbPlaceholder>
+        <div class="fb-media-placeholder">
+          <span>{{ type === 'reel' ? 'Reel Preview' : 'Feed Preview' }}</span>
+        </div>
+      </ng-template>
+    </ng-template>
   </div>
 
   <!-- ACTION BAR -->

@@ -1,0 +1,13 @@
+<div class="mobile-frame" [style.aspect-ratio]="config.frameAspectRatio">
+  <div
+    class="app-content"
+    [style.aspect-ratio]="config.aspectRatio"
+    [style.padding.px]="config.padding"
+  >
+    <ng-content></ng-content>
+
+    <!-- Safe Area Overlay -->
+    <div class="safe-overlay safe-top" [style.height.%]="config.safeTop * 100"></div>
+    <div class="safe-overlay safe-bottom" [style.height.%]="config.safeBottom * 100"></div>
+  </div>
+</div>

@@ -1,1 +1,65 @@
-<p>instagram-preview works!</p>
+<div class="ig-card">
+  <div class="ig-header">
+    <div class="ig-avatar">{{ profileName.charAt(0) || 'B' }}</div>
+    <div class="ig-meta">
+      <strong>{{ profileName }}</strong>
+      <span>Just now</span>
+    </div>
+  </div>
+
+  <div class="ig-caption" *ngIf="title">{{ title }}</div>
+  <div class="ig-caption" *ngIf="caption">{{ caption }}</div>
+
+  <div class="ig-media" [ngClass]="{ reel: type === 'reel', feed: type !== 'reel' }" *ngIf="type !== 'text'">
+    <ng-container *ngIf="type !== 'reel' && mediaItems.length > 1; else igSingleItem">
+      <div class="ig-carousel">
+        <div class="ig-carousel-track" [style.transform]="'translateX(-' + activeSlide * 100 + '%)'">
+          <div class="ig-slide" *ngFor="let item of mediaItems; let i = index">
+            <video *ngIf="item.isVideo" [src]="item.url" controls muted></video>
+            <img *ngIf="!item.isVideo" [src]="item.url" alt="Instagram preview media" />
+          </div>
+        </div>
+
+        <button class="ig-nav ig-nav--prev" type="button" (click)="prevSlide()" [disabled]="activeSlide === 0">
+          ‹
+        </button>
+        <button
+          class="ig-nav ig-nav--next"
+          type="button"
+          (click)="nextSlide()"
+          [disabled]="activeSlide === mediaItems.length - 1"
+        >
+          ›
+        </button>
+
+        <div class="ig-dots">
+          <button
+            type="button"
+            class="ig-dot"
+            *ngFor="let _item of mediaItems; let i = index"
+            [class.ig-dot--active]="activeSlide === i"
+            (click)="goToSlide(i)"
+          ></button>
+        </div>
+      </div>
+    </ng-container>
+
+    <ng-template #igSingleItem>
+      <ng-container *ngIf="mediaUrl; else igPlaceholder">
+        <video *ngIf="isVideo" [src]="mediaUrl" controls muted></video>
+        <img *ngIf="!isVideo" [src]="mediaUrl" alt="Instagram preview media" />
+      </ng-container>
+      <ng-template #igPlaceholder>
+        <div class="ig-placeholder">
+          <span>{{ type === 'reel' ? 'Reel Preview' : 'Feed Preview' }}</span>
+        </div>
+      </ng-template>
+    </ng-template>
+  </div>
+
+  <div class="ig-actions">
+    <span>Like</span>
+    <span>Comment</span>
+    <span>Share</span>
+  </div>
+</div>
