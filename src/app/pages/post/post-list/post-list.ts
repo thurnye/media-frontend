@@ -11,6 +11,8 @@ import {
 } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { Store } from '@ngrx/store';
+import { Subject, Subscription } from 'rxjs';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { PostActions } from '../../../store/post/post.actions';
 import {
   selectPostError,
@@ -19,13 +21,16 @@ import {
   selectPosts,
   selectPostsHasMore,
   selectPostsPage,
+  selectPostsTotal,
   selectSelectedPost,
 } from '../../../store/post/post.selectors';
 import { selectUser } from '../../../store/auth/auth.selectors';
+import { IPostListFilters } from '../../../core/interfaces/post';
+import { PostListFilters } from './post-list-filters/post-list-filters';
 
 @Component({
   selector: 'app-post-list',
-  imports: [RouterLink],
+  imports: [RouterLink, PostListFilters],
   templateUrl: './post-list.html',
   styleUrl: './post-list.css',
 })
@@ -39,6 +44,7 @@ export class PostList implements OnInit, AfterViewInit, OnDestroy {
   loadingMore = this.store.selectSignal(selectPostLoadingMore);
   error = this.store.selectSignal(selectPostError);
   page = this.store.selectSignal(selectPostsPage);
+  total = this.store.selectSignal(selectPostsTotal);
   hasMore = this.store.selectSignal(selectPostsHasMore);
   currentUser = this.store.selectSignal(selectUser);
   selectedPost = this.store.selectSignal(selectSelectedPost);
@@ -50,6 +56,71 @@ export class PostList implements OnInit, AfterViewInit, OnDestroy {
 
   readonly limit = 6;
   showMenu = signal(false);
+  searchQuery = '';
+  statusFilter = 'all';
+  categoryFilter = 'all';
+  priorityFilter = 'all';
+  evergreenFilter = 'all';
+  sortBy = 'newest';
+  private searchInput$ = new Subject<string>();
+  private searchSub?: Subscription;
+
+  readonly statusOptions = [
+    { value: 'all', label: 'All Statuses' },
+    { value: 'draft', label: 'Draft' },
+    { value: 'pending_approval', label: 'Pending Approval' },
+    { value: 'approved', label: 'Approved' },
+    { value: 'rejected', label: 'Rejected' },
+    { value: 'scheduled', label: 'Scheduled' },
+    { value: 'publishing', label: 'Publishing' },
+    { value: 'partially_published', label: 'Partially Published' },
+    { value: 'published', label: 'Published' },
+    { value: 'failed', label: 'Failed' },
+    { value: 'cancelled', label: 'Cancelled' },
+    { value: 'archived', label: 'Archived' },
+  ];
+
+  readonly categoryOptions = [
+    { value: 'all', label: 'All Categories' },
+    { value: 'marketing', label: 'Marketing' },
+    { value: 'educational', label: 'Educational' },
+    { value: 'promotional', label: 'Promotional' },
+    { value: 'announcement', label: 'Announcement' },
+    { value: 'engagement', label: 'Engagement' },
+    { value: 'brand', label: 'Brand' },
+    { value: 'community', label: 'Community' },
+    { value: 'event', label: 'Event' },
+    { value: 'product', label: 'Product' },
+    { value: 'user_generated', label: 'User Generated' },
+    { value: 'testimonial', label: 'Testimonial' },
+    { value: 'behind_the_scenes', label: 'Behind the Scenes' },
+    { value: 'seasonal', label: 'Seasonal' },
+    { value: 'others', label: 'Others' },
+  ];
+
+  readonly priorityOptions = [
+    { value: 'all', label: 'All Priorities' },
+    { value: 'high', label: 'High' },
+    { value: 'medium', label: 'Medium' },
+    { value: 'low', label: 'Low' },
+  ];
+
+  readonly evergreenOptions = [
+    { value: 'all', label: 'All Types' },
+    { value: 'evergreen', label: 'Evergreen' },
+    { value: 'regular', label: 'Regular' },
+  ];
+
+  readonly sortOptions = [
+    { value: 'newest', label: 'Newest First' },
+    { value: 'oldest', label: 'Oldest First' },
+    { value: 'updated_desc', label: 'Recently Updated' },
+    { value: 'updated_asc', label: 'Least Recently Updated' },
+    { value: 'title_asc', label: 'Title A-Z' },
+    { value: 'title_desc', label: 'Title Z-A' },
+    { value: 'priority_desc', label: 'Highest Priority' },
+    { value: 'priority_asc', label: 'Lowest Priority' },
+  ];
 
   @ViewChild('scrollSentinel') private sentinelRef!: ElementRef<HTMLElement>;
   private observer: IntersectionObserver | null = null;
@@ -62,6 +133,10 @@ export class PostList implements OnInit, AfterViewInit, OnDestroy {
         this.panelLoading.set(false);
       }
     });
+
+    this.searchSub = this.searchInput$
+      .pipe(debounceTime(500), distinctUntilChanged())
+      .subscribe(() => this.refreshPosts());
   }
 
   ngOnInit(): void {
@@ -70,7 +145,7 @@ export class PostList implements OnInit, AfterViewInit, OnDestroy {
       this.route.snapshot.paramMap.get('workspaceId') ??
       '';
     this.workspaceId.set(wsId);
-    this.store.dispatch(PostActions.loadPosts({ workspaceId: wsId, page: 1, limit: this.limit }));
+    this.refreshPosts();
   }
 
   ngAfterViewInit(): void {
@@ -83,6 +158,7 @@ export class PostList implements OnInit, AfterViewInit, OnDestroy {
               workspaceId: this.workspaceId(),
               page: this.page() + 1,
               limit: this.limit,
+              filters: this.backendFilters,
             }),
           );
         }
@@ -96,6 +172,7 @@ export class PostList implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.searchSub?.unsubscribe();
     this.observer?.disconnect();
   }
 
@@ -128,6 +205,36 @@ export class PostList implements OnInit, AfterViewInit, OnDestroy {
     this.showMenu.set(false);
   }
 
+  selectStatus(value: string): void {
+    this.statusFilter = value;
+    this.refreshPosts();
+  }
+
+  selectCategory(value: string): void {
+    this.categoryFilter = value;
+    this.refreshPosts();
+  }
+
+  selectPriority(value: string): void {
+    this.priorityFilter = value;
+    this.refreshPosts();
+  }
+
+  selectEvergreen(value: string): void {
+    this.evergreenFilter = value;
+    this.refreshPosts();
+  }
+
+  selectSort(value: string): void {
+    this.sortBy = value;
+    this.refreshPosts();
+  }
+
+  onSearchChange(value: string): void {
+    this.searchQuery = value;
+    this.searchInput$.next(value.trim());
+  }
+
   onDelete(id: string, event: Event): void {
     event.stopPropagation();
     if (!confirm('Delete this post? This cannot be undone.')) return;
@@ -149,5 +256,41 @@ export class PostList implements OnInit, AfterViewInit, OnDestroy {
   getStatusLabel(status?: string): string {
     if (!status) return 'Draft';
     return status.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+  }
+
+  get backendFilters(): IPostListFilters {
+    const query = this.searchQuery.trim();
+    return {
+      search: query || undefined,
+      status: this.statusFilter !== 'all' ? this.statusFilter : undefined,
+      category: this.categoryFilter !== 'all' ? this.categoryFilter : undefined,
+      priority: this.priorityFilter !== 'all' ? this.priorityFilter : undefined,
+      isEvergreen:
+        this.evergreenFilter === 'all'
+          ? undefined
+          : this.evergreenFilter === 'evergreen',
+      sortBy: this.sortBy || 'newest',
+    };
+  }
+
+  refreshPosts(): void {
+    this.store.dispatch(
+      PostActions.loadPosts({
+        workspaceId: this.workspaceId(),
+        page: 1,
+        limit: this.limit,
+        filters: this.backendFilters,
+      }),
+    );
+  }
+
+  clearFilters(): void {
+    this.searchQuery = '';
+    this.statusFilter = 'all';
+    this.categoryFilter = 'all';
+    this.priorityFilter = 'all';
+    this.evergreenFilter = 'all';
+    this.sortBy = 'newest';
+    this.refreshPosts();
   }
 }

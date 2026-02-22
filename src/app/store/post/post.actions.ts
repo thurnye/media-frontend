@@ -1,14 +1,14 @@
 import { createActionGroup, emptyProps, props } from '@ngrx/store';
-import { ICreatePost, IPaginatedPosts, IPost, IUpdatePost } from '../../core/interfaces/post';
+import { ICreatePost, IPaginatedPosts, IPost, IPostListFilters, IUpdatePost } from '../../core/interfaces/post';
 
 export const PostActions = createActionGroup({
   source: 'Post',
   events: {
-    'Load Posts':               props<{ workspaceId: string; page: number; limit: number }>(),
+    'Load Posts':               props<{ workspaceId: string; page: number; limit: number; filters?: IPostListFilters }>(),
     'Load Posts Success':       props<{ result: IPaginatedPosts }>(),
     'Load Posts Failure':       props<{ error: string }>(),
 
-    'Load More Posts':          props<{ workspaceId: string; page: number; limit: number }>(),
+    'Load More Posts':          props<{ workspaceId: string; page: number; limit: number; filters?: IPostListFilters }>(),
     'Load More Posts Success':  props<{ result: IPaginatedPosts }>(),
     'Load More Posts Failure':  props<{ error: string }>(),
 

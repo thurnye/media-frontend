@@ -19,8 +19,8 @@ export class PostEffects {
   loadPosts$ = createEffect(() =>
     this.actions$.pipe(
       ofType(PostActions.loadPosts),
-      switchMap(({ workspaceId, page, limit }) =>
-        this.postGql.getPosts(workspaceId, page, limit).pipe(
+      switchMap(({ workspaceId, page, limit, filters }) =>
+        this.postGql.getPosts(workspaceId, page, limit, filters ?? {}).pipe(
           map(result => PostActions.loadPostsSuccess({ result })),
           catchError(err => of(PostActions.loadPostsFailure({ error: err.message }))),
         ),
@@ -31,8 +31,8 @@ export class PostEffects {
   loadMorePosts$ = createEffect(() =>
     this.actions$.pipe(
       ofType(PostActions.loadMorePosts),
-      exhaustMap(({ workspaceId, page, limit }) =>
-        this.postGql.getPosts(workspaceId, page, limit).pipe(
+      exhaustMap(({ workspaceId, page, limit, filters }) =>
+        this.postGql.getPosts(workspaceId, page, limit, filters ?? {}).pipe(
           map(result => PostActions.loadMorePostsSuccess({ result })),
           catchError(err => of(PostActions.loadMorePostsFailure({ error: err.message }))),
         ),

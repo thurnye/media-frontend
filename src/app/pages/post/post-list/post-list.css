@@ -60,127 +60,21 @@
   margin-bottom: 1.5rem;
 }
 
-/* ── Toolbar ── */
-.pl-toolbar {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  margin-bottom: 0.75rem;
-  flex-wrap: wrap;
-}
-
-.pl-toolbar-search {
-  position: relative;
-  flex: 1;
-  min-width: 180px;
-}
-
-.pl-toolbar-search-icon {
-  position: absolute;
-  left: 0.75rem;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #9ca3af;
-  pointer-events: none;
-}
-
-.pl-search-input {
-  width: 100%;
-  height: 38px;
-  padding: 0 0.875rem 0 2.25rem;
-  border: 1.5px solid #e5e7eb;
-  border-radius: 8px;
-  font-size: 0.875rem;
-  background: #fff;
-  color: #111;
-  outline: none;
-  box-sizing: border-box;
-  transition: border-color 0.2s;
-}
-
-.pl-search-input:focus {
-  border-color: #6b7280;
-}
-.pl-search-input::placeholder {
-  color: #9ca3af;
-}
-
-/* Suppress browser clear (×) button — we have our own Clear button */
-.pl-search-input::-webkit-search-cancel-button {
-  display: none;
-}
-
-.pl-toolbar-controls {
-  display: flex;
-  gap: 0.5rem;
-  flex-shrink: 0;
-  flex-wrap: wrap;
-}
-
-/* Custom select wrapper — positions the left icon and right chevron */
-.pl-select-wrap {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-}
-
-.pl-select-icon {
-  position: absolute;
-  left: 0.7rem;
-  color: #9ca3af;
-  pointer-events: none;
-  z-index: 1;
-}
-
-.pl-select-chevron {
-  position: absolute;
-  right: 0.65rem;
-  color: #9ca3af;
-  pointer-events: none;
-  transition: transform 0.18s;
-}
-
-.pl-select {
-  height: 38px;
-  /* left-pad for icon, right-pad for chevron */
-  padding: 0 2rem 0 2rem;
-  border: 1.5px solid #e5e7eb;
-  border-radius: 10px;
-  font-size: 0.83rem;
-  font-weight: 500;
-  color: #374151;
-  background: #fff;
-  cursor: pointer;
-  outline: none;
-  appearance: none;
-  transition:
-    border-color 0.2s,
-    box-shadow 0.2s,
-    background 0.15s;
-  min-width: 120px;
-}
-
-.pl-select:hover {
-  border-color: #d1d5db;
-  background: #fafafa;
-}
-
-.pl-select:focus {
-  border-color: #6b7280;
-  box-shadow: 0 0 0 3px rgba(107, 114, 128, 0.12);
-}
-
-/* Rotate chevron on open (best-effort — works in Firefox; Chrome/Safari don't expose :open) */
-.pl-select:focus + .pl-select-chevron,
-.pl-select-wrap:focus-within .pl-select-chevron {
-  transform: rotate(180deg);
-}
-
 /* ── Result count ── */
 .pl-result-count {
   font-size: 0.78rem;
   color: #9ca3af;
   margin: 0 0 1rem;
+}
+
+.pl-empty-filter {
+  padding: 1.1rem;
+  border: 1px dashed #d1d5db;
+  border-radius: 12px;
+  background: #fff;
+  color: #6b7280;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
 }
 
 /* ── Grid ── */
@@ -537,35 +431,38 @@
 
 /* ── Split layout ── */
 .pl-split {
-  display: flex;
-  gap: 1.5rem;
-  align-items: flex-start;
+  display: block;
 }
 
 .pl-split-list {
-  flex: 1;
   min-width: 0;
 }
 
-/* Detail column — collapses to zero width, expands smoothly on split */
+.pl-list-content-wrap {
+  display: block;
+}
+
+.pl-list-content {
+  min-width: 0;
+}
+
+/* Detail panel lives under the same parent as list items */
 .pl-split-detail {
-  display: flex;
+  display: none;
   flex-direction: column;
-  flex: 0;
   min-width: 0;
   overflow: hidden;
   position: sticky;
   top: 1rem;
   max-height: calc(100vh - 80px);
-  transition: flex 0.35s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.pl-split.is-split .pl-split-detail {
-  flex: 1;
+.pl-list-content-wrap.is-split .pl-split-detail {
+  display: flex;
 }
 
 /* Narrow the grid to 2 cols when the panel is open */
-.pl-split.is-split .pl-grid {
+.pl-list-content-wrap.is-split .pl-grid {
   grid-template-columns: repeat(2, 1fr);
 }
 
@@ -581,7 +478,7 @@
 }
 
 /* Panel slides in from the right when revealed */
-.pl-split.is-split .pl-panel {
+.pl-list-content-wrap.is-split .pl-panel {
   animation: plPanelReveal 0.35s cubic-bezier(0.4, 0, 0.2, 1) both;
 }
 
@@ -599,13 +496,22 @@
 /* ── Mobile: no split, always navigate ── */
 @media (max-width: 768px) {
   .pl-split-detail,
-  .pl-split.is-split .pl-split-detail {
-    flex: 0;
+  .pl-list-content-wrap.is-split .pl-split-detail {
+    display: none;
     overflow: hidden;
     position: static;
   }
-  .pl-split.is-split .pl-grid {
+  .pl-list-content-wrap.is-split .pl-grid {
     grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 992px) {
+  .pl-list-content-wrap.is-split {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(360px, 420px);
+    gap: 1.5rem;
+    align-items: start;
   }
 }
 

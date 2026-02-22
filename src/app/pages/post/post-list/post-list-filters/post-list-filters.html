@@ -1,0 +1,109 @@
+<div class="pl-toolbar" role="search" aria-label="Search and filter posts">
+  <div class="pl-toolbar-search">
+    <svg
+      class="pl-toolbar-search-icon"
+      xmlns="http://www.w3.org/2000/svg"
+      width="15"
+      height="15"
+      fill="currentColor"
+      viewBox="0 0 16 16"
+      aria-hidden="true"
+    >
+      <path
+        d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.099zm-5.242 1.656a5.5 5.5 0 1 1 0-11 5.5 5.5 0 0 1 0 11"
+      />
+    </svg>
+    <input
+      class="pl-search-input"
+      type="search"
+      placeholder="Search title, tags, description, creator…"
+      aria-label="Search posts"
+      [value]="searchQuery"
+      (input)="onSearchInput(($any($event.target)).value)"
+    />
+  </div>
+
+  <div class="pl-toolbar-controls">
+    <div class="pl-dropdown">
+      <svg class="pl-dropdown-icon" xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true"><path d="M1.5 1.5A.5.5 0 0 1 2 1h12a.5.5 0 0 1 .354.854l-4.5 4.5a.5.5 0 0 1-.354.146h-3a.5.5 0 0 1-.354-.146l-4.5-4.5A.5.5 0 0 1 1.5 1.5M2.793 2 6.5 5.707h3L13.207 2zM6 7.5v6a.5.5 0 0 0 .757.429l3-1.5A.5.5 0 0 0 10 12V7.5a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5" /></svg>
+      <button type="button" class="pl-dropdown-trigger" aria-label="Filter posts by status" (click)="toggleDropdown('status')">
+        <span>{{ getOptionLabel(statusOptions, statusFilter) }}</span>
+        <span class="pl-dropdown-chevron">▾</span>
+      </button>
+      @if (openDropdown === 'status') {
+        <div class="pl-dropdown-backdrop" (click)="closeDropdowns()"></div>
+        <div class="pl-dropdown-menu">
+          @for (status of statusOptions; track status.value) {
+            <button type="button" class="pl-dropdown-item" [class.is-active]="statusFilter === status.value" (click)="selectStatus(status.value)">{{ status.label }}</button>
+          }
+        </div>
+      }
+    </div>
+
+    <div class="pl-dropdown">
+      <svg class="pl-dropdown-icon" xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 3.5a.5.5 0 0 0-1 0v8.793l-1.146-1.147a.5.5 0 0 0-.708.708l2 1.999.007.007a.497.497 0 0 0 .7-.006l2-2a.5.5 0 0 0-.707-.708L3.5 12.293zm4 .5a.5.5 0 0 1 0-1h1a.5.5 0 0 1 0 1zm0 3a.5.5 0 0 1 0-1h3a.5.5 0 0 1 0 1zm0 3a.5.5 0 0 1 0-1h5a.5.5 0 0 1 0 1zM7 12.5a.5.5 0 0 0 .5.5h7a.5.5 0 0 0 0-1h-7a.5.5 0 0 0-.5.5" /></svg>
+      <button type="button" class="pl-dropdown-trigger" aria-label="Filter posts by category" (click)="toggleDropdown('category')">
+        <span>{{ getOptionLabel(categoryOptions, categoryFilter) }}</span>
+        <span class="pl-dropdown-chevron">▾</span>
+      </button>
+      @if (openDropdown === 'category') {
+        <div class="pl-dropdown-backdrop" (click)="closeDropdowns()"></div>
+        <div class="pl-dropdown-menu">
+          @for (category of categoryOptions; track category.value) {
+            <button type="button" class="pl-dropdown-item" [class.is-active]="categoryFilter === category.value" (click)="selectCategory(category.value)">{{ category.label }}</button>
+          }
+        </div>
+      }
+    </div>
+
+    <div class="pl-dropdown">
+      <svg class="pl-dropdown-icon" xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 0a1 1 0 0 1 1 1v14a1 1 0 1 1-2 0V1a1 1 0 0 1 1-1m5 4a1 1 0 0 1 1 1v10a1 1 0 1 1-2 0V5a1 1 0 0 1 1-1m5 4a1 1 0 0 1 1 1v6a1 1 0 1 1-2 0V9a1 1 0 0 1 1-1" /></svg>
+      <button type="button" class="pl-dropdown-trigger" aria-label="Filter posts by priority" (click)="toggleDropdown('priority')">
+        <span>{{ getOptionLabel(priorityOptions, priorityFilter) }}</span>
+        <span class="pl-dropdown-chevron">▾</span>
+      </button>
+      @if (openDropdown === 'priority') {
+        <div class="pl-dropdown-backdrop" (click)="closeDropdowns()"></div>
+        <div class="pl-dropdown-menu">
+          @for (priority of priorityOptions; track priority.value) {
+            <button type="button" class="pl-dropdown-item" [class.is-active]="priorityFilter === priority.value" (click)="selectPriority(priority.value)">{{ priority.label }}</button>
+          }
+        </div>
+      }
+    </div>
+
+    <div class="pl-dropdown">
+      <svg class="pl-dropdown-icon" xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0c.663 0 1.2.537 1.2 1.2V2a4.8 4.8 0 0 1 4.8 4.8c0 3.04-2.72 6.24-5.34 8.75a.98.98 0 0 1-1.32 0C4.72 13.04 2 9.84 2 6.8A4.8 4.8 0 0 1 6.8 2v-.8C6.8.537 7.337 0 8 0" /></svg>
+      <button type="button" class="pl-dropdown-trigger" aria-label="Filter evergreen posts" (click)="toggleDropdown('evergreen')">
+        <span>{{ getOptionLabel(evergreenOptions, evergreenFilter) }}</span>
+        <span class="pl-dropdown-chevron">▾</span>
+      </button>
+      @if (openDropdown === 'evergreen') {
+        <div class="pl-dropdown-backdrop" (click)="closeDropdowns()"></div>
+        <div class="pl-dropdown-menu">
+          @for (option of evergreenOptions; track option.value) {
+            <button type="button" class="pl-dropdown-item" [class.is-active]="evergreenFilter === option.value" (click)="selectEvergreen(option.value)">{{ option.label }}</button>
+          }
+        </div>
+      }
+    </div>
+
+    <div class="pl-dropdown">
+      <svg class="pl-dropdown-icon" xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 3.5a.5.5 0 0 0-1 0v8.793l-1.146-1.147a.5.5 0 0 0-.708.708l2 1.999.007.007a.497.497 0 0 0 .7-.006l2-2a.5.5 0 0 0-.707-.708L3.5 12.293zm4 .5a.5.5 0 0 1 0-1h1a.5.5 0 0 1 0 1zm0 3a.5.5 0 0 1 0-1h3a.5.5 0 0 1 0 1zm0 3a.5.5 0 0 1 0-1h5a.5.5 0 0 1 0 1zM7 12.5a.5.5 0 0 0 .5.5h7a.5.5 0 0 0 0-1h-7a.5.5 0 0 0-.5.5" /></svg>
+      <button type="button" class="pl-dropdown-trigger" aria-label="Sort posts" (click)="toggleDropdown('sort')">
+        <span>{{ getOptionLabel(sortOptions, sortBy) }}</span>
+        <span class="pl-dropdown-chevron">▾</span>
+      </button>
+      @if (openDropdown === 'sort') {
+        <div class="pl-dropdown-backdrop" (click)="closeDropdowns()"></div>
+        <div class="pl-dropdown-menu">
+          @for (option of sortOptions; track option.value) {
+            <button type="button" class="pl-dropdown-item" [class.is-active]="sortBy === option.value" (click)="selectSort(option.value)">{{ option.label }}</button>
+          }
+        </div>
+      }
+    </div>
+
+    <button type="button" class="pl-btn-clear" (click)="clear.emit()">Clear</button>
+  </div>
+</div>

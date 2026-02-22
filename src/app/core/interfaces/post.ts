@@ -122,3 +122,13 @@ export interface IPaginatedPosts {
   page:       number;
   totalPages: number;
 }
+
+export interface IPostListFilters {
+  search?: string;
+  status?: string;
+  category?: string;
+  priority?: string;
+  isEvergreen?: boolean;
+  sortBy?: string;
+  createdBy?: string;
+}

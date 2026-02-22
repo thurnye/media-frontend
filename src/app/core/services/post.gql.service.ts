@@ -1,7 +1,14 @@
 import { inject, Injectable } from '@angular/core';
 import { Apollo } from 'apollo-angular';
 import { map } from 'rxjs';
-import { ICreatePost, IPaginatedPosts, IPost, IPostReviewComment, IUpdatePost } from '../interfaces/post';
+import {
+  ICreatePost,
+  IPaginatedPosts,
+  IPost,
+  IPostListFilters,
+  IPostReviewComment,
+  IUpdatePost,
+} from '../interfaces/post';
 import {
   ADD_POST_REVIEW_COMMENT,
   APPROVE_POST,
@@ -19,11 +26,11 @@ import {
 export class PostGqlService {
   private apollo = inject(Apollo);
 
-  getPosts(workspaceId: string, page = 1, limit = 10) {
+  getPosts(workspaceId: string, page = 1, limit = 10, filters: IPostListFilters = {}) {
     return this.apollo
       .query<{ posts: IPaginatedPosts }>({
         query: GET_POSTS,
-        variables: { workspaceId, page, limit },
+        variables: { workspaceId, page, limit, ...filters },
         fetchPolicy: 'no-cache',
       })
       .pipe(map(r => r.data!.posts));

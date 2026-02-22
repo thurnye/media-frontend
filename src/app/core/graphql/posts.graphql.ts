@@ -80,8 +80,30 @@ const POST_FIELDS = `
 `;
 
 export const GET_POSTS = gql`
-  query Posts($workspaceId: ID!, $page: Int, $limit: Int) {
-    posts(workspaceId: $workspaceId, page: $page, limit: $limit) {
+  query Posts(
+    $workspaceId: ID!
+    $page: Int
+    $limit: Int
+    $search: String
+    $status: String
+    $category: String
+    $priority: String
+    $isEvergreen: Boolean
+    $sortBy: String
+    $createdBy: String
+  ) {
+    posts(
+      workspaceId: $workspaceId
+      page: $page
+      limit: $limit
+      search: $search
+      status: $status
+      category: $category
+      priority: $priority
+      isEvergreen: $isEvergreen
+      sortBy: $sortBy
+      createdBy: $createdBy
+    ) {
       data {
         ${POST_FIELDS}
       }
