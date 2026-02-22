@@ -1,4 +1,4 @@
-import { Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
+import { Component, effect, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -10,11 +10,17 @@ import {
   selectSelectedPost,
 } from '../../../store/post/post.selectors';
 import { selectUser } from '../../../store/auth/auth.selectors';
+import { selectSelectedWorkspace } from '../../../store/workspace/workspace.selectors';
+import { WorkspaceActions } from '../../../store/workspace/workspace.actions';
 import { PostPublishDialog } from '../post-publish-dialog/post-publish-dialog';
+import { ReviewerOption, ReviewerTypeahead } from './reviewer-typeahead/reviewer-typeahead';
+import { PostReviewComments } from './post-review-comments/post-review-comments';
+
+type ReviewerDecision = 'approved' | 'rejected' | 'cancelled' | 'archived';
 
 @Component({
   selector: 'app-post-detail',
-  imports: [RouterLink, FormsModule, DatePipe, PostPublishDialog],
+  imports: [RouterLink, FormsModule, DatePipe, PostPublishDialog, ReviewerTypeahead, PostReviewComments],
   templateUrl: './post-detail.html',
   styleUrl: './post-detail.css',
 })
@@ -27,12 +33,48 @@ export class PostDetail implements OnInit, OnDestroy {
   loading = this.store.selectSignal(selectPostLoading);
   error = this.store.selectSignal(selectPostError);
   currentUser = this.store.selectSignal(selectUser);
+  selectedWorkspace = this.store.selectSignal(selectSelectedWorkspace);
   workspaceId = signal('');
 
   showRejectDialog = signal(false);
   showPublishDialog = signal(false);
   rejectReason = signal('');
   showMenu = signal(false);
+  selectedReviewers = signal<ReviewerOption[]>([]);
+  reviewerDecision = signal<ReviewerDecision>('approved');
+
+  reviewerDecisionOptions: { value: ReviewerDecision; label: string }[] = [
+    { value: 'approved', label: 'Approved' },
+    { value: 'rejected', label: 'Rejected' },
+    { value: 'cancelled', label: 'Cancelled' },
+    { value: 'archived', label: 'Archived' },
+  ];
+
+  constructor() {
+    effect(() => {
+      const post = this.post();
+      const workspace = this.selectedWorkspace();
+      if (!post || !workspace?.members?.length) return;
+      if (this.selectedReviewers().length) return;
+
+      const reviewerIds = new Set(post.approvalWorkflow?.requiredApprovers ?? []);
+      if (!reviewerIds.size) return;
+
+      const preselected = workspace.members
+        .filter((member) => reviewerIds.has(member.userId))
+        .map((member) => ({
+          id: member.userId,
+          name: `${member.firstName ?? ''} ${member.lastName ?? ''}`.trim() || member.userId,
+          email: `${member.userId}@workspace.local`,
+          role: member.role,
+          avatarUrl: member.avatarUrl,
+        }));
+
+      if (preselected.length) {
+        this.selectedReviewers.set(preselected);
+      }
+    });
+  }
 
   ngOnInit(): void {
     const wsId =
@@ -43,6 +85,7 @@ export class PostDetail implements OnInit, OnDestroy {
 
     const id = this.route.snapshot.paramMap.get('postId')!;
     this.store.dispatch(PostActions.loadPost({ id }));
+    this.store.dispatch(WorkspaceActions.loadWorkspace({ id: wsId }));
   }
 
   ngOnDestroy(): void {
@@ -103,5 +146,31 @@ export class PostDetail implements OnInit, OnDestroy {
     this.store.dispatch(PostActions.rejectPost({ postId: post.id, reason }));
     this.showRejectDialog.set(false);
     this.rejectReason.set('');
+  }
+
+  onSelectedReviewersChange(reviewers: ReviewerOption[]): void {
+    this.selectedReviewers.set(reviewers);
+  }
+
+  get availableReviewers(): ReviewerOption[] {
+    const me = this.currentUser()?.id;
+    const members = this.selectedWorkspace()?.members ?? [];
+
+    return members
+      .filter((member) => member.userId && member.userId !== me)
+      .map((member) => ({
+        id: member.userId,
+        name: `${member.firstName ?? ''} ${member.lastName ?? ''}`.trim() || member.userId,
+        email: `${member.userId}@workspace.local`,
+        role: member.role,
+        avatarUrl: member.avatarUrl,
+      }));
+  }
+
+  get canSeeReviewerDecision(): boolean {
+    const me = this.currentUser()?.id;
+    if (!me) return false;
+    const requiredApprovers = this.post()?.approvalWorkflow?.requiredApprovers ?? [];
+    return requiredApprovers.includes(me);
   }
 }

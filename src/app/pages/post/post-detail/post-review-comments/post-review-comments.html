@@ -1,0 +1,174 @@
+<section class="pd-review-comments-card">
+  <div class="pd-review-comments-header">
+    <h2>Review Comments</h2>
+  </div>
+
+  @if (!replyingToCommentId()) {
+    <div class="pd-review-comment-form">
+      <textarea
+        rows="3"
+        class="pd-review-comment-input"
+        placeholder="Add a comment for reviewers..."
+        [ngModel]="reviewCommentInput()"
+        (ngModelChange)="reviewCommentInput.set($event)"
+      ></textarea>
+
+      <div class="pd-review-comment-media">
+        <label class="pd-review-media-attach">
+          <input
+            type="file"
+            multiple
+            [accept]="commentAcceptedTypes"
+            (change)="onCommentFileSelected($event)"
+          />
+          Attach Media
+        </label>
+
+        @if (commentMedia().length) {
+          <div class="pd-review-media-grid">
+            @for (item of commentMedia(); track $index) {
+              <div class="pd-review-media-item">
+                @if (item.preview) {
+                  <img [src]="item.preview" alt="Comment media preview" />
+                } @else {
+                  <div class="pd-review-media-video">Video</div>
+                }
+
+                @if (item.status === 'uploading') {
+                  <div class="pd-review-media-progress">
+                    <div class="pd-review-media-progress-bar" [style.width.%]="item.progress"></div>
+                  </div>
+                }
+
+                @if (item.status === 'error') {
+                  <span class="pd-review-media-error">Failed</span>
+                }
+
+                <button type="button" (click)="removeCommentMedia($index)">×</button>
+              </div>
+            }
+          </div>
+        }
+      </div>
+
+      <button
+        type="button"
+        class="pd-review-comment-btn"
+        [disabled]="!reviewCommentInput().trim() || isAddingComment()"
+        (click)="onAddReviewComment()"
+      >
+        {{ isAddingComment() ? 'Saving…' : 'Add Comment' }}
+      </button>
+    </div>
+  }
+
+  <div class="pd-review-comment-list">
+    @if (orderedReviewComments.length === 0) {
+      <p class="pd-review-comment-empty">No review comments yet.</p>
+    } @else {
+      @for (comment of visibleReviewComments; track comment.id) {
+        <article class="pd-review-comment-item" [style.marginLeft.px]="comment.depth * 20">
+          <div class="pd-review-comment-avatar">
+            @if (comment.authorAvatarUrl) {
+              <img [src]="comment.authorAvatarUrl" [alt]="comment.author" />
+            } @else {
+              <span>{{ getInitials(comment.author) }}</span>
+            }
+          </div>
+
+          <div class="pd-review-comment-main">
+            <div class="pd-review-comment-bubble">
+              <header>
+                <strong>{{ comment.author }}</strong>
+              </header>
+              <p>{{ comment.message }}</p>
+              @if (comment.mediaUrls.length) {
+                <div class="pd-review-comment-media-list">
+                  @for (mediaUrl of comment.mediaUrls; track mediaUrl) {
+                    <a class="pd-review-comment-media-link" [href]="mediaUrl" target="_blank">
+                      <img [src]="mediaUrl" alt="Comment attachment" />
+                    </a>
+                  }
+                </div>
+              }
+            </div>
+
+            <div class="pd-review-comment-meta">
+              <span>{{ comment.createdAt | date: 'medium' }}</span>
+              <button type="button" (click)="startReply(comment.id)">Reply</button>
+              @if (comment.hasReplies) {
+                <button type="button" class="pd-review-comment-collapse" (click)="toggleCollapse(comment.id)">
+                  {{ isCollapsed(comment.id) ? 'Show replies' : 'Hide replies' }}
+                </button>
+              }
+            </div>
+
+            @if (isReplyingTo(comment.id)) {
+              <div class="pd-inline-reply-form">
+                <div class="pd-replying-banner">
+                  Replying to <strong>{{ comment.author }}</strong>
+                  <button type="button" (click)="cancelReply()">Cancel</button>
+                </div>
+
+                <textarea
+                  rows="2"
+                  class="pd-review-comment-input"
+                  placeholder="Write a reply…"
+                  [ngModel]="reviewCommentInput()"
+                  (ngModelChange)="reviewCommentInput.set($event)"
+                ></textarea>
+
+                <div class="pd-review-comment-media">
+                  <label class="pd-review-media-attach">
+                    <input
+                      type="file"
+                      multiple
+                      [accept]="commentAcceptedTypes"
+                      (change)="onCommentFileSelected($event)"
+                    />
+                    Attach Media
+                  </label>
+
+                  @if (commentMedia().length) {
+                    <div class="pd-review-media-grid">
+                      @for (item of commentMedia(); track $index) {
+                        <div class="pd-review-media-item">
+                          @if (item.preview) {
+                            <img [src]="item.preview" alt="Comment media preview" />
+                          } @else {
+                            <div class="pd-review-media-video">Video</div>
+                          }
+
+                          @if (item.status === 'uploading') {
+                            <div class="pd-review-media-progress">
+                              <div class="pd-review-media-progress-bar" [style.width.%]="item.progress"></div>
+                            </div>
+                          }
+
+                          @if (item.status === 'error') {
+                            <span class="pd-review-media-error">Failed</span>
+                          }
+
+                          <button type="button" (click)="removeCommentMedia($index)">×</button>
+                        </div>
+                      }
+                    </div>
+                  }
+                </div>
+
+                <button
+                  type="button"
+                  class="pd-review-comment-btn"
+                  [disabled]="!reviewCommentInput().trim() || isAddingComment()"
+                  (click)="onAddReviewComment()"
+                >
+                  {{ isAddingComment() ? 'Saving…' : 'Reply' }}
+                </button>
+              </div>
+            }
+          </div>
+        </article>
+      }
+    }
+  </div>
+</section>

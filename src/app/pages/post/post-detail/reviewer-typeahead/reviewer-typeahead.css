@@ -1,0 +1,144 @@
+:host {
+  display: block;
+}
+
+.rt-card {
+  background: #fff;
+  border-radius: 16px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+  padding: 1.2rem;
+}
+
+.rt-title {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+.rt-subtitle {
+  margin: 0.25rem 0 0.9rem;
+  color: #6b7280;
+  font-size: 0.82rem;
+}
+
+.rt-selected-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-bottom: 0.8rem;
+}
+
+.rt-selected-chip {
+  border: 1px solid #d1d5db;
+  background: #f9fafb;
+  color: #111827;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 999px;
+  padding: 0.25rem 0.55rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.rt-chip-remove {
+  font-size: 0.95rem;
+  line-height: 1;
+  color: #6b7280;
+}
+
+.rt-input-wrap {
+  position: relative;
+}
+
+.rt-input {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1.5px solid #d1d5db;
+  border-radius: 10px;
+  padding: 0.62rem 0.72rem;
+  font-size: 0.9rem;
+  outline: none;
+}
+
+.rt-input:focus {
+  border-color: #111827;
+}
+
+.rt-results {
+  margin-top: 0.45rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  max-height: 220px;
+  overflow-y: auto;
+  background: #fff;
+}
+
+.rt-result {
+  width: 100%;
+  text-align: left;
+  border: none;
+  background: #fff;
+  padding: 0.62rem 0.72rem;
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  cursor: pointer;
+}
+
+.rt-result:hover {
+  background: #f9fafb;
+}
+
+.rt-result-name {
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+.rt-result-meta {
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+.rt-empty {
+  padding: 0.75rem;
+  color: #6b7280;
+  font-size: 0.8rem;
+}
+
+.rt-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: #e5e7eb;
+  color: #374151;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.rt-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.rt-avatar--chip {
+  width: 18px;
+  height: 18px;
+  font-size: 0.58rem;
+}
+
+.rt-result-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.12rem;
+}

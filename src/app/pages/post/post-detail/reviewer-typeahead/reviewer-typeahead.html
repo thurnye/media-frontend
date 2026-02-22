@@ -1,0 +1,58 @@
+<div class="rt-card">
+  <h3 class="rt-title">Reviewers</h3>
+  <p class="rt-subtitle">Search and assign reviewers for this post.</p>
+
+  @if (selected.length) {
+    <div class="rt-selected-list">
+      @for (reviewer of selected; track reviewer.id) {
+        <button type="button" class="rt-selected-chip" (click)="removeReviewer(reviewer.id)">
+          <span class="rt-avatar rt-avatar--chip">
+            @if (reviewer.avatarUrl) {
+              <img [src]="reviewer.avatarUrl" [alt]="reviewer.name" />
+            } @else {
+              <span>{{ getInitials(reviewer.name) }}</span>
+            }
+          </span>
+          <span>{{ reviewer.name }}</span>
+          <span class="rt-chip-remove">&times;</span>
+        </button>
+      }
+    </div>
+  }
+
+  <div class="rt-input-wrap">
+    <input
+      type="text"
+      class="rt-input"
+      placeholder="Search by name or email"
+      [(ngModel)]="query"
+      (focus)="open()"
+      (blur)="close()"
+      autocomplete="false"
+    />
+  </div>
+
+  @if (isOpen) {
+    <div class="rt-results">
+      @if (filteredOptions.length) {
+        @for (reviewer of filteredOptions; track reviewer.id) {
+          <button type="button" class="rt-result" (mousedown)="$event.preventDefault()" (click)="addReviewer(reviewer)">
+            <span class="rt-avatar">
+              @if (reviewer.avatarUrl) {
+                <img [src]="reviewer.avatarUrl" [alt]="reviewer.name" />
+              } @else {
+                <span>{{ getInitials(reviewer.name) }}</span>
+              }
+            </span>
+            <span class="rt-result-text">
+              <span class="rt-result-name">{{ reviewer.name }}</span>
+              <span class="rt-result-meta">{{ reviewer.email }}</span>
+            </span>
+          </button>
+        }
+      } @else {
+        <div class="rt-empty">No matching reviewer found.</div>
+      }
+    </div>
+  }
+</div>

@@ -49,205 +49,241 @@
       </div>
     }
 
-    <!-- Post content -->
-    @if (post() && !loading()) {
-      <article class="pd-article">
-        <!-- Article header -->
-        <header class="pd-article-header">
-          <div class="pd-panel-header">
-            <h1 class="pd-title">{{ post()!.title }}</h1>
-            <div
-              class="pd-panel-actions"
-              role="group"
-              [attr.aria-label]="'Actions for ' + post()!.title"
-            >
-              <div class="pd-menu-wrapper">
-                <button type="button" class="pd-btn-ellipsis" (click)="toggleMenu()">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="18"
-                    height="18"
-                    fill="currentColor"
-                    viewBox="0 0 16 16"
-                  >
-                    <path
-                      d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3"
-                    />
-                  </svg>
-                </button>
-                @if (showMenu() && isOwner()) {
-                  <div class="pd-menu-backdrop" (click)="closeMenu()"></div>
-                  <div class="pd-menu-dropdown">
-                    <a
-                      class="pd-menu-item"
-                      routerLink="post/new"
-                      (click)="onEdit(); closeMenu()"
-                      [attr.aria-label]="'Edit post: ' + post()!.title"
-                    >
+    <div class="pb-sections-container">
+      <!-- Post content -->
+      <section class="pb-section pb-section--content">
+        @if (post() && !loading()) {
+          <article class="pd-article">
+            <!-- Article header -->
+            <header class="pd-article-header">
+              <div class="pd-panel-header">
+                <h1 class="pd-title">{{ post()!.title }}</h1>
+                <div
+                  class="pd-panel-actions"
+                  role="group"
+                  [attr.aria-label]="'Actions for ' + post()!.title"
+                >
+                  <div class="pd-menu-wrapper">
+                    <button type="button" class="pd-btn-ellipsis" (click)="toggleMenu()">
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
-                        width="14"
-                        height="14"
+                        width="18"
+                        height="18"
                         fill="currentColor"
                         viewBox="0 0 16 16"
                       >
                         <path
-                          d="M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.499.499 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11z"
+                          d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3"
                         />
                       </svg>
-                      Edit
-                    </a>
-                    @if (post()!.status === 'approved') {
-                      <button
-                        type="button"
-                        class="pd-menu-item"
-                        (click)="showPublishDialog.set(true); closeMenu()"
-                      >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="14"
-                          height="14"
-                          fill="currentColor"
-                          viewBox="0 0 16 16"
-                        >
-                          <path
-                            d="M0 1.5A1.5 1.5 0 0 1 1.5 0h2A1.5 1.5 0 0 1 5 1.5v2A1.5 1.5 0 0 1 3.5 5h-2A1.5 1.5 0 0 1 0 3.5zM1.5 1a.5.5 0 0 0-.5.5v2a.5.5 0 0 0 .5.5h2a.5.5 0 0 0 .5-.5v-2a.5.5 0 0 0-.5-.5zM0 8a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2zm1 3v2a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2zm14-1V8a1 1 0 0 0-1-1H2a1 1 0 0 0-1 1v2zM2 8.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5m0 4a.5.5 0 0 1 .5-.5h6a.5.5 0 0 1 0 1h-6a.5.5 0 0 1-.5-.5"
-                          />
-                        </svg>
-                        Publish
-                      </button>
-                    }
-                    <button
-                      type="button"
-                      class="pd-menu-item pd-menu-item-delete"
-                      (click)="onDelete(); closeMenu()"
-                      [attr.aria-label]="'Delete post: ' + post()!.title"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="14"
-                        height="14"
-                        fill="currentColor"
-                        viewBox="0 0 16 16"
-                      >
-                        <path
-                          d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"
-                        />
-                        <path
-                          d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"
-                        />
-                      </svg>
-                      Delete
                     </button>
+                    @if (showMenu() && isOwner()) {
+                      <div class="pd-menu-backdrop" (click)="closeMenu()"></div>
+                      <div class="pd-menu-dropdown">
+                        <a
+                          class="pd-menu-item"
+                          routerLink="post/new"
+                          (click)="onEdit(); closeMenu()"
+                          [attr.aria-label]="'Edit post: ' + post()!.title"
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="14"
+                            height="14"
+                            fill="currentColor"
+                            viewBox="0 0 16 16"
+                          >
+                            <path
+                              d="M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.499.499 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11z"
+                            />
+                          </svg>
+                          Edit
+                        </a>
+                        @if (post()!.status === 'approved') {
+                          <button
+                            type="button"
+                            class="pd-menu-item"
+                            (click)="showPublishDialog.set(true); closeMenu()"
+                          >
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="14"
+                              height="14"
+                              fill="currentColor"
+                              viewBox="0 0 16 16"
+                            >
+                              <path
+                                d="M0 1.5A1.5 1.5 0 0 1 1.5 0h2A1.5 1.5 0 0 1 5 1.5v2A1.5 1.5 0 0 1 3.5 5h-2A1.5 1.5 0 0 1 0 3.5zM1.5 1a.5.5 0 0 0-.5.5v2a.5.5 0 0 0 .5.5h2a.5.5 0 0 0 .5-.5v-2a.5.5 0 0 0-.5-.5zM0 8a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2zm1 3v2a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2zm14-1V8a1 1 0 0 0-1-1H2a1 1 0 0 0-1 1v2zM2 8.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5m0 4a.5.5 0 0 1 .5-.5h6a.5.5 0 0 1 0 1h-6a.5.5 0 0 1-.5-.5"
+                              />
+                            </svg>
+                            Publish
+                          </button>
+                        }
+                        <button
+                          type="button"
+                          class="pd-menu-item pd-menu-item-delete"
+                          (click)="onDelete(); closeMenu()"
+                          [attr.aria-label]="'Delete post: ' + post()!.title"
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="14"
+                            height="14"
+                            fill="currentColor"
+                            viewBox="0 0 16 16"
+                          >
+                            <path
+                              d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"
+                            />
+                            <path
+                              d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"
+                            />
+                          </svg>
+                          Delete
+                        </button>
+                      </div>
+                    }
+                  </div>
+                </div>
+              </div>
+
+              <div class="pd-meta">
+                <div class="pd-badges">
+                  <span class="pd-status-badge pd-status--{{ post()!.status ?? 'draft' }}">
+                    {{ getStatusLabel(post()!.status) }}
+                  </span>
+                  @if (post()!.priority) {
+                    <span class="pd-priority-badge pd-priority--{{ post()!.priority }}">
+                      {{ post()!.priority }}
+                    </span>
+                  }
+                  @if (post()!.category) {
+                    <span class="pd-category-badge">{{ post()!.category }}</span>
+                  }
+                  @if (post()!.isEvergreen) {
+                    <span class="pd-evergreen-badge">Evergreen</span>
+                  }
+                </div>
+              </div>
+
+              <!-- Tags -->
+              @if (post()!.tags && post()!.tags!.length > 0) {
+                <div class="pd-tags">
+                  @for (tag of post()!.tags; track tag) {
+                    <span class="pd-tag">{{ tag }}</span>
+                  }
+                </div>
+              }
+
+              <hr class="pd-divider" />
+            </header>
+
+            <!-- Article body -->
+            <div class="pd-body">
+              @if (post()!.description) {
+                <p>{{ post()!.description }}</p>
+              } @else {
+                <p class="pd-no-content">No description was provided for this post.</p>
+              }
+            </div>
+
+            <!-- Rejection comments -->
+            @if (post()!.status === 'rejected' && post()!.approvalWorkflow?.comments?.length) {
+              <div class="pd-rejection-section">
+                <h3 class="pd-rejection-title">Rejection Feedback</h3>
+                @for (comment of post()!.approvalWorkflow!.comments; track comment.createdAt) {
+                  <div class="pd-rejection-comment">
+                    <p class="pd-rejection-reason">{{ comment.message }}</p>
+                    <span class="pd-rejection-date">{{ comment.createdAt | date: 'medium' }}</span>
                   </div>
                 }
               </div>
-            </div>
-          </div>
-
-          <div class="pd-meta">
-            <div class="pd-badges">
-              <span class="pd-status-badge pd-status--{{ post()!.status ?? 'draft' }}">
-                {{ getStatusLabel(post()!.status) }}
-              </span>
-              @if (post()!.priority) {
-                <span class="pd-priority-badge pd-priority--{{ post()!.priority }}">
-                  {{ post()!.priority }}
-                </span>
-              }
-              @if (post()!.category) {
-                <span class="pd-category-badge">{{ post()!.category }}</span>
-              }
-              @if (post()!.isEvergreen) {
-                <span class="pd-evergreen-badge">Evergreen</span>
-              }
-            </div>
-          </div>
-
-          <!-- Tags -->
-          @if (post()!.tags && post()!.tags!.length > 0) {
-            <div class="pd-tags">
-              @for (tag of post()!.tags; track tag) {
-                <span class="pd-tag">{{ tag }}</span>
-              }
-            </div>
-          }
-
-          <hr class="pd-divider" />
-        </header>
-
-        <!-- Article body -->
-        <div class="pd-body">
-          @if (post()!.description) {
-            <p>{{ post()!.description }}</p>
-          } @else {
-            <p class="pd-no-content">No description was provided for this post.</p>
-          }
-        </div>
-
-        <!-- Rejection comments -->
-        @if (post()!.status === 'rejected' && post()!.approvalWorkflow?.comments?.length) {
-          <div class="pd-rejection-section">
-            <h3 class="pd-rejection-title">Rejection Feedback</h3>
-            @for (comment of post()!.approvalWorkflow!.comments; track comment.createdAt) {
-              <div class="pd-rejection-comment">
-                <p class="pd-rejection-reason">{{ comment.message }}</p>
-                <span class="pd-rejection-date">{{ comment.createdAt | date: 'medium' }}</span>
-              </div>
             }
+
+            <!-- Approval actions -->
+            <div class="pd-approval-bar">
+              @if (post()!.status === 'draft' || post()!.status === 'rejected') {
+                <button class="pd-btn-submit" (click)="onSubmitForApproval()">
+                  Submit for Approval
+                </button>
+              }
+              @if (post()!.status === 'pending_approval') {
+                <button class="pd-btn-approve" (click)="onApprove()">Approve</button>
+                <button class="pd-btn-reject" (click)="showRejectDialog.set(true)">Reject</button>
+              }
+            </div>
+          </article>
+
+          <!-- Reject dialog -->
+          @if (showRejectDialog()) {
+            <div class="pd-dialog-backdrop" (click)="showRejectDialog.set(false)">
+              <div class="pd-dialog" (click)="$event.stopPropagation()">
+                <h3 class="pd-dialog-title">Reject Post</h3>
+                <p class="pd-dialog-desc">Please provide a reason for rejecting this post.</p>
+                <textarea
+                  class="pd-dialog-textarea"
+                  rows="4"
+                  placeholder="Rejection reason..."
+                  [ngModel]="rejectReason()"
+                  (ngModelChange)="rejectReason.set($event)"
+                ></textarea>
+                <div class="pd-dialog-actions">
+                  <button class="pd-btn-cancel" (click)="showRejectDialog.set(false)">
+                    Cancel
+                  </button>
+                  <button
+                    class="pd-btn-confirm-reject"
+                    [disabled]="!rejectReason().trim()"
+                    (click)="onReject()"
+                  >
+                    Reject Post
+                  </button>
+                </div>
+              </div>
+            </div>
+          }
+
+          @if (showPublishDialog()) {
+            <app-post-publish-dialog
+              [postId]="post()!.id"
+              [workspaceId]="workspaceId()"
+              [defaultCaption]="post()!.description ?? ''"
+              [defaultHashtags]="post()!.tags ?? []"
+              (close)="showPublishDialog.set(false)"
+            />
+          }
+        }
+      </section>
+
+      <!-- Reviewer assignment -->
+      <section class="pb-section pb-section--reviewer">
+        @if (canSeeReviewerDecision) {
+          <div class="pd-reviewer-select-wrap">
+            <label class="pd-reviewer-select-label" for="reviewerDecision">Review Decision</label>
+            <select
+              id="reviewerDecision"
+              class="pd-reviewer-select"
+              [ngModel]="reviewerDecision()"
+              (ngModelChange)="reviewerDecision.set($event)"
+            >
+              @for (option of reviewerDecisionOptions; track option.value) {
+                <option [value]="option.value">{{ option.label }}</option>
+              }
+            </select>
           </div>
         }
 
-        <!-- Approval actions -->
-        <div class="pd-approval-bar">
-          @if (post()!.status === 'draft' || post()!.status === 'rejected') {
-            <button class="pd-btn-submit" (click)="onSubmitForApproval()">
-              Submit for Approval
-            </button>
-          }
-          @if (post()!.status === 'pending_approval') {
-            <button class="pd-btn-approve" (click)="onApprove()">Approve</button>
-            <button class="pd-btn-reject" (click)="showRejectDialog.set(true)">Reject</button>
-          }
-        </div>
-      </article>
-
-      <!-- Reject dialog -->
-      @if (showRejectDialog()) {
-        <div class="pd-dialog-backdrop" (click)="showRejectDialog.set(false)">
-          <div class="pd-dialog" (click)="$event.stopPropagation()">
-            <h3 class="pd-dialog-title">Reject Post</h3>
-            <p class="pd-dialog-desc">Please provide a reason for rejecting this post.</p>
-            <textarea
-              class="pd-dialog-textarea"
-              rows="4"
-              placeholder="Rejection reason..."
-              [ngModel]="rejectReason()"
-              (ngModelChange)="rejectReason.set($event)"
-            ></textarea>
-            <div class="pd-dialog-actions">
-              <button class="pd-btn-cancel" (click)="showRejectDialog.set(false)">Cancel</button>
-              <button
-                class="pd-btn-confirm-reject"
-                [disabled]="!rejectReason().trim()"
-                (click)="onReject()"
-              >
-                Reject Post
-              </button>
-            </div>
-          </div>
-        </div>
-      }
-
-      @if (showPublishDialog()) {
-        <app-post-publish-dialog
-          [postId]="post()!.id"
-          [workspaceId]="workspaceId()"
-          [defaultCaption]="post()!.description ?? ''"
-          [defaultHashtags]="post()!.tags ?? []"
-          (close)="showPublishDialog.set(false)"
+        <app-reviewer-typeahead
+          [options]="availableReviewers"
+          [selected]="selectedReviewers()"
+          (selectedChange)="onSelectedReviewersChange($event)"
         />
-      }
-    }
+      </section>
+    </div>
+
+    <app-post-review-comments
+      [workspaceId]="workspaceId()"
+      [currentUser]="currentUser()"
+    />
   </div>
 </div>
