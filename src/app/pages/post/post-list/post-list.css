@@ -297,7 +297,15 @@
   background: #d1fae5;
   color: #065f46;
 }
+.pl-status--rejected {
+  background: #fee2e2;
+  color: #991b1b;
+}
 .pl-status--scheduled {
+  background: #dbeafe;
+  color: #1e40af;
+}
+.pl-status--publishing {
   background: #dbeafe;
   color: #1e40af;
 }
@@ -314,6 +322,10 @@
   color: #991b1b;
 }
 .pl-status--archived {
+  background: #e5e7eb;
+  color: #4b5563;
+}
+.pl-status--cancelled {
   background: #e5e7eb;
   color: #4b5563;
 }

@@ -15,8 +15,16 @@ import { WorkspaceActions } from '../../../store/workspace/workspace.actions';
 import { PostPublishDialog } from '../post-publish-dialog/post-publish-dialog';
 import { ReviewerOption, ReviewerTypeahead } from './reviewer-typeahead/reviewer-typeahead';
 import { PostReviewComments } from './post-review-comments/post-review-comments';
+import { MediaService } from '../../../core/services/media.service';
+import { IUserSummary } from '../../../core/interfaces/post';
 
 type ReviewerDecision = 'approved' | 'rejected' | 'cancelled' | 'archived';
+type ReviewerDecisionValue = ReviewerDecision | '';
+type ReviewerDecisionItem = {
+  userId: string;
+  decision: ReviewerDecision;
+  user?: IUserSummary;
+};
 
 @Component({
   selector: 'app-post-detail',
@@ -28,6 +36,7 @@ export class PostDetail implements OnInit, OnDestroy {
   private store = inject(Store);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
+  private mediaService = inject(MediaService);
 
   post = this.store.selectSignal(selectSelectedPost);
   loading = this.store.selectSignal(selectPostLoading);
@@ -39,9 +48,10 @@ export class PostDetail implements OnInit, OnDestroy {
   showRejectDialog = signal(false);
   showPublishDialog = signal(false);
   rejectReason = signal('');
+  pendingReviewerDecision = signal<ReviewerDecisionValue>('');
+  showReviewerDecisionMenu = signal(false);
   showMenu = signal(false);
   selectedReviewers = signal<ReviewerOption[]>([]);
-  reviewerDecision = signal<ReviewerDecision>('approved');
 
   reviewerDecisionOptions: { value: ReviewerDecision; label: string }[] = [
     { value: 'approved', label: 'Approved' },
@@ -74,6 +84,7 @@ export class PostDetail implements OnInit, OnDestroy {
         this.selectedReviewers.set(preselected);
       }
     });
+
   }
 
   ngOnInit(): void {
@@ -127,29 +138,83 @@ export class PostDetail implements OnInit, OnDestroy {
     this.router.navigate(['/dashboard/workspace', this.workspaceId(), 'posts']);
   }
 
-  onSubmitForApproval(): void {
-    const post = this.post();
-    if (!post) return;
-    this.store.dispatch(PostActions.submitForApproval({ postId: post.id }));
-  }
-
-  onApprove(): void {
-    const post = this.post();
-    if (!post) return;
-    this.store.dispatch(PostActions.approvePost({ postId: post.id }));
-  }
-
   onReject(): void {
     const reason = this.rejectReason().trim();
     const post = this.post();
     if (!post || !reason) return;
     this.store.dispatch(PostActions.rejectPost({ postId: post.id, reason }));
+    this.pendingReviewerDecision.set('');
     this.showRejectDialog.set(false);
     this.rejectReason.set('');
   }
 
+  onCancelRejectDialog(): void {
+    this.showRejectDialog.set(false);
+    this.rejectReason.set('');
+    this.pendingReviewerDecision.set('');
+  }
+
+  toggleReviewerDecisionMenu(): void {
+    if (!this.canSubmitReviewerDecision) return;
+    this.showReviewerDecisionMenu.update((open) => !open);
+  }
+
+  closeReviewerDecisionMenu(): void {
+    this.showReviewerDecisionMenu.set(false);
+  }
+
+  onReviewerDecisionChange(decision: ReviewerDecisionValue): void {
+    this.closeReviewerDecisionMenu();
+    const post = this.post();
+    if (!post) return;
+    if (post.status !== 'pending_approval') return;
+    if (!decision) return;
+
+    if (decision === 'approved') {
+      this.pendingReviewerDecision.set('');
+      this.store.dispatch(PostActions.approvePost({ postId: post.id }));
+      return;
+    }
+
+    if (decision === 'rejected') {
+      this.pendingReviewerDecision.set(decision);
+      this.showRejectDialog.set(true);
+      return;
+    }
+
+    this.pendingReviewerDecision.set('');
+    this.store.dispatch(
+      PostActions.updatePost({
+        input: {
+          id: post.id,
+          status: decision,
+        },
+      }),
+    );
+  }
+
   onSelectedReviewersChange(reviewers: ReviewerOption[]): void {
     this.selectedReviewers.set(reviewers);
+
+    const post = this.post();
+    if (!post) return;
+
+    const nextReviewerIds = reviewers.map((reviewer) => reviewer.id);
+    const currentReviewerIds = post.approvalWorkflow?.requiredApprovers ?? [];
+    const isSameSelection =
+      nextReviewerIds.length === currentReviewerIds.length &&
+      nextReviewerIds.every((id) => currentReviewerIds.includes(id));
+
+    if (isSameSelection) return;
+
+    this.store.dispatch(
+      PostActions.updatePost({
+        input: {
+          id: post.id,
+          requiredApprovers: nextReviewerIds,
+        },
+      }),
+    );
   }
 
   get availableReviewers(): ReviewerOption[] {
@@ -172,5 +237,83 @@ export class PostDetail implements OnInit, OnDestroy {
     if (!me) return false;
     const requiredApprovers = this.post()?.approvalWorkflow?.requiredApprovers ?? [];
     return requiredApprovers.includes(me);
+  }
+
+  get canSubmitReviewerDecision(): boolean {
+    const status = this.post()?.status;
+    return status === 'pending_approval' || status === 'rejected';
+  }
+
+  get reviewerDecisionValue(): ReviewerDecisionValue {
+    return this.pendingReviewerDecision() || this.currentReviewerDecision || '';
+  }
+
+  get reviewerDecisionLabel(): string {
+    if (!this.reviewerDecisionValue) return 'Select decision';
+    return this.reviewerDecisionValue.charAt(0).toUpperCase() + this.reviewerDecisionValue.slice(1);
+  }
+
+  get currentReviewerDecision(): ReviewerDecision | null {
+    const me = this.currentUser()?.id;
+    const workflow = this.post()?.approvalWorkflow;
+    if (!me || !workflow) return null;
+    if ((workflow.approvedBy ?? []).includes(me)) return 'approved';
+    if ((workflow.rejectedBy ?? []).includes(me)) return 'rejected';
+    if ((workflow.cancelledBy ?? []).includes(me)) return 'cancelled';
+    if ((workflow.archivedBy ?? []).includes(me)) return 'archived';
+    return null;
+  }
+
+  getMediaUrl(url: string): string {
+    return this.mediaService.getMediaUrl(url);
+  }
+
+  isVideoUrl(url: string): boolean {
+    return /\.(mp4|webm|mov|m4v|avi)$/i.test(url);
+  }
+
+  get reviewerDecisionItems(): ReviewerDecisionItem[] {
+    const workflow = this.post()?.approvalWorkflow;
+    if (!workflow) return [];
+
+    const items: ReviewerDecisionItem[] = [];
+    const pushItems = (
+      ids: string[] | undefined,
+      users: IUserSummary[] | undefined,
+      decision: ReviewerDecision,
+    ) => {
+      const usersById = new Map((users ?? []).map((user) => [user.id, user]));
+      for (const userId of ids ?? []) {
+        items.push({
+          userId,
+          decision,
+          user: usersById.get(userId),
+        });
+      }
+    };
+
+    pushItems(workflow.approvedBy, workflow.approvedByUsers, 'approved');
+    pushItems(workflow.rejectedBy, workflow.rejectedByUsers, 'rejected');
+    pushItems(workflow.cancelledBy, workflow.cancelledByUsers, 'cancelled');
+    pushItems(workflow.archivedBy, workflow.archivedByUsers, 'archived');
+
+    const byUser = new Map<string, ReviewerDecisionItem>();
+    for (const item of items) {
+      byUser.set(item.userId, item);
+    }
+    return Array.from(byUser.values());
+  }
+
+  getUserInitials(item: ReviewerDecisionItem): string {
+    const name = `${item.user?.firstName ?? ''} ${item.user?.lastName ?? ''}`.trim();
+    const parts = name.split(/\s+/).filter(Boolean);
+    if (parts.length >= 2) return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
+    if (parts.length === 1) return parts[0][0].toUpperCase();
+    return '?';
+  }
+
+  getDecisionDisplayName(item: ReviewerDecisionItem): string {
+    const fullName = `${item.user?.firstName ?? ''} ${item.user?.lastName ?? ''}`.trim();
+    return fullName || item.user?.email || item.userId;
   }
 }

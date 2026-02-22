@@ -31,24 +31,56 @@ export type PostCategory =
 
 export interface IApprovalComment {
   userId: string;
+  user?: IUserSummary;
   message: string;
   createdAt: string;
 }
 
+export interface IUserSummary {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  avatarUrl?: string;
+}
+
 export interface IApprovalWorkflow {
   requiredApprovers?: string[];
+  requiredApproverUsers?: IUserSummary[];
   approvedBy?: string[];
+  approvedByUsers?: IUserSummary[];
   rejectedBy?: string[];
+  rejectedByUsers?: IUserSummary[];
+  cancelledBy?: string[];
+  cancelledByUsers?: IUserSummary[];
+  archivedBy?: string[];
+  archivedByUsers?: IUserSummary[];
   comments?: IApprovalComment[];
+}
+
+export interface IPostReviewComment {
+  id: string;
+  workspaceId: string;
+  postId: string;
+  authorId: string;
+  author?: IUserSummary;
+  message: string;
+  mediaIds?: string[];
+  mediaUrls?: string[];
+  parentCommentId?: string | null;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface IPost {
   id:          string;
   workspaceId: string;
   createdBy:   string;
+  createdByUser?: IUserSummary;
   title:       string;
   description?: string;
   mediaIds?:   string[];
+  mediaUrls?:  string[];
   category?:   PostCategory;
   tags?:       string[];
   status?:     PostStatus;
@@ -81,6 +113,7 @@ export interface IUpdatePost {
   priority?:   string;
   status?:     string;
   isEvergreen?: boolean;
+  requiredApprovers?: string[];
 }
 
 export interface IPaginatedPosts {

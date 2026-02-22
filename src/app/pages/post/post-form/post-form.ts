@@ -15,7 +15,7 @@ import {
 import { InstagramPreview } from '../post-preview/instagram-preview/instagram-preview';
 import { TicktokPreview } from '../post-preview/ticktok-preview/ticktok-preview';
 import { MediaService } from '../../../core/services/media.service';
-import { IMediaUploadItem } from '../../../core/interfaces/media';
+import { IMedia, IMediaUploadItem } from '../../../core/interfaces/media';
 
 @Component({
   selector: 'app-post-form',
@@ -46,6 +46,7 @@ export class PostForm implements OnInit, OnDestroy {
   isSubmitting  = signal(false);
   previewPlatform = signal<'facebook' | 'instagram' | 'tiktok'>('facebook');
   previewMode     = signal<PreviewMode>('feed');
+  private hydratedMediaPostId = signal<string | null>(null);
 
   readonly acceptedTypes = 'image/jpeg,image/png,image/gif,image/webp,video/mp4,video/quicktime,video/webm';
   readonly previewPlatforms = [
@@ -93,6 +94,38 @@ export class PostForm implements OnInit, OnDestroy {
         this.tags        = post.tags?.join(', ') ?? '';
         this.priority    = post.priority ?? '';
         this.isEvergreen = post.isEvergreen ?? false;
+
+        if (this.hydratedMediaPostId() !== post.id) {
+          const urls = post.mediaUrls ?? [];
+          const ids = post.mediaIds ?? [];
+          const hydrated = urls.map((url, index) => {
+            const absoluteUrl = this.mediaService.getMediaUrl(url);
+            const isVideo = this.isVideoUrl(url);
+            const fallbackName = isVideo ? `video-${index + 1}` : `image-${index + 1}`;
+            const extension = this.fileExtensionFromUrl(url) || (isVideo ? 'mp4' : 'jpg');
+            const fileName = `${fallbackName}.${extension}`;
+            const mediaType: IMedia['type'] = isVideo ? 'video' : 'image';
+            const processingStatus: IMedia['processingStatus'] = 'ready';
+
+            return {
+              file: new File([], fileName, { type: isVideo ? 'video/mp4' : 'image/jpeg' }),
+              preview: isVideo ? '' : absoluteUrl,
+              progress: 100,
+              status: 'done' as const,
+              media: {
+                _id: ids[index] ?? `existing-${index}`,
+                workspaceId: this.workspaceId(),
+                url,
+                type: mediaType,
+                processingStatus,
+                uploadedBy: post.createdBy,
+              },
+            };
+          });
+
+          this.uploadedMedia.set(hydrated);
+          this.hydratedMediaPostId.set(post.id);
+        }
       }
     });
 
@@ -122,7 +155,7 @@ export class PostForm implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.store.dispatch(PostActions.clearSelectedPost());
     this.uploadedMedia().forEach(item => {
-      if (item.preview) URL.revokeObjectURL(item.preview);
+      if (item.preview?.startsWith('blob:')) URL.revokeObjectURL(item.preview);
     });
   }
 
@@ -159,7 +192,7 @@ export class PostForm implements OnInit, OnDestroy {
     if (item.media?._id) {
       this.mediaService.deleteMedia(item.media._id).subscribe();
     }
-    if (item.preview) URL.revokeObjectURL(item.preview);
+    if (item.preview?.startsWith('blob:')) URL.revokeObjectURL(item.preview);
     this.uploadedMedia.update(list => list.filter((_, i) => i !== index));
   }
 
@@ -178,6 +211,17 @@ export class PostForm implements OnInit, OnDestroy {
 
       this.uploadedMedia.update(list => [...list, item]);
     }
+  }
+
+  private isVideoUrl(url: string): boolean {
+    return /\.(mp4|webm|mov|m4v|avi)$/i.test(url);
+  }
+
+  private fileExtensionFromUrl(url: string): string {
+    const path = url.split('?')[0];
+    const lastDot = path.lastIndexOf('.');
+    if (lastDot === -1) return '';
+    return path.slice(lastDot + 1).toLowerCase();
   }
 
   async onSubmit(): Promise<void> {

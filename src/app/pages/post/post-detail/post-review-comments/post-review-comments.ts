@@ -1,12 +1,15 @@
 import { CommonModule, DatePipe } from '@angular/common';
-import { Component, inject, Input, OnDestroy, signal } from '@angular/core';
+import { Component, inject, Input, OnChanges, OnDestroy, SimpleChanges, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { IUser } from '../../../../core/interfaces/auth';
 import { IMediaUploadItem } from '../../../../core/interfaces/media';
 import { MediaService } from '../../../../core/services/media.service';
+import { PostGqlService } from '../../../../core/services/post.gql.service';
+import { IPostReviewComment } from '../../../../core/interfaces/post';
 
 interface ReviewComment {
   id: string;
+  authorId: string;
   author: string;
   authorAvatarUrl?: string;
   message: string;
@@ -28,10 +31,12 @@ interface ReviewCommentRow extends ReviewComment {
   templateUrl: './post-review-comments.html',
   styleUrl: './post-review-comments.css',
 })
-export class PostReviewComments implements OnDestroy {
+export class PostReviewComments implements OnChanges, OnDestroy {
   private mediaService = inject(MediaService);
+  private postGqlService = inject(PostGqlService);
 
   @Input({ required: true }) workspaceId!: string;
+  @Input({ required: true }) postId!: string;
   @Input() currentUser: IUser | null = null;
 
   reviewCommentInput = signal('');
@@ -43,6 +48,12 @@ export class PostReviewComments implements OnDestroy {
 
   readonly commentAcceptedTypes =
     'image/jpeg,image/png,image/gif,image/webp,video/mp4,video/quicktime,video/webm';
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['postId']?.currentValue) {
+      this.loadComments();
+    }
+  }
 
   ngOnDestroy(): void {
     this.commentMedia().forEach((item) => {
@@ -64,22 +75,23 @@ export class PostReviewComments implements OnDestroy {
     const user = this.currentUser;
     const author = user ? `${user.firstName} ${user.lastName}`.trim() : 'Reviewer';
 
-    this.reviewComments.update((comments) => [
-      {
-        id: `review-${Date.now()}`,
-        author: author || 'Reviewer',
-        authorAvatarUrl: user?.avatarUrl,
-        message,
-        createdAt: new Date().toISOString(),
-        mediaIds: uploadedMedia.mediaIds,
-        mediaUrls: uploadedMedia.mediaUrls,
-        parentCommentId: this.replyingToCommentId(),
+    const parentCommentId = this.replyingToCommentId();
+    this.postGqlService.addPostReviewComment({
+      postId: this.postId,
+      message,
+      mediaIds: uploadedMedia.mediaIds,
+      parentCommentId,
+    }).subscribe({
+      next: (saved) => {
+        this.reviewComments.update((comments) => [
+          this.mapBackendComment(saved, uploadedMedia.mediaUrls, author || 'Reviewer', user?.avatarUrl),
+          ...comments,
+        ]);
+        this.clearCommentComposer();
+        this.isAddingComment.set(false);
       },
-      ...comments,
-    ]);
-
-    this.clearCommentComposer();
-    this.isAddingComment.set(false);
+      error: () => this.isAddingComment.set(false),
+    });
   }
 
   startReply(commentId: string): void {
@@ -267,5 +279,43 @@ export class PostReviewComments implements OnDestroy {
         },
       });
     });
+  }
+
+  private loadComments(): void {
+    this.postGqlService.getPostReviewComments(this.postId).subscribe({
+      next: (comments) => {
+        this.reviewComments.set(comments.map((comment) => this.mapBackendComment(comment)));
+      },
+    });
+  }
+
+  private mapBackendComment(
+    comment: IPostReviewComment,
+    mediaUrls?: string[],
+    currentAuthorName?: string,
+    currentAuthorAvatar?: string,
+  ): ReviewComment {
+    const isCurrentUserComment = comment.authorId === this.currentUser?.id;
+    const authorFromApi = comment.author
+      ? `${comment.author.firstName} ${comment.author.lastName}`.trim()
+      : '';
+    const author = isCurrentUserComment
+      ? (currentAuthorName || `${this.currentUser?.firstName ?? ''} ${this.currentUser?.lastName ?? ''}`.trim() || 'You')
+      : (authorFromApi || comment.authorId);
+    const authorAvatarUrl = isCurrentUserComment
+      ? (currentAuthorAvatar || this.currentUser?.avatarUrl)
+      : comment.author?.avatarUrl;
+
+    return {
+      id: comment.id,
+      authorId: comment.authorId,
+      message: comment.message,
+      mediaIds: comment.mediaIds ?? [],
+      parentCommentId: comment.parentCommentId ?? null,
+      createdAt: comment.createdAt ?? new Date().toISOString(),
+      author,
+      authorAvatarUrl,
+      mediaUrls: mediaUrls ?? comment.mediaUrls ?? [],
+    };
   }
 }

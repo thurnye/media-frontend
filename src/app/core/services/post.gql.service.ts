@@ -1,8 +1,19 @@
 import { inject, Injectable } from '@angular/core';
 import { Apollo } from 'apollo-angular';
 import { map } from 'rxjs';
-import { ICreatePost, IPaginatedPosts, IPost, IUpdatePost } from '../interfaces/post';
-import { CREATE_POST, DELETE_POST, GET_POST, GET_POSTS, UPDATE_POST, SUBMIT_FOR_APPROVAL, APPROVE_POST, REJECT_POST } from '../graphql/posts.graphql';
+import { ICreatePost, IPaginatedPosts, IPost, IPostReviewComment, IUpdatePost } from '../interfaces/post';
+import {
+  ADD_POST_REVIEW_COMMENT,
+  APPROVE_POST,
+  CREATE_POST,
+  DELETE_POST,
+  GET_POST,
+  GET_POST_REVIEW_COMMENTS,
+  GET_POSTS,
+  REJECT_POST,
+  SUBMIT_FOR_APPROVAL,
+  UPDATE_POST,
+} from '../graphql/posts.graphql';
 
 @Injectable({ providedIn: 'root' })
 export class PostGqlService {
@@ -62,5 +73,29 @@ export class PostGqlService {
     return this.apollo
       .mutate<{ rejectPost: IPost }>({ mutation: REJECT_POST, variables: { postId, reason } })
       .pipe(map(r => r.data!.rejectPost));
+  }
+
+  getPostReviewComments(postId: string) {
+    return this.apollo
+      .query<{ postReviewComments: IPostReviewComment[] }>({
+        query: GET_POST_REVIEW_COMMENTS,
+        variables: { postId },
+        fetchPolicy: 'no-cache',
+      })
+      .pipe(map((r) => r.data!.postReviewComments));
+  }
+
+  addPostReviewComment(input: {
+    postId: string;
+    message: string;
+    mediaIds?: string[];
+    parentCommentId?: string | null;
+  }) {
+    return this.apollo
+      .mutate<{ addPostReviewComment: IPostReviewComment }>({
+        mutation: ADD_POST_REVIEW_COMMENT,
+        variables: input,
+      })
+      .pipe(map((r) => r.data!.addPostReviewComment));
   }
 }

@@ -185,6 +185,20 @@
               } @else {
                 <p class="pd-no-content">No description was provided for this post.</p>
               }
+
+              @if (post()!.mediaUrls?.length) {
+                <div class="pd-media-grid">
+                  @for (mediaUrl of post()!.mediaUrls!; track mediaUrl) {
+                    <div class="pd-media-item">
+                      @if (isVideoUrl(mediaUrl)) {
+                        <video controls preload="metadata" [src]="getMediaUrl(mediaUrl)"></video>
+                      } @else {
+                        <img [src]="getMediaUrl(mediaUrl)" alt="Post media" />
+                      }
+                    </div>
+                  }
+                </div>
+              }
             </div>
 
             <!-- Rejection comments -->
@@ -200,18 +214,6 @@
               </div>
             }
 
-            <!-- Approval actions -->
-            <div class="pd-approval-bar">
-              @if (post()!.status === 'draft' || post()!.status === 'rejected') {
-                <button class="pd-btn-submit" (click)="onSubmitForApproval()">
-                  Submit for Approval
-                </button>
-              }
-              @if (post()!.status === 'pending_approval') {
-                <button class="pd-btn-approve" (click)="onApprove()">Approve</button>
-                <button class="pd-btn-reject" (click)="showRejectDialog.set(true)">Reject</button>
-              }
-            </div>
           </article>
 
           <!-- Reject dialog -->
@@ -228,7 +230,7 @@
                   (ngModelChange)="rejectReason.set($event)"
                 ></textarea>
                 <div class="pd-dialog-actions">
-                  <button class="pd-btn-cancel" (click)="showRejectDialog.set(false)">
+                  <button class="pd-btn-cancel" (click)="onCancelRejectDialog()">
                     Cancel
                   </button>
                   <button
@@ -260,16 +262,42 @@
         @if (canSeeReviewerDecision) {
           <div class="pd-reviewer-select-wrap">
             <label class="pd-reviewer-select-label" for="reviewerDecision">Review Decision</label>
-            <select
-              id="reviewerDecision"
-              class="pd-reviewer-select"
-              [ngModel]="reviewerDecision()"
-              (ngModelChange)="reviewerDecision.set($event)"
-            >
-              @for (option of reviewerDecisionOptions; track option.value) {
-                <option [value]="option.value">{{ option.label }}</option>
+            <div class="pd-reviewer-dropdown">
+              <button
+                id="reviewerDecision"
+                type="button"
+                class="pd-reviewer-dropdown-trigger"
+                [disabled]="!canSubmitReviewerDecision"
+                (click)="toggleReviewerDecisionMenu()"
+              >
+                <span>{{ reviewerDecisionLabel }}</span>
+                <span class="pd-reviewer-dropdown-chevron">▾</span>
+              </button>
+
+              @if (showReviewerDecisionMenu()) {
+                <div class="pd-reviewer-dropdown-backdrop" (click)="closeReviewerDecisionMenu()"></div>
+                <div class="pd-reviewer-dropdown-menu">
+                  <button
+                    type="button"
+                    class="pd-reviewer-dropdown-item"
+                    [class.is-active]="reviewerDecisionValue === ''"
+                    (click)="onReviewerDecisionChange('')"
+                  >
+                    Select decision
+                  </button>
+                  @for (option of reviewerDecisionOptions; track option.value) {
+                    <button
+                      type="button"
+                      class="pd-reviewer-dropdown-item"
+                      [class.is-active]="reviewerDecisionValue === option.value"
+                      (click)="onReviewerDecisionChange(option.value)"
+                    >
+                      {{ option.label }}
+                    </button>
+                  }
+                </div>
               }
-            </select>
+            </div>
           </div>
         }
 
@@ -278,12 +306,40 @@
           [selected]="selectedReviewers()"
           (selectedChange)="onSelectedReviewersChange($event)"
         />
+
+        <div class="pd-reviewer-decisions">
+          <h4>Reviewer Decisions</h4>
+          @if (!reviewerDecisionItems.length) {
+            <p class="pd-reviewer-decisions-empty">No decisions yet.</p>
+          } @else {
+            <div class="pd-reviewer-decisions-list">
+              @for (item of reviewerDecisionItems; track item.userId) {
+                <div class="pd-reviewer-decision-item">
+                  <div class="pd-reviewer-decision-user">
+                    @if (item.user?.avatarUrl) {
+                      <img [src]="item.user!.avatarUrl!" [alt]="getDecisionDisplayName(item)" />
+                    } @else {
+                      <span>{{ getUserInitials(item) }}</span>
+                    }
+                    <strong>{{ getDecisionDisplayName(item) }}</strong>
+                  </div>
+                  <span class="pd-reviewer-decision-badge pd-reviewer-decision--{{ item.decision }}">
+                    {{ item.decision }}
+                  </span>
+                </div>
+              }
+            </div>
+          }
+        </div>
       </section>
     </div>
 
-    <app-post-review-comments
-      [workspaceId]="workspaceId()"
-      [currentUser]="currentUser()"
-    />
+    @if (post()) {
+      <app-post-review-comments
+        [workspaceId]="workspaceId()"
+        [postId]="post()!.id"
+        [currentUser]="currentUser()"
+      />
+    }
   </div>
 </div>

@@ -4,9 +4,17 @@ const POST_FIELDS = `
   id
   workspaceId
   createdBy
+  createdByUser {
+    id
+    firstName
+    lastName
+    email
+    avatarUrl
+  }
   title
   description
   mediaIds
+  mediaUrls
   category
   tags
   status
@@ -14,10 +22,54 @@ const POST_FIELDS = `
   isEvergreen
   approvalWorkflow {
     requiredApprovers
+    requiredApproverUsers {
+      id
+      firstName
+      lastName
+      email
+      avatarUrl
+    }
     approvedBy
+    approvedByUsers {
+      id
+      firstName
+      lastName
+      email
+      avatarUrl
+    }
     rejectedBy
+    rejectedByUsers {
+      id
+      firstName
+      lastName
+      email
+      avatarUrl
+    }
+    cancelledBy
+    cancelledByUsers {
+      id
+      firstName
+      lastName
+      email
+      avatarUrl
+    }
+    archivedBy
+    archivedByUsers {
+      id
+      firstName
+      lastName
+      email
+      avatarUrl
+    }
     comments {
       userId
+      user {
+        id
+        firstName
+        lastName
+        email
+        avatarUrl
+      }
       message
       createdAt
     }
@@ -85,6 +137,7 @@ export const UPDATE_POST = gql`
     $priority: String
     $status: String
     $isEvergreen: Boolean
+    $requiredApprovers: [ID]
   ) {
     updatePost(
       id: $id
@@ -96,6 +149,7 @@ export const UPDATE_POST = gql`
       priority: $priority
       status: $status
       isEvergreen: $isEvergreen
+      requiredApprovers: $requiredApprovers
     ) {
       ${POST_FIELDS}
     }
@@ -130,6 +184,64 @@ export const REJECT_POST = gql`
   mutation RejectPost($postId: ID!, $reason: String!) {
     rejectPost(postId: $postId, reason: $reason) {
       ${POST_FIELDS}
+    }
+  }
+`;
+
+export const GET_POST_REVIEW_COMMENTS = gql`
+  query PostReviewComments($postId: ID!) {
+    postReviewComments(postId: $postId) {
+      id
+      workspaceId
+      postId
+      authorId
+      author {
+        id
+        firstName
+        lastName
+        email
+        avatarUrl
+      }
+      message
+      mediaIds
+      mediaUrls
+      parentCommentId
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
+export const ADD_POST_REVIEW_COMMENT = gql`
+  mutation AddPostReviewComment(
+    $postId: ID!
+    $message: String!
+    $mediaIds: [ID]
+    $parentCommentId: ID
+  ) {
+    addPostReviewComment(
+      postId: $postId
+      message: $message
+      mediaIds: $mediaIds
+      parentCommentId: $parentCommentId
+    ) {
+      id
+      workspaceId
+      postId
+      authorId
+      author {
+        id
+        firstName
+        lastName
+        email
+        avatarUrl
+      }
+      message
+      mediaIds
+      mediaUrls
+      parentCommentId
+      createdAt
+      updatedAt
     }
   }
 `;
