@@ -16,11 +16,12 @@ import { InstagramPreview } from '../post-preview/instagram-preview/instagram-pr
 import { TicktokPreview } from '../post-preview/ticktok-preview/ticktok-preview';
 import { MediaService } from '../../../core/services/media.service';
 import { IMedia, IMediaUploadItem } from '../../../core/interfaces/media';
+import { SocialIcon } from '../../../shared/icons/social-icon/social-icon';
 
 @Component({
   selector: 'app-post-form',
   standalone: true,
-  imports: [FormsModule, MobileShell, FacebookPreview, InstagramPreview, TicktokPreview],
+  imports: [FormsModule, MobileShell, FacebookPreview, InstagramPreview, TicktokPreview, SocialIcon],
   templateUrl: './post-form.html',
   styleUrl: './post-form.css',
 })

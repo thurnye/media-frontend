@@ -195,6 +195,26 @@
   background: #f8fafc;
   display: grid;
   gap: 0.2rem;
+  position: relative;
+}
+
+.wc-platform-icon {
+  position: absolute;
+  top: 0.45rem;
+  right: 0.5rem;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 999px;
+  border: 1px solid #d1d5db;
+  background: #fff;
+  color: #334155;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1;
+  padding: 5px
 }
 
 .wc-event-type {
@@ -226,6 +246,7 @@
   color: #1f2937;
   text-decoration: none;
   font-weight: 600;
+  margin-top: 15px
 }
 
 .wc-event-title:hover {
@@ -263,4 +284,3 @@
     padding: 0.4rem 0.5rem;
   }
 }
-

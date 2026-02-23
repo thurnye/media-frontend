@@ -521,6 +521,12 @@
   text-transform: capitalize;
 }
 
+.pd-platform-post-platform {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
 .pd-platform-post-created-at {
   font-size: 0.74rem;
   color: #6b7280;

@@ -118,9 +118,8 @@
   width: 34px;
   height: 34px;
   border-radius: 0.5rem;
-  color: #fff;
-  font-size: 0.9375rem;
-  font-weight: 700;
+  background: #fff;
+  border: 1px solid #e2e8f0;
   flex-shrink: 0;
 }
 
@@ -188,9 +187,8 @@
   width: 40px;
   height: 40px;
   border-radius: 0.625rem;
-  color: #fff;
-  font-size: 1.125rem;
-  font-weight: 700;
+  background: #fff;
+  border: 1px solid #e2e8f0;
 }
 
 .cad-platform-label {

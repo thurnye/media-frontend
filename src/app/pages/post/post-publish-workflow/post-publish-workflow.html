@@ -34,6 +34,7 @@
                 [class.ppw-tab--active]="activeTabIndex() === i"
                 (click)="selectTab(i)"
               >
+                <app-social-icon [platform]="entry.account.platform" [size]="20" />
                 {{ entry.account.displayName }}
                 <span>{{ entry.account.platform }}</span>
               </button>
@@ -298,7 +299,7 @@
                   (click)="togglePendingAddAccount(account.id)"
                 >
                   <span class="ppw-account-icon">
-                    {{ account.platform.charAt(0).toUpperCase() }}
+                    <app-social-icon [platform]="account.platform" [size]="20" />
                   </span>
                   <div class="ppw-account-info">
                     <span class="ppw-account-name">{{ account.displayName }}</span>

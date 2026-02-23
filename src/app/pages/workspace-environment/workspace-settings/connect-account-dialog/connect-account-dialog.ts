@@ -4,6 +4,7 @@ import { PlatformType } from '../../../../core/interfaces/platform';
 import { PlatformActions } from '../../../../store/platform/platform.actions';
 import { selectMyPlatformAccounts, selectPlatformSaving } from '../../../../store/platform/platform.selectors';
 import { environment } from '../../../../../environments/environment';
+import { SocialIcon } from '../../../../shared/icons/social-icon/social-icon';
 
 interface PlatformOption {
   type:  PlatformType;
@@ -14,7 +15,7 @@ interface PlatformOption {
 const PLATFORM_OPTIONS: PlatformOption[] = [
   { type: 'instagram', label: 'Instagram', color: '#e1306c' },
   { type: 'facebook',  label: 'Facebook',  color: '#1877f2' },
-  { type: 'twitter',   label: 'Twitter',   color: '#1da1f2' },
+  { type: 'twitter',   label: 'Twitter(X)',   color: '#1da1f2' },
   { type: 'linkedin',  label: 'LinkedIn',  color: '#0a66c2' },
   { type: 'tiktok',    label: 'TikTok',    color: '#010101' },
   { type: 'youtube',   label: 'YouTube',   color: '#ff0000' },
@@ -22,7 +23,7 @@ const PLATFORM_OPTIONS: PlatformOption[] = [
 
 @Component({
   selector: 'app-connect-account-dialog',
-  imports: [],
+  imports: [SocialIcon],
   templateUrl: './connect-account-dialog.html',
   styleUrl: './connect-account-dialog.css',
 })
@@ -93,7 +94,4 @@ export class ConnectAccountDialog implements OnInit {
     return PLATFORM_OPTIONS.find(p => p.type === type)?.label ?? type;
   }
 
-  getPlatformColor(type: string): string {
-    return PLATFORM_OPTIONS.find(p => p.type === type)?.color ?? '#6c757d';
-  }
 }

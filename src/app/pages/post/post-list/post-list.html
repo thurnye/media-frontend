@@ -149,7 +149,7 @@
                               [attr.title]="platform"
                               [attr.aria-label]="platform"
                             >
-                              {{ getPlatformIconLabel(platform) }}
+                              <app-social-icon [platform]="platform" [size]="20" />
                             </span>
                           }
                         </div>
@@ -371,7 +371,7 @@
                           [attr.title]="platform"
                           [attr.aria-label]="platform"
                         >
-                          {{ getPlatformIconLabel(platform) }}
+                          <app-social-icon [platform]="platform" [size]="25" />
                         </span>
                       }
                     </div>

@@ -39,8 +39,8 @@
                   [checked]="isSelected(account.id)"
                   (change)="toggleSelection(account.id)"
                 />
-                <span class="cad-account-icon" [style.background]="getPlatformColor(account.platform)">
-                  {{ account.platform.charAt(0).toUpperCase() }}
+                <span class="cad-account-icon">
+                  <app-social-icon [platform]="account.platform" [size]="25" />
                 </span>
                 <span class="cad-account-info">
                   <span class="cad-account-name">{{ account.displayName }}</span>
@@ -80,8 +80,8 @@
               (click)="selectPlatform(p)"
               type="button"
             >
-              <span class="cad-platform-icon" [style.background]="p.color">
-                {{ p.label.charAt(0) }}
+              <span class="cad-platform-icon">
+                <app-social-icon [platform]="p.type" [size]="52" />
               </span>
               <span class="cad-platform-label">{{ p.label }}</span>
             </button>

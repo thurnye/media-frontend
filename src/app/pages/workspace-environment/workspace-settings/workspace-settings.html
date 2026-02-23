@@ -90,8 +90,8 @@
       <div class="wst-account-list">
         @for (account of accounts(); track account.id) {
           <div class="wst-account-row">
-            <div class="wst-account-icon" [style.background]="getPlatformColor(account.platform)">
-              {{ getPlatformLabel(account.platform).charAt(0) }}
+            <div class="wst-account-icon">
+              <app-social-icon [platform]="account.platform" [size]="32" />
             </div>
             <div class="wst-account-info">
               <span class="wst-account-name">{{ account.displayName }}</span>

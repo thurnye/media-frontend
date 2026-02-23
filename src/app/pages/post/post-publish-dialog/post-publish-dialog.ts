@@ -4,6 +4,7 @@ import { IPlatformAccount, ICreatePlatformPostBatch } from '../../../core/interf
 import { PlatformGqlService } from '../../../core/services/platform.gql.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { MediaService } from '../../../core/services/media.service';
+import { SocialIcon } from '../../../shared/icons/social-icon/social-icon';
 
 type PlatformMediaType = 'image' | 'video' | 'carousel';
 
@@ -29,7 +30,7 @@ interface AccountEntry {
 
 @Component({
   selector: 'app-post-publish-dialog',
-  imports: [FormsModule],
+  imports: [FormsModule, SocialIcon],
   templateUrl: './post-publish-dialog.html',
   styleUrl: './post-publish-dialog.css',
 })

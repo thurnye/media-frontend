@@ -66,6 +66,13 @@
         <ul class="wc-events-list">
           @for (event of selectedDateEvents; track trackEvent($index, event)) {
             <li class="wc-event-item">
+              <span
+                class="wc-platform-icon"
+                [attr.title]="event.platform || 'platform'"
+                [attr.aria-label]="event.platform || 'platform'"
+              >
+                <app-social-icon [platform]="event.platform ?? ''" [size]="28" />
+              </span>
               <span class="wc-event-type wc-event-type--{{ event.type }}">{{ getEventTypeLabel(event) }}</span>
               <a
                 class="wc-event-title"
@@ -74,7 +81,7 @@
                 {{ event.title }}
               </a>
               <span class="wc-event-meta">
-                {{ formatEventDate(event.at) }}@if (event.platform) { • {{ event.platform }} }
+                {{ formatEventDate(event.at) }} • {{ formatEventTime(event.at) }}
               </span>
             </li>
           }
@@ -83,4 +90,3 @@
     </div>
   </div>
 </section>
-

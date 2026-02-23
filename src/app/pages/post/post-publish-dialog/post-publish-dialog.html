@@ -46,8 +46,8 @@
                 (click)="toggleAccount(i)"
                 type="button"
               >
-                <span class="ppd-account-icon" [style.background]="entry.account.platform === 'instagram' ? '#e1306c' : entry.account.platform === 'facebook' ? '#1877f2' : entry.account.platform === 'twitter' ? '#1da1f2' : entry.account.platform === 'linkedin' ? '#0a66c2' : entry.account.platform === 'tiktok' ? '#010101' : '#ff0000'">
-                  {{ entry.account.platform.charAt(0).toUpperCase() }}
+                <span class="ppd-account-icon">
+                  <app-social-icon [platform]="entry.account.platform" [size]="30" />
                 </span>
                 <div class="ppd-account-info">
                   <span class="ppd-account-name">{{ entry.account.displayName }}</span>
@@ -85,8 +85,8 @@
           @if (entry.selected) {
             <div class="ppd-entry-card">
               <div class="ppd-entry-header">
-                <span class="ppd-account-icon ppd-account-icon--sm" [style.background]="entry.account.platform === 'instagram' ? '#e1306c' : entry.account.platform === 'facebook' ? '#1877f2' : entry.account.platform === 'twitter' ? '#1da1f2' : entry.account.platform === 'linkedin' ? '#0a66c2' : entry.account.platform === 'tiktok' ? '#010101' : '#ff0000'">
-                  {{ entry.account.platform.charAt(0).toUpperCase() }}
+                <span class="ppd-account-icon ppd-account-icon--sm">
+                  <app-social-icon [platform]="entry.account.platform" [size]="20" />
                 </span>
                 <span class="ppd-entry-name">{{ entry.account.displayName }}</span>
               </div>

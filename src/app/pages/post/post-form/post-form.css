@@ -536,6 +536,9 @@ select.pf-input {
   padding: 0.34rem 0.7rem;
   cursor: pointer;
   transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.38rem;
 }
 
 .pf-chip:hover {

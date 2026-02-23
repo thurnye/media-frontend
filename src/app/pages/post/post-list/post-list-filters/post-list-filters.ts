@@ -1,4 +1,5 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { SocialIcon } from '../../../../shared/icons/social-icon/social-icon';
 
 export type FilterDropdownName = 'status' | 'category' | 'priority' | 'platform' | 'evergreen' | 'sort';
 export type FilterOption = { value: string; label: string };
@@ -6,6 +7,7 @@ export type FilterOption = { value: string; label: string };
 @Component({
   selector: 'app-post-list-filters',
   standalone: true,
+  imports: [SocialIcon],
   templateUrl: './post-list-filters.html',
   styleUrl: './post-list-filters.css',
 })
@@ -80,19 +82,6 @@ export class PostListFilters {
 
   getOptionLabel(options: FilterOption[], value: string): string {
     return options.find((option) => option.value === value)?.label ?? options[0]?.label ?? '';
-  }
-
-  getPlatformInitial(value: string): string {
-    const map: Record<string, string> = {
-      all: 'A',
-      facebook: 'f',
-      instagram: 'i',
-      twitter: 'x',
-      linkedin: 'in',
-      tiktok: 't',
-      youtube: 'y',
-    };
-    return map[value] ?? '?';
   }
 
   getPriorityMark(value: string): string {

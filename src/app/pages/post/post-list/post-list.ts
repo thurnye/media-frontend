@@ -29,10 +29,11 @@ import { selectUser } from '../../../store/auth/auth.selectors';
 import { IPostListFilters } from '../../../core/interfaces/post';
 import { PostListFilters } from './post-list-filters/post-list-filters';
 import { PlatformGqlService } from '../../../core/services/platform.gql.service';
+import { SocialIcon } from '../../../shared/icons/social-icon/social-icon';
 
 @Component({
   selector: 'app-post-list',
-  imports: [RouterLink, PostListFilters],
+  imports: [RouterLink, PostListFilters, SocialIcon],
   templateUrl: './post-list.html',
   styleUrl: './post-list.css',
 })

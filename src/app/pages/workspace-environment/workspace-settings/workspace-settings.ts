@@ -9,10 +9,11 @@ import {
 } from '../../../store/platform/platform.selectors';
 import { PlatformActions } from '../../../store/platform/platform.actions';
 import { ConnectAccountDialog } from './connect-account-dialog/connect-account-dialog';
+import { SocialIcon } from '../../../shared/icons/social-icon/social-icon';
 
 @Component({
   selector: 'app-workspace-settings',
-  imports: [RouterLink, ConnectAccountDialog],
+  imports: [RouterLink, ConnectAccountDialog, SocialIcon],
   templateUrl: './workspace-settings.html',
   styleUrl: './workspace-settings.css',
 })

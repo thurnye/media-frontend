@@ -9,6 +9,7 @@ import { PlatformGqlService } from '../../../core/services/platform.gql.service'
 import { PostGqlService } from '../../../core/services/post.gql.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { forkJoin } from 'rxjs';
+import { SocialIcon } from '../../../shared/icons/social-icon/social-icon';
 
 type PlatformMediaType = 'image' | 'video' | 'carousel';
 
@@ -38,7 +39,7 @@ interface AccountEntry {
 @Component({
   selector: 'app-post-publish-workflow',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, SocialIcon],
   templateUrl: './post-publish-workflow.html',
   styleUrl: './post-publish-workflow.css',
 })

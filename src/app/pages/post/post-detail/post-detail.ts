@@ -20,6 +20,7 @@ import { IUserSummary } from '../../../core/interfaces/post';
 import { IPlatformPost } from '../../../core/interfaces/platform';
 import { PlatformGqlService } from '../../../core/services/platform.gql.service';
 import { forkJoin } from 'rxjs';
+import { SocialIcon } from '../../../shared/icons/social-icon/social-icon';
 
 type ReviewerDecision = 'approved' | 'rejected' | 'cancelled' | 'archived';
 type ReviewerDecisionValue = ReviewerDecision | '';
@@ -39,7 +40,7 @@ type DraftEditModel = {
 
 @Component({
   selector: 'app-post-detail',
-  imports: [RouterLink, FormsModule, DatePipe, PostPublishDialog, ReviewerTypeahead, PostReviewComments],
+  imports: [RouterLink, FormsModule, DatePipe, PostPublishDialog, ReviewerTypeahead, PostReviewComments, SocialIcon],
   templateUrl: './post-detail.html',
   styleUrl: './post-detail.css',
 })

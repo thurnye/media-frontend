@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { SocialIcon } from '../../../../shared/icons/social-icon/social-icon';
 
 type CalendarDay = {
   date: Date;
@@ -19,7 +20,7 @@ type CalendarEvent = {
 @Component({
   selector: 'app-workspace-calendar-view',
   standalone: true,
-  imports: [RouterLink],
+  imports: [RouterLink, SocialIcon],
   templateUrl: './workspace-calendar-view.html',
   styleUrl: './workspace-calendar-view.css',
 })
@@ -86,6 +87,10 @@ export class WorkspaceCalendarView {
     return date.toLocaleDateString([], { year: 'numeric', month: 'short', day: 'numeric' });
   }
 
+  formatEventTime(date: Date): string {
+    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  }
+
   getEventTypeLabel(event: CalendarEvent): string {
     const value = event.type === 'other' ? event.status : event.type;
     return value.replace(/_/g, ' ');
@@ -99,4 +104,3 @@ export class WorkspaceCalendarView {
     return `${y}-${m}-${d}`;
   }
 }
-
