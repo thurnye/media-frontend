@@ -46,7 +46,7 @@
   border: 1px solid #e2e8f0;
   border-radius: 0.75rem;
   background: #fff;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .ppw-tabs {
@@ -91,6 +91,7 @@
 
 .ppw-card {
   padding: 1rem;
+  overflow: visible;
 }
 
 .ppw-label {
@@ -251,6 +252,92 @@
   gap: 0.6rem;
 }
 
+.ppw-schedule-field {
+  display: flex;
+  flex-direction: column;
+}
+
+.ppw-schedule-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #475569;
+  margin: 0 0 0.3rem;
+  letter-spacing: 0.01em;
+}
+
+.ppw-time-pickers {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr 1fr;
+  gap: 0.4rem;
+  align-items: center;
+}
+
+.ppw-time-separator {
+  color: #64748b;
+  font-weight: 700;
+  font-size: 0.95rem;
+  line-height: 1;
+}
+
+.ppw-dropdown {
+  position: relative;
+}
+
+.ppw-dropdown-trigger {
+  width: 100%;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.5rem;
+  background: #fff;
+  color: #0f172a;
+  padding: 0.55rem 0.7rem;
+  font-size: 0.875rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+}
+
+.ppw-dropdown-trigger span {
+  color: #64748b;
+  font-size: 0.7rem;
+}
+
+.ppw-dropdown-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+}
+
+.ppw-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 0.3rem);
+  left: 0;
+  right: 0;
+  max-height: 220px;
+  overflow: auto;
+  z-index: 1300;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.55rem;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.12);
+}
+
+.ppw-dropdown-item {
+  width: 100%;
+  border: none;
+  background: #fff;
+  color: #0f172a;
+  text-align: left;
+  padding: 0.5rem 0.7rem;
+  font-size: 0.84rem;
+  cursor: pointer;
+}
+
+.ppw-dropdown-item:hover {
+  background: #eef2ff;
+  color: #3730a3;
+}
+
 .ppw-summary {
   margin: 0.25rem 0 0;
   color: #475569;
@@ -263,6 +350,9 @@
   border-radius: 0.7rem;
   background: #f8fafc;
   padding: 0.85rem;
+  position: relative;
+  overflow: visible;
+  z-index: 2;
 }
 
 .ppw-schedule-header {
@@ -517,5 +607,8 @@
 @media (max-width: 700px) {
   .ppw-schedule-grid {
     grid-template-columns: 1fr;
+  }
+  .ppw-time-pickers {
+    grid-template-columns: 1fr auto 1fr 1fr;
   }
 }

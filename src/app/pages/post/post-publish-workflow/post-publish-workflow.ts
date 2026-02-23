@@ -63,8 +63,12 @@ export class PostPublishWorkflow implements OnInit, OnDestroy {
   availableAccounts = signal<IPlatformAccount[]>([]);
   showAddAccountsModal = signal(false);
   pendingAddAccountIds = signal<string[]>([]);
+  activeScheduleDropdown = signal<'hour' | 'minute' | 'period' | null>(null);
 
   timezone = signal(Intl.DateTimeFormat().resolvedOptions().timeZone);
+  readonly scheduleHourOptions = this.buildScheduleHourOptions();
+  readonly scheduleMinuteOptions = ['00', '15', '30', '45'];
+  readonly schedulePeriodOptions: Array<'AM' | 'PM'> = ['AM', 'PM'];
 
   private mediaIdCounter = 0;
 
@@ -133,7 +137,9 @@ export class PostPublishWorkflow implements OnInit, OnDestroy {
                       : this.buildDefaultMediaItems(post.mediaUrls ?? []),
                     publishMode: draftPost?.publishing?.scheduledAt ? 'schedule' : 'now',
                     scheduledDate: draftPost?.publishing?.scheduledAt ? this.toDateInputValue(new Date(draftPost.publishing.scheduledAt)) : '',
-                    scheduledTime: draftPost?.publishing?.scheduledAt ? this.toTimeInputValue(new Date(draftPost.publishing.scheduledAt)) : '',
+                    scheduledTime: draftPost?.publishing?.scheduledAt
+                      ? this.normalizeScheduledTime(this.toTimeInputValue(new Date(draftPost.publishing.scheduledAt)))
+                      : '',
                   };
                 }),
               );
@@ -308,10 +314,50 @@ export class PostPublishWorkflow implements OnInit, OnDestroy {
   }
 
   updateActiveScheduledTime(value: string): void {
+    const normalizedTime = this.normalizeScheduledTime(value);
     const index = this.activeTabIndex();
     this.entries.update((entries) =>
-      entries.map((entry, i) => (i === index ? { ...entry, scheduledTime: value } : entry)),
+      entries.map((entry, i) => (i === index ? { ...entry, scheduledTime: normalizedTime } : entry)),
     );
+  }
+
+  getScheduledHourValue(entry: AccountEntry): string {
+    return this.parseScheduledTime(entry.scheduledTime).hour12;
+  }
+
+  getScheduledMinuteValue(entry: AccountEntry): string {
+    return this.parseScheduledTime(entry.scheduledTime).minute;
+  }
+
+  getScheduledPeriodValue(entry: AccountEntry): 'AM' | 'PM' {
+    return this.parseScheduledTime(entry.scheduledTime).period;
+  }
+
+  updateActiveScheduledHour(hour12: string): void {
+    this.updateActiveScheduledClock({ hour12 });
+    this.closeScheduleDropdown();
+  }
+
+  updateActiveScheduledMinute(minute: string): void {
+    this.updateActiveScheduledClock({ minute });
+    this.closeScheduleDropdown();
+  }
+
+  updateActiveScheduledPeriod(period: 'AM' | 'PM'): void {
+    this.updateActiveScheduledClock({ period });
+    this.closeScheduleDropdown();
+  }
+
+  toggleScheduleDropdown(type: 'hour' | 'minute' | 'period'): void {
+    this.activeScheduleDropdown.update((current) => (current === type ? null : type));
+  }
+
+  closeScheduleDropdown(): void {
+    this.activeScheduleDropdown.set(null);
+  }
+
+  isScheduleDropdownOpen(type: 'hour' | 'minute' | 'period'): boolean {
+    return this.activeScheduleDropdown() === type;
   }
 
   onPublish(): void {
@@ -353,7 +399,7 @@ export class PostPublishWorkflow implements OnInit, OnDestroy {
 
       const scheduledAt =
         status === 'scheduled' && entry.scheduledDate && entry.scheduledTime
-          ? new Date(`${entry.scheduledDate}T${entry.scheduledTime}`).toISOString()
+          ? new Date(`${entry.scheduledDate}T${this.normalizeScheduledTime(entry.scheduledTime)}`).toISOString()
           : undefined;
 
       if (this.editDraftMode() && entry.existingPlatformPostId) {
@@ -597,6 +643,70 @@ export class PostPublishWorkflow implements OnInit, OnDestroy {
     const hours = `${date.getHours()}`.padStart(2, '0');
     const minutes = `${date.getMinutes()}`.padStart(2, '0');
     return `${hours}:${minutes}`;
+  }
+
+  private normalizeScheduledTime(value: string): string {
+    if (!value || !/^\d{2}:\d{2}$/.test(value)) return value;
+    const [hoursRaw, minutesRaw] = value.split(':').map(Number);
+    if (!Number.isFinite(hoursRaw) || !Number.isFinite(minutesRaw)) return value;
+
+    const totalMinutes = hoursRaw * 60 + minutesRaw;
+    const rounded = Math.round(totalMinutes / 15) * 15;
+    const clamped = Math.min(Math.max(rounded, 0), 23 * 60 + 45);
+    const hours = Math.floor(clamped / 60);
+    const minutes = clamped % 60;
+    return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+  }
+
+  private updateActiveScheduledClock(patch: {
+    hour12?: string;
+    minute?: string;
+    period?: 'AM' | 'PM';
+  }): void {
+    const index = this.activeTabIndex();
+    this.entries.update((entries) =>
+      entries.map((entry, i) => {
+        if (i !== index) return entry;
+        const current = this.parseScheduledTime(entry.scheduledTime);
+        return {
+          ...entry,
+          scheduledTime: this.composeScheduledTime(
+            patch.hour12 ?? current.hour12,
+            patch.minute ?? current.minute,
+            patch.period ?? current.period,
+          ),
+        };
+      }),
+    );
+  }
+
+  private parseScheduledTime(value: string): { hour12: string; minute: string; period: 'AM' | 'PM' } {
+    const normalized = this.normalizeScheduledTime(value || '12:00');
+    const [hourRaw, minuteRaw] = normalized.split(':').map(Number);
+    const period: 'AM' | 'PM' = hourRaw >= 12 ? 'PM' : 'AM';
+    const hour12 = String(hourRaw % 12 || 12).padStart(2, '0');
+    const minute = String(minuteRaw).padStart(2, '0');
+    return { hour12, minute, period };
+  }
+
+  private composeScheduledTime(hour12: string, minute: string, period: 'AM' | 'PM'): string {
+    const parsedHour12 = Number(hour12);
+    const parsedMinute = Number(minute);
+    if (!Number.isFinite(parsedHour12) || !Number.isFinite(parsedMinute)) return '12:00';
+
+    let hour24 = parsedHour12 % 12;
+    if (period === 'PM') hour24 += 12;
+    return this.normalizeScheduledTime(
+      `${String(hour24).padStart(2, '0')}:${String(parsedMinute).padStart(2, '0')}`,
+    );
+  }
+
+  private buildScheduleHourOptions(): string[] {
+    const options: string[] = [];
+    for (let hour = 1; hour <= 12; hour += 1) {
+      options.push(String(hour).padStart(2, '0'));
+    }
+    return options;
   }
 
   private inferMediaType(url: string): PlatformMediaType {

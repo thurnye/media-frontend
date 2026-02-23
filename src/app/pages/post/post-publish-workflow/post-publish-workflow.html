@@ -167,19 +167,83 @@
 
               @if (entry.publishMode === 'schedule') {
                 <div class="ppw-schedule-grid">
-                  <input
-                    class="ppw-input"
-                    type="date"
-                    [ngModel]="entry.scheduledDate"
-                    (ngModelChange)="updateActiveScheduledDate($event)"
-                  />
-                  <input
-                    class="ppw-input"
-                    type="time"
-                    [ngModel]="entry.scheduledTime"
-                    (ngModelChange)="updateActiveScheduledTime($event)"
-                  />
+                  <div class="ppw-schedule-field">
+                    <label class="ppw-schedule-label">Date</label>
+                    <input
+                      class="ppw-input"
+                      type="date"
+                      [ngModel]="entry.scheduledDate"
+                      (ngModelChange)="updateActiveScheduledDate($event)"
+                    />
+                  </div>
+                  <div class="ppw-schedule-field">
+                    <label class="ppw-schedule-label">Time</label>
+                    <div class="ppw-time-pickers">
+                      <div class="ppw-dropdown">
+                        <button
+                          type="button"
+                          class="ppw-dropdown-trigger"
+                          (click)="toggleScheduleDropdown('hour')"
+                        >
+                          {{ getScheduledHourValue(entry) }}
+                          <span>▾</span>
+                        </button>
+                        @if (isScheduleDropdownOpen('hour')) {
+                          <div class="ppw-dropdown-backdrop" (click)="closeScheduleDropdown()"></div>
+                          <div class="ppw-dropdown-menu">
+                            @for (hour of scheduleHourOptions; track hour) {
+                              <button type="button" class="ppw-dropdown-item" (click)="updateActiveScheduledHour(hour)">
+                                {{ hour }}
+                              </button>
+                            }
+                          </div>
+                        }
+                      </div>
+                      <span class="ppw-time-separator">:</span>
+                      <div class="ppw-dropdown">
+                        <button
+                          type="button"
+                          class="ppw-dropdown-trigger"
+                          (click)="toggleScheduleDropdown('minute')"
+                        >
+                          {{ getScheduledMinuteValue(entry) }}
+                          <span>▾</span>
+                        </button>
+                        @if (isScheduleDropdownOpen('minute')) {
+                          <div class="ppw-dropdown-backdrop" (click)="closeScheduleDropdown()"></div>
+                          <div class="ppw-dropdown-menu">
+                            @for (minute of scheduleMinuteOptions; track minute) {
+                              <button type="button" class="ppw-dropdown-item" (click)="updateActiveScheduledMinute(minute)">
+                                {{ minute }}
+                              </button>
+                            }
+                          </div>
+                        }
+                      </div>
+                      <div class="ppw-dropdown">
+                        <button
+                          type="button"
+                          class="ppw-dropdown-trigger"
+                          (click)="toggleScheduleDropdown('period')"
+                        >
+                          {{ getScheduledPeriodValue(entry) }}
+                          <span>▾</span>
+                        </button>
+                        @if (isScheduleDropdownOpen('period')) {
+                          <div class="ppw-dropdown-backdrop" (click)="closeScheduleDropdown()"></div>
+                          <div class="ppw-dropdown-menu">
+                            @for (period of schedulePeriodOptions; track period) {
+                              <button type="button" class="ppw-dropdown-item" (click)="updateActiveScheduledPeriod(period)">
+                                {{ period }}
+                              </button>
+                            }
+                          </div>
+                        }
+                      </div>
+                    </div>
+                  </div>
                 </div>
+                <p class="ppw-summary">Available in 15-minute slots every hour.</p>
               }
 
               <p class="ppw-summary">Accounts selected: {{ entries().length }}</p>
