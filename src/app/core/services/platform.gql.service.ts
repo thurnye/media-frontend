@@ -11,6 +11,7 @@ import {
   GET_PLATFORM_POSTS_QUERY,
   GET_WORKSPACE_PLATFORM_POSTS_QUERY,
   GET_WORKSPACE_PLATFORM_POSTS_BY_DAY_QUERY,
+  GET_WORKSPACE_PLATFORM_POSTS_BY_MONTH_QUERY,
   CREATE_PLATFORM_POST_MUTATION,
   CREATE_PLATFORM_POSTS_BATCH_MUTATION,
   UPDATE_PLATFORM_POST_MUTATION,
@@ -94,6 +95,16 @@ export class PlatformGqlService {
         fetchPolicy: 'no-cache',
       })
       .pipe(map(r => r.data!.workspacePlatformPostsByDay));
+  }
+
+  getWorkspacePlatformPostsByMonth(workspaceId: string, month: string) {
+    return this.apollo
+      .query<{ workspacePlatformPostsByMonth: IPlatformPost[] }>({
+        query: GET_WORKSPACE_PLATFORM_POSTS_BY_MONTH_QUERY,
+        variables: { workspaceId, month },
+        fetchPolicy: 'no-cache',
+      })
+      .pipe(map(r => r.data!.workspacePlatformPostsByMonth));
   }
 
   createPlatformPostsBatch(input: ICreatePlatformPostBatch) {

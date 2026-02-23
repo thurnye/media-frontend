@@ -1,85 +1,15 @@
-<section class="wc-card" aria-label="Workspace calendar">
-  <header class="wc-head">
-    <h2>Calendar</h2>
-    <div class="wc-nav">
-      <button type="button" class="wc-nav-btn" (click)="previousMonth()" aria-label="Previous month">
-        ‹
-      </button>
-      <span class="wc-month-label">{{ monthLabel() }}</span>
-      <button type="button" class="wc-nav-btn" (click)="nextMonth()" aria-label="Next month">
-        ›
-      </button>
-    </div>
-  </header>
+<app-workspace-calendar-view
+  [monthLabel]="monthLabel()"
+  [weekdayLabels]="weekdayLabels"
+  [calendarDays]="calendarDays()"
+  [selectedDate]="selectedDate()"
+  [selectedDateEvents]="selectedDateEvents()"
+  [eventsByDay]="eventsByDay()"
+  [loadingEvents]="loadingEvents()"
+  [totalEvents]="totalEvents()"
+  [workspaceId]="workspaceId()"
+  (previousMonth)="previousMonth()"
+  (nextMonth)="nextMonth()"
+  (selectDate)="selectDate($event)"
+/>
 
-  <div class="wc-layout">
-    <div class="wc-month-panel">
-      <div class="wc-weekdays">
-        @for (label of weekdayLabels; track label) {
-          <span>{{ label }}</span>
-        }
-      </div>
-
-      <div class="wc-grid">
-        @for (day of calendarDays(); track trackCalendarDay($index, day)) {
-          <button
-            type="button"
-            class="wc-day"
-            [class.wc-day--outside]="!day.inCurrentMonth"
-            [class.wc-day--today]="day.isToday"
-            [class.wc-day--selected]="isSelected(day.date)"
-            (click)="selectDate(day.date)"
-            [attr.aria-label]="day.date.toDateString()"
-          >
-            <span class="wc-day-number">{{ day.date.getDate() }}</span>
-            @if (eventCountForDate(day.date) > 0) {
-              <span class="wc-day-markers">
-                @if (hasScheduledEvent(day.date)) {
-                  <span class="wc-marker wc-marker--scheduled" aria-hidden="true"></span>
-                }
-                @if (hasPublishedEvent(day.date)) {
-                  <span class="wc-marker wc-marker--published" aria-hidden="true"></span>
-                }
-                @if (hasOtherEvent(day.date)) {
-                  <span class="wc-marker wc-marker--other" aria-hidden="true"></span>
-                }
-              </span>
-            }
-          </button>
-        }
-      </div>
-    </div>
-
-    <div class="wc-events">
-      <div class="wc-events-head">
-        <strong>{{ selectedDate().toDateString() }}</strong>
-        @if (loadingEvents()) {
-          <span>Loading...</span>
-        } @else {
-          <span>{{ selectedDateEvents().length }} item(s) • {{ totalEvents() }} total</span>
-        }
-      </div>
-
-      @if (!selectedDateEvents().length && !loadingEvents()) {
-        <p class="wc-empty">No platform posts for this date.</p>
-      } @else {
-        <ul class="wc-events-list">
-          @for (event of selectedDateEvents(); track trackEvent($index, event)) {
-            <li class="wc-event-item">
-              <span class="wc-event-type wc-event-type--{{ event.type }}">{{ getEventTypeLabel(event) }}</span>
-              <a
-                class="wc-event-title"
-                [routerLink]="['/dashboard/workspace', workspaceId(), 'post', event.postId]"
-              >
-                {{ event.title }}
-              </a>
-              <span class="wc-event-meta">
-                {{ formatEventDate(event.at) }}@if (event.platform) { • {{ event.platform }} }
-              </span>
-            </li>
-          }
-        </ul>
-      }
-    </div>
-  </div>
-</section>

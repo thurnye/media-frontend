@@ -1,9 +1,10 @@
 import { Component, OnDestroy, OnInit, computed, inject, signal } from '@angular/core';
-import { ActivatedRoute, RouterLink } from '@angular/router';
-import { Subject, of } from 'rxjs';
-import { catchError, takeUntil } from 'rxjs/operators';
+import { ActivatedRoute } from '@angular/router';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { IPlatformPost } from '../../../core/interfaces/platform';
 import { PlatformGqlService } from '../../../core/services/platform.gql.service';
+import { WorkspaceCalendarView } from './workspace-calendar-view/workspace-calendar-view';
 
 type CalendarDay = {
   date: Date;
@@ -23,7 +24,7 @@ type CalendarEvent = {
 @Component({
   selector: 'app-workspace-calendar',
   standalone: true,
-  imports: [RouterLink],
+  imports: [WorkspaceCalendarView],
   templateUrl: './workspace-calendar.html',
   styleUrl: './workspace-calendar.css',
 })
@@ -37,7 +38,7 @@ export class WorkspaceCalendar implements OnInit, OnDestroy {
   selectedDate = signal(this.today);
   loadingEvents = signal(false);
   workspaceId = signal('');
-  private eventsByDay = signal<Record<string, CalendarEvent[]>>({});
+  eventsByDay = signal<Record<string, CalendarEvent[]>>({});
 
   readonly weekdayLabels = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
@@ -114,7 +115,7 @@ export class WorkspaceCalendar implements OnInit, OnDestroy {
       this.route.snapshot.paramMap.get('workspaceId') ??
       '';
     this.workspaceId.set(workspaceId);
-    this.loadEventsForDate(this.selectedDate());
+    this.loadEventsForMonth(this.currentMonth());
   }
 
   ngOnDestroy(): void {
@@ -124,64 +125,39 @@ export class WorkspaceCalendar implements OnInit, OnDestroy {
 
   previousMonth(): void {
     const month = this.currentMonth();
-    this.currentMonth.set(this.startOfMonth(new Date(month.getFullYear(), month.getMonth() - 1, 1)));
+    const newMonth = this.startOfMonth(new Date(month.getFullYear(), month.getMonth() - 1, 1));
+    this.currentMonth.set(newMonth);
+    this.loadEventsForMonth(newMonth);
   }
 
   nextMonth(): void {
     const month = this.currentMonth();
-    this.currentMonth.set(this.startOfMonth(new Date(month.getFullYear(), month.getMonth() + 1, 1)));
+    const newMonth = this.startOfMonth(new Date(month.getFullYear(), month.getMonth() + 1, 1));
+    this.currentMonth.set(newMonth);
+    this.loadEventsForMonth(newMonth);
   }
 
   selectDate(date: Date): void {
     const normalizedDate = this.startOfDay(date);
     this.selectedDate.set(normalizedDate);
+    const selectedMonth = this.startOfMonth(normalizedDate);
+    const didMonthChange =
+      selectedMonth.getFullYear() !== this.currentMonth().getFullYear() ||
+      selectedMonth.getMonth() !== this.currentMonth().getMonth();
+
     if (
       date.getFullYear() !== this.currentMonth().getFullYear() ||
       date.getMonth() !== this.currentMonth().getMonth()
     ) {
-      this.currentMonth.set(this.startOfMonth(date));
+      this.currentMonth.set(selectedMonth);
     }
-    this.loadEventsForDate(normalizedDate);
+
+    if (didMonthChange) {
+      this.loadEventsForMonth(selectedMonth);
+    }
   }
 
-  isSelected(date: Date): boolean {
-    return this.isSameDay(this.selectedDate(), date);
-  }
-
-  eventCountForDate(date: Date): number {
-    return (this.eventsByDay()[this.getDayKey(date)] ?? []).length;
-  }
-
-  hasScheduledEvent(date: Date): boolean {
-    return (this.eventsByDay()[this.getDayKey(date)] ?? []).some((event) => event.type === 'scheduled');
-  }
-
-  hasPublishedEvent(date: Date): boolean {
-    return (this.eventsByDay()[this.getDayKey(date)] ?? []).some((event) => event.type === 'published');
-  }
-
-  hasOtherEvent(date: Date): boolean {
-    return (this.eventsByDay()[this.getDayKey(date)] ?? []).some((event) => event.type === 'other');
-  }
-
-  trackEvent(_: number, event: CalendarEvent): string {
-    return `${event.postId}:${event.type}:${event.at.toISOString()}:${event.platform ?? 'none'}`;
-  }
-
-  formatEventDate(date: Date): string {
-    return date.toLocaleDateString([], { year: 'numeric', month: 'short', day: 'numeric' });
-  }
-
-  getEventTypeLabel(event: CalendarEvent): string {
-    const value = event.type === 'other' ? event.status : event.type;
-    return value.replace(/_/g, ' ');
-  }
-
-  trackCalendarDay(_: number, day: CalendarDay): string {
-    return day.date.toISOString();
-  }
-
-  private loadEventsForDate(targetDate: Date): void {
+  private loadEventsForMonth(targetMonth: Date): void {
     const workspaceId = this.workspaceId();
     if (!workspaceId) {
       this.eventsByDay.set({});
@@ -190,28 +166,27 @@ export class WorkspaceCalendar implements OnInit, OnDestroy {
 
     this.loadingEvents.set(true);
 
+    const monthStart = this.startOfMonth(targetMonth);
+    const targetMonthKey = this.getMonthKey(monthStart);
+
     this.platformGql
-      .getWorkspacePlatformPostsByDay(workspaceId, this.formatDateForQuery(targetDate))
+      .getWorkspacePlatformPostsByMonth(workspaceId, this.formatMonthForQuery(monthStart))
       .pipe(
-        catchError(() => of([] as IPlatformPost[])),
         takeUntil(this.destroy$),
       )
       .subscribe({
         next: (platformPosts) => {
-          const events = this.mapPlatformPostsToEvents(platformPosts, targetDate);
-          const key = this.getDayKey(targetDate);
-          this.eventsByDay.update((current) => ({
-            ...current,
-            [key]: events,
-          }));
+          const monthEvents = this.mapPlatformPostsToEvents(platformPosts, monthStart);
+          const nextByDay = this.groupEventsByDay(monthEvents);
+          this.eventsByDay.set(nextByDay);
+          this.ensureSelectedDateHasData(targetMonthKey, nextByDay);
           this.loadingEvents.set(false);
         },
         error: () => {
-          const key = this.getDayKey(targetDate);
-          this.eventsByDay.update((current) => ({
-            ...current,
-            [key]: [],
-          }));
+          // Keep this visible during integration so backend/query issues are not silently swallowed.
+          // eslint-disable-next-line no-console
+          console.error('Failed to load workspace platform posts by month');
+          this.eventsByDay.set({});
           this.loadingEvents.set(false);
         },
       });
@@ -257,6 +232,11 @@ export class WorkspaceCalendar implements OnInit, OnDestroy {
   private parseDateValue(value: string | undefined): Date | null {
     if (!value) return null;
 
+    if (/^\d{13}$/.test(value)) {
+      const parsedFromTimestamp = new Date(Number(value));
+      return Number.isNaN(parsedFromTimestamp.getTime()) ? null : parsedFromTimestamp;
+    }
+
     // Avoid timezone day-shift for date-only payloads.
     if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
       const [yearRaw, monthRaw, dayRaw] = value.split('-');
@@ -281,12 +261,44 @@ export class WorkspaceCalendar implements OnInit, OnDestroy {
     return `${y}-${m}-${d}`;
   }
 
-  private formatDateForQuery(date: Date): string {
+  private getMonthKey(date: Date): string {
     const day = this.startOfDay(date);
     const year = day.getFullYear();
     const month = `${day.getMonth() + 1}`.padStart(2, '0');
-    const dayOfMonth = `${day.getDate()}`.padStart(2, '0');
-    return `${year}-${month}-${dayOfMonth}`;
+    return `${year}-${month}`;
+  }
+
+  private formatMonthForQuery(date: Date): string {
+    const day = this.startOfDay(date);
+    const year = day.getFullYear();
+    const month = `${day.getMonth() + 1}`.padStart(2, '0');
+    return `${year}-${month}`;
+  }
+
+  private groupEventsByDay(events: CalendarEvent[]): Record<string, CalendarEvent[]> {
+    const byDay: Record<string, CalendarEvent[]> = {};
+    for (const event of events) {
+      const dayKey = this.getDayKey(event.at);
+      byDay[dayKey] = byDay[dayKey] ?? [];
+      byDay[dayKey].push(event);
+    }
+    return byDay;
+  }
+
+  private ensureSelectedDateHasData(
+    targetMonthKey: string,
+    byDay: Record<string, CalendarEvent[]>,
+  ): void {
+    const selectedDayKey = this.getDayKey(this.selectedDate());
+    const selectedMonthKey = this.getMonthKey(this.selectedDate());
+    const hasSelectedData = (byDay[selectedDayKey] ?? []).length > 0;
+    if (selectedMonthKey === targetMonthKey && hasSelectedData) return;
+
+    const firstEventDayKey = Object.keys(byDay).sort()[0];
+    if (!firstEventDayKey) return;
+    const [year, month, day] = firstEventDayKey.split('-').map(Number);
+    if (!year || !month || !day) return;
+    this.selectedDate.set(new Date(year, month - 1, day));
   }
 
   private startOfMonth(date: Date): Date {

@@ -131,6 +131,14 @@ export const GET_WORKSPACE_PLATFORM_POSTS_BY_DAY_QUERY = gql`
   }
 `;
 
+export const GET_WORKSPACE_PLATFORM_POSTS_BY_MONTH_QUERY = gql`
+  query WorkspacePlatformPostsByMonth($workspaceId: ID!, $month: String!) {
+    workspacePlatformPostsByMonth(workspaceId: $workspaceId, month: $month) {
+      ${PLATFORM_POST_FIELDS}
+    }
+  }
+`;
+
 export const CREATE_PLATFORM_POSTS_BATCH_MUTATION = gql`
   mutation CreatePlatformPostsBatch(
     $postId: ID!
