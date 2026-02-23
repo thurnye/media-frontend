@@ -115,6 +115,22 @@ export const GET_PLATFORM_POSTS_QUERY = gql`
   }
 `;
 
+export const GET_WORKSPACE_PLATFORM_POSTS_QUERY = gql`
+  query WorkspacePlatformPosts($workspaceId: ID!) {
+    workspacePlatformPosts(workspaceId: $workspaceId) {
+      ${PLATFORM_POST_FIELDS}
+    }
+  }
+`;
+
+export const GET_WORKSPACE_PLATFORM_POSTS_BY_DAY_QUERY = gql`
+  query WorkspacePlatformPostsByDay($workspaceId: ID!, $date: String!) {
+    workspacePlatformPostsByDay(workspaceId: $workspaceId, date: $date) {
+      ${PLATFORM_POST_FIELDS}
+    }
+  }
+`;
+
 export const CREATE_PLATFORM_POSTS_BATCH_MUTATION = gql`
   mutation CreatePlatformPostsBatch(
     $postId: ID!

@@ -4,10 +4,11 @@ import { Store } from '@ngrx/store';
 import { selectSelectedWorkspace, selectWorkspaceLoading } from '../../../store/workspace/workspace.selectors';
 import { InviteDialog } from '../workspace-members/invite-dialog/invite-dialog';
 import { ConnectAccountDialog } from '../workspace-settings/connect-account-dialog/connect-account-dialog';
+import { WorkspaceCalendar } from '../workspace-calendar/workspace-calendar';
 
 @Component({
   selector: 'app-workspace-home',
-  imports: [RouterLink, InviteDialog, ConnectAccountDialog],
+  imports: [RouterLink, InviteDialog, ConnectAccountDialog, WorkspaceCalendar],
   templateUrl: './workspace-home.html',
   styleUrl: './workspace-home.css',
 })

@@ -1,0 +1,265 @@
+.wc-card {
+  background: #fff;
+  border: 1px solid #e9ecef;
+  border-radius: 0.75rem;
+  padding: 1rem;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03);
+}
+
+.wc-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.85rem;
+}
+
+.wc-head h2 {
+  margin: 0;
+  font-size: 0.95rem;
+  color: #1a1a2e;
+}
+
+.wc-nav {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.wc-nav-btn {
+  width: 28px;
+  height: 28px;
+  border: 1px solid #d1d5db;
+  border-radius: 0.45rem;
+  background: #fff;
+  color: #374151;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.wc-nav-btn:hover {
+  border-color: #6366f1;
+  color: #4f46e5;
+}
+
+.wc-month-label {
+  min-width: 128px;
+  text-align: center;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+.wc-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 0.3rem;
+  margin-bottom: 0.3rem;
+}
+
+.wc-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+.wc-month-panel {
+  min-width: 0;
+}
+
+.wc-weekdays span {
+  text-align: center;
+  font-size: 0.7rem;
+  color: #6b7280;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.wc-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 0.3rem;
+}
+
+.wc-day {
+  border: 1px solid #e5e7eb;
+  border-radius: 0.45rem;
+  background: #fff;
+  color: #1f2937;
+  font-size: 0.8rem;
+  min-height: 44px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.wc-day:hover {
+  border-color: #c7d2fe;
+  background: #eef2ff;
+}
+
+.wc-day--outside {
+  color: #9ca3af;
+  background: #f9fafb;
+}
+
+.wc-day--today {
+  border-color: #22c55e;
+  color: #15803d;
+  font-weight: 700;
+}
+
+.wc-day--selected {
+  background: #4f46e5;
+  border-color: #4f46e5;
+  color: #fff;
+}
+
+.wc-day-number {
+  line-height: 1;
+}
+
+.wc-day-markers {
+  display: inline-flex;
+  gap: 0.2rem;
+}
+
+.wc-marker {
+  width: 5px;
+  height: 5px;
+  border-radius: 999px;
+  display: inline-block;
+}
+
+.wc-marker--scheduled {
+  background: #f59e0b;
+}
+
+.wc-marker--published {
+  background: #22c55e;
+}
+
+.wc-marker--other {
+  background: #64748b;
+}
+
+.wc-events {
+  border: 1px solid #f0f2f5;
+  border-radius: 0.65rem;
+  padding: 0.75rem;
+  background: #fcfcfd;
+  min-width: 0;
+}
+
+.wc-events-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.wc-events-head strong {
+  font-size: 0.8rem;
+  color: #0f172a;
+}
+
+.wc-events-head span {
+  font-size: 0.72rem;
+  color: #6b7280;
+}
+
+.wc-empty {
+  margin: 0;
+  font-size: 0.78rem;
+  color: #6b7280;
+}
+
+.wc-events-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.55rem;
+  max-height: 520px;
+  overflow: auto;
+}
+
+.wc-event-item {
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  padding: 0.45rem 0.55rem;
+  background: #f8fafc;
+  display: grid;
+  gap: 0.2rem;
+}
+
+.wc-event-type {
+  width: fit-content;
+  border-radius: 999px;
+  padding: 0.12rem 0.45rem;
+  font-size: 0.66rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.wc-event-type--scheduled {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.wc-event-type--published {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.wc-event-type--other {
+  background: #e2e8f0;
+  color: #334155;
+}
+
+.wc-event-title {
+  font-size: 0.8rem;
+  color: #1f2937;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.wc-event-title:hover {
+  color: #4f46e5;
+}
+
+.wc-event-meta {
+  font-size: 0.7rem;
+  color: #64748b;
+}
+
+@media (min-width: 900px) {
+  .wc-layout {
+    grid-template-columns: minmax(0, 1.4fr) minmax(280px, 0.9fr);
+    align-items: start;
+  }
+}
+
+@media (max-width: 640px) {
+  .wc-card {
+    padding: 0.75rem;
+  }
+
+  .wc-month-label {
+    min-width: 110px;
+    font-size: 0.78rem;
+  }
+
+  .wc-day {
+    min-height: 38px;
+    font-size: 0.76rem;
+  }
+
+  .wc-event-item {
+    padding: 0.4rem 0.5rem;
+  }
+}

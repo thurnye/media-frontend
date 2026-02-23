@@ -16,6 +16,7 @@ import { Workspace } from './pages/workspace-environment/workspace/workspace';
 import { WorkspaceMembers } from './pages/workspace-environment/workspace-members/workspace-members';
 import { WorkspaceAnalytics } from './pages/workspace-environment/workspace-analytics/workspace-analytics';
 import { WorkspaceSettings } from './pages/workspace-environment/workspace-settings/workspace-settings';
+import { WorkspaceCalendar } from './pages/workspace-environment/workspace-calendar/workspace-calendar';
 import { AcceptInvite } from './pages/invite/accept-invite';
 
 export const routes: Routes = [
@@ -64,6 +65,7 @@ export const routes: Routes = [
           { path: 'post/:postId/publish', component: PostPublishWorkflow },
           { path: 'post/:postId/edit', component: PostForm },
           { path: 'members', component: WorkspaceMembers },
+          { path: 'calendar', component: WorkspaceCalendar },
           { path: 'analytics', component: WorkspaceAnalytics },
           { path: 'settings', component: WorkspaceSettings },
         ],

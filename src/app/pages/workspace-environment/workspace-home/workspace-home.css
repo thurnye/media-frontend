@@ -236,6 +236,10 @@
   color: #16a34a;
 }
 
+.wh-calendar-wrap {
+  width: 100%;
+}
+
 /* ── Quick actions grid ──────────────────────────────────────── */
 .wh-actions-grid {
   display: grid;

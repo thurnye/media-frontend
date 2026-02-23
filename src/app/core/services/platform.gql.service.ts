@@ -9,6 +9,8 @@ import {
   LINK_PLATFORM_ACCOUNT_MUTATION,
   UNLINK_PLATFORM_ACCOUNT_MUTATION,
   GET_PLATFORM_POSTS_QUERY,
+  GET_WORKSPACE_PLATFORM_POSTS_QUERY,
+  GET_WORKSPACE_PLATFORM_POSTS_BY_DAY_QUERY,
   CREATE_PLATFORM_POST_MUTATION,
   CREATE_PLATFORM_POSTS_BATCH_MUTATION,
   UPDATE_PLATFORM_POST_MUTATION,
@@ -72,6 +74,26 @@ export class PlatformGqlService {
         fetchPolicy: 'no-cache',
       })
       .pipe(map(r => r.data!.platformPosts));
+  }
+
+  getWorkspacePlatformPosts(workspaceId: string) {
+    return this.apollo
+      .query<{ workspacePlatformPosts: IPlatformPost[] }>({
+        query: GET_WORKSPACE_PLATFORM_POSTS_QUERY,
+        variables: { workspaceId },
+        fetchPolicy: 'no-cache',
+      })
+      .pipe(map(r => r.data!.workspacePlatformPosts));
+  }
+
+  getWorkspacePlatformPostsByDay(workspaceId: string, date: string) {
+    return this.apollo
+      .query<{ workspacePlatformPostsByDay: IPlatformPost[] }>({
+        query: GET_WORKSPACE_PLATFORM_POSTS_BY_DAY_QUERY,
+        variables: { workspaceId, date },
+        fetchPolicy: 'no-cache',
+      })
+      .pipe(map(r => r.data!.workspacePlatformPostsByDay));
   }
 
   createPlatformPostsBatch(input: ICreatePlatformPostBatch) {
