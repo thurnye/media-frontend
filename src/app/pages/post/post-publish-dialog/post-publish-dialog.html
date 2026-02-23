@@ -106,6 +106,77 @@
                 [ngModel]="entry.hashtags"
                 (ngModelChange)="updateHashtags(i, $event)"
               />
+
+              <div class="ppd-media-section">
+                <div class="ppd-media-header">
+                  <label class="ppd-label">Media</label>
+                  <label class="ppd-add-media-btn">
+                    Add Media
+                    <input
+                      type="file"
+                      class="ppd-hidden-file"
+                      multiple
+                      accept="image/*,video/*"
+                      (change)="onEntryMediaSelected(i, $event)"
+                    />
+                  </label>
+                </div>
+
+                @if (entry.media.length === 0) {
+                  <p class="ppd-media-empty">No media selected for this platform.</p>
+                } @else {
+                  <div class="ppd-media-grid">
+                    @for (mediaItem of entry.media; track trackMediaItem($index, mediaItem)) {
+                      <div
+                        class="ppd-media-item"
+                        draggable="true"
+                        (dragstart)="onMediaDragStart(i, mediaItem.id, $event)"
+                        (dragover)="onMediaDragOver($event)"
+                        (drop)="onMediaDrop(i, mediaItem.id, $event)"
+                      >
+                        @if (mediaItem.type === 'video') {
+                          <video
+                            class="ppd-media-preview"
+                            [src]="getPreviewMediaUrl(mediaItem.url)"
+                            muted
+                            playsinline
+                            controls
+                          ></video>
+                        } @else {
+                          <img
+                            class="ppd-media-preview"
+                            [src]="getPreviewMediaUrl(mediaItem.url)"
+                            alt="Platform media"
+                          />
+                        }
+
+                        @if (mediaItem.source === 'post') {
+                          <span class="ppd-media-source">From Post</span>
+                        }
+
+                        @if (mediaItem.uploading) {
+                          <div class="ppd-media-overlay">
+                            Uploading {{ mediaItem.progress ?? 0 }}%
+                          </div>
+                        } @else if (mediaItem.error) {
+                          <div class="ppd-media-overlay ppd-media-overlay--error">
+                            {{ mediaItem.error }}
+                          </div>
+                        }
+
+                        <button
+                          type="button"
+                          class="ppd-remove-media-btn"
+                          [disabled]="mediaItem.uploading"
+                          (click)="removeEntryMedia(i, mediaItem.id)"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    }
+                  </div>
+                }
+              </div>
             </div>
           }
         }

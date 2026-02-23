@@ -164,6 +164,24 @@
                     <span class="pd-evergreen-badge">Evergreen</span>
                   }
                 </div>
+                @if (usedPlatforms.length) {
+                  <div class="pd-platform-icons" aria-label="Platforms using this post">
+                    @for (platform of usedPlatforms; track platform) {
+                      <span
+                        class="pd-platform-icon pd-platform-icon--{{ platform }}"
+                        [attr.title]="platform"
+                        [attr.aria-label]="platform"
+                      >
+                        {{ getPlatformIconLabel(platform) }}
+                      </span>
+                    }
+                  </div>
+                }
+                @if (post()!.createdAt) {
+                  <span class="pd-created-at">
+                    Created: {{ post()!.createdAt | date: 'medium' }}
+                  </span>
+                }
               </div>
 
               <!-- Tags -->
@@ -213,7 +231,6 @@
                 }
               </div>
             }
-
           </article>
 
           <!-- Reject dialog -->
@@ -230,9 +247,7 @@
                   (ngModelChange)="rejectReason.set($event)"
                 ></textarea>
                 <div class="pd-dialog-actions">
-                  <button class="pd-btn-cancel" (click)="onCancelRejectDialog()">
-                    Cancel
-                  </button>
+                  <button class="pd-btn-cancel" (click)="onCancelRejectDialog()">Cancel</button>
                   <button
                     class="pd-btn-confirm-reject"
                     [disabled]="!rejectReason().trim()"
@@ -251,6 +266,8 @@
               [workspaceId]="workspaceId()"
               [defaultCaption]="post()!.description ?? ''"
               [defaultHashtags]="post()!.tags ?? []"
+              [defaultMediaUrls]="post()!.mediaUrls ?? []"
+              (proceed)="onPublishAccountsSelected($event)"
               (close)="showPublishDialog.set(false)"
             />
           }
@@ -259,6 +276,19 @@
 
       <!-- Reviewer assignment -->
       <section class="pb-section pb-section--reviewer">
+        @if (canShowReadyForPublish) {
+          <div class="pd-reviewer-select-wrap">
+            <div class="pd-publish-btn-group">
+              <span class="pd-publish-status-badge">
+                {{ getStatusLabel(post()?.status) }}
+              </span>
+              <button type="button" class="pd-btn-publish" (click)="showPublishDialog.set(true)">
+                Ready For Publish
+              </button>
+            </div>
+          </div>
+        }
+
         @if (canSeeReviewerDecision) {
           <div class="pd-reviewer-select-wrap">
             <label class="pd-reviewer-select-label" for="reviewerDecision">Review Decision</label>
@@ -275,7 +305,10 @@
               </button>
 
               @if (showReviewerDecisionMenu()) {
-                <div class="pd-reviewer-dropdown-backdrop" (click)="closeReviewerDecisionMenu()"></div>
+                <div
+                  class="pd-reviewer-dropdown-backdrop"
+                  (click)="closeReviewerDecisionMenu()"
+                ></div>
                 <div class="pd-reviewer-dropdown-menu">
                   <button
                     type="button"
@@ -323,7 +356,9 @@
                     }
                     <strong>{{ getDecisionDisplayName(item) }}</strong>
                   </div>
-                  <span class="pd-reviewer-decision-badge pd-reviewer-decision--{{ item.decision }}">
+                  <span
+                    class="pd-reviewer-decision-badge pd-reviewer-decision--{{ item.decision }}"
+                  >
                     {{ item.decision }}
                   </span>
                 </div>
@@ -340,6 +375,178 @@
         [postId]="post()!.id"
         [currentUser]="currentUser()"
       />
+
+      <section class="pd-platform-posts">
+        <header class="pd-platform-posts-header">
+          <div>
+            <h3>Platform Posts</h3>
+            <p>All platform entries created from this post.</p>
+          </div>
+          @if (canManagePlatformDrafts && hasDraftPlatformPosts) {
+            <div class="pd-platform-posts-actions">
+              <button
+                type="button"
+                class="pd-platform-btn pd-platform-btn--primary"
+                (click)="goToPublishFlowForAllDrafts()"
+              >
+                Edit All Drafts/Failed
+              </button>
+            </div>
+          }
+        </header>
+
+        @if (loadingPlatformPosts()) {
+          <p class="pd-platform-posts-state">Loading platform posts...</p>
+        } @else if (platformPostsError()) {
+          <p class="pd-platform-posts-state pd-platform-posts-state--error">
+            {{ platformPostsError() }}
+          </p>
+        } @else if (!platformPosts().length) {
+          <p class="pd-platform-posts-state">No platform posts have been created yet.</p>
+        } @else {
+          <div class="pd-platform-posts-list">
+            @for (platformPost of platformPosts(); track platformPost.id) {
+              <article class="pd-platform-post-card">
+                <div class="pd-platform-post-meta">
+                  <span
+                    class="pd-platform-post-platform pd-platform-post-platform--{{
+                      platformPost.platform
+                    }}"
+                  >
+                    {{ platformPost.platform }}
+                  </span>
+                  <span
+                    class="pd-platform-post-status pd-platform-post-status--{{
+                      platformPost.publishing.status ?? 'draft'
+                    }}"
+                  >
+                    {{ getStatusLabel(platformPost.publishing.status) }}
+                  </span>
+                  @if (platformPost.createdAt) {
+                    <span class="pd-platform-post-created-at">
+                      Created: {{ platformPost.createdAt | date: 'medium' }}
+                    </span>
+                  }
+                  @if (canManagePlatformDrafts && isDraftPlatformPost(platformPost)) {
+                    <div class="pd-platform-draft-actions">
+                      <div class="pd-menu-wrapper">
+                        <button
+                          type="button"
+                          class="pd-btn-ellipsis"
+                          (click)="togglePlatformPostMenu(platformPost)"
+                          [attr.aria-label]="
+                            'Open actions for ' + platformPost.platform + ' platform post'
+                          "
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="18"
+                            height="18"
+                            fill="currentColor"
+                            viewBox="0 0 16 16"
+                            aria-hidden="true"
+                          >
+                            <path
+                              d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3"
+                            />
+                          </svg>
+                        </button>
+                        @if (isPlatformPostMenuOpen(platformPost)) {
+                          <div class="pd-menu-backdrop" (click)="closePlatformPostMenu()"></div>
+                          <div class="pd-menu-dropdown">
+                            <button
+                              type="button"
+                              class="pd-menu-item"
+                              (click)="goToPublishFlowForDraft(platformPost)"
+                            >
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="14"
+                                height="14"
+                                fill="currentColor"
+                                viewBox="0 0 16 16"
+                                aria-hidden="true"
+                              >
+                                <path
+                                  d="M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.499.499 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11z"
+                                />
+                              </svg>
+                              {{ getPlatformPostEditLabel(platformPost) }}
+                            </button>
+                            @if (platformPost.publishing.status === 'failed') {
+                              <button
+                                type="button"
+                                class="pd-menu-item"
+                                [disabled]="isRetryingPlatformPost(platformPost.id)"
+                                (click)="retryFailedPlatformPost(platformPost)"
+                              >
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  width="14"
+                                  height="14"
+                                  fill="currentColor"
+                                  viewBox="0 0 16 16"
+                                  aria-hidden="true"
+                                >
+                                  <path
+                                    d="M8 3a5 5 0 1 0 4.546 2.916.5.5 0 0 1 .908-.418A6 6 0 1 1 8 2v1z"
+                                  />
+                                  <path
+                                    d="M8 0a.5.5 0 0 1 .5.5V3h2.5a.5.5 0 0 1 .354.854l-3 3a.5.5 0 0 1-.708 0l-3-3A.5.5 0 0 1 5 3h2.5V.5A.5.5 0 0 1 8 0"
+                                  />
+                                </svg>
+                                {{
+                                  isRetryingPlatformPost(platformPost.id)
+                                    ? 'Retrying...'
+                                    : 'Retry Publish'
+                                }}
+                              </button>
+                            }
+                          </div>
+                        }
+                      </div>
+                    </div>
+                  }
+                </div>
+
+                @if (platformPost.content.caption) {
+                  <p class="pd-platform-post-caption">{{ platformPost.content.caption }}</p>
+                }
+
+                @if (platformPost.content.hashtags?.length) {
+                  <p class="pd-platform-post-tags">
+                    {{ platformPost.content.hashtags!.join(', ') }}
+                  </p>
+                }
+
+                @if (platformPost.publishing.scheduledAt) {
+                  <p class="pd-platform-post-schedule pd-platform-post-schedule--info">
+                    Schedule info:
+                    <strong>{{ platformPost.publishing.scheduledAt | date: 'medium' }}</strong>
+                    @if (platformPost.publishing.timezone) {
+                      <span>({{ platformPost.publishing.timezone }})</span>
+                    }
+                  </p>
+                }
+
+                @if (getPlatformPostMedia(platformPost).length) {
+                  <div class="pd-platform-post-media-grid">
+                    @for (item of getPlatformPostMedia(platformPost); track item.url) {
+                      <div class="pd-platform-post-media-item">
+                        @if (isVideoUrl(item.url)) {
+                          <video controls preload="metadata" [src]="getMediaUrl(item.url)"></video>
+                        } @else {
+                          <img [src]="getMediaUrl(item.url)" alt="Platform post media" />
+                        }
+                      </div>
+                    }
+                  </div>
+                }
+              </article>
+            }
+          </div>
+        }
+      </section>
     }
   </div>
 </div>

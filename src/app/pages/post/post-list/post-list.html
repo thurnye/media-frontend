@@ -49,23 +49,26 @@
       <app-post-list-filters
         [searchQuery]="searchQuery"
         [statusFilter]="statusFilter"
-        [categoryFilter]="categoryFilter"
-        [priorityFilter]="priorityFilter"
-        [evergreenFilter]="evergreenFilter"
-        [sortBy]="sortBy"
-        [statusOptions]="statusOptions"
-        [categoryOptions]="categoryOptions"
-        [priorityOptions]="priorityOptions"
-        [evergreenOptions]="evergreenOptions"
-        [sortOptions]="sortOptions"
-        (searchChanged)="onSearchChange($event)"
-        (statusChanged)="selectStatus($event)"
-        (categoryChanged)="selectCategory($event)"
-        (priorityChanged)="selectPriority($event)"
-        (evergreenChanged)="selectEvergreen($event)"
-        (sortChanged)="selectSort($event)"
-        (clear)="clearFilters()"
-      />
+          [categoryFilter]="categoryFilter"
+          [priorityFilter]="priorityFilter"
+          [platformFilter]="platformFilter"
+          [evergreenFilter]="evergreenFilter"
+          [sortBy]="sortBy"
+          [statusOptions]="statusOptions"
+          [categoryOptions]="categoryOptions"
+          [priorityOptions]="priorityOptions"
+          [platformOptions]="platformOptions"
+          [evergreenOptions]="evergreenOptions"
+          [sortOptions]="sortOptions"
+          (searchChanged)="onSearchChange($event)"
+          (statusChanged)="selectStatus($event)"
+          (categoryChanged)="selectCategory($event)"
+          (priorityChanged)="selectPriority($event)"
+          (platformChanged)="selectPlatform($event)"
+          (evergreenChanged)="selectEvergreen($event)"
+          (sortChanged)="selectSort($event)"
+          (clear)="clearFilters()"
+        />
 
       <div class="pl-list-content-wrap" [class.is-split]="selectedPostId()">
         <div class="pl-list-content">
@@ -138,6 +141,19 @@
                       }
                     </div>
                     <div class="pl-card-footer">
+                      @if (getPostPlatforms(post.id).length) {
+                        <div class="pl-platform-icons" aria-label="Platforms using this post">
+                          @for (platform of getPostPlatforms(post.id); track platform) {
+                            <span
+                              class="pl-platform-icon pl-platform-icon--{{ platform }}"
+                              [attr.title]="platform"
+                              [attr.aria-label]="platform"
+                            >
+                              {{ getPlatformIconLabel(platform) }}
+                            </span>
+                          }
+                        </div>
+                      }
                       <div class="pl-card-badges">
                         <span class="pl-status-badge pl-status--{{ post.status ?? 'draft' }}">
                           {{ getStatusLabel(post.status) }}
@@ -344,6 +360,23 @@
                     </div>
                   }
                 </div>
+
+                @if (getPostPlatforms(selectedPost()!.id).length) {
+                  <div class="pl-panel-platforms" aria-label="Platforms using this post">
+                    <span class="pl-panel-platforms-label">Platforms</span>
+                    <div class="pl-platform-icons-inline">
+                      @for (platform of getPostPlatforms(selectedPost()!.id); track platform) {
+                        <span
+                          class="pl-platform-icon pl-platform-icon--{{ platform }}"
+                          [attr.title]="platform"
+                          [attr.aria-label]="platform"
+                        >
+                          {{ getPlatformIconLabel(platform) }}
+                        </span>
+                      }
+                    </div>
+                  </div>
+                }
 
                 <!-- Tags -->
                 @if (selectedPost()!.tags && selectedPost()!.tags!.length > 0) {

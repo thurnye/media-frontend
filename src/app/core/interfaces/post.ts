@@ -128,6 +128,7 @@ export interface IPostListFilters {
   status?: string;
   category?: string;
   priority?: string;
+  platform?: string;
   isEvergreen?: boolean;
   sortBy?: string;
   createdBy?: string;

@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { Apollo } from 'apollo-angular';
 import { map } from 'rxjs';
-import { ICreatePlatformPostBatch, IPlatformAccount, IPlatformPost } from '../interfaces/platform';
+import { ICreatePlatformPost, ICreatePlatformPostBatch, IPlatformAccount, IPlatformPost, IUpdatePlatformPost } from '../interfaces/platform';
 import {
   DISCONNECT_PLATFORM_ACCOUNT_MUTATION,
   GET_PLATFORM_ACCOUNTS_QUERY,
@@ -9,7 +9,9 @@ import {
   LINK_PLATFORM_ACCOUNT_MUTATION,
   UNLINK_PLATFORM_ACCOUNT_MUTATION,
   GET_PLATFORM_POSTS_QUERY,
+  CREATE_PLATFORM_POST_MUTATION,
   CREATE_PLATFORM_POSTS_BATCH_MUTATION,
+  UPDATE_PLATFORM_POST_MUTATION,
 } from '../graphql/platforms.graphql';
 
 @Injectable({ providedIn: 'root' })
@@ -79,5 +81,23 @@ export class PlatformGqlService {
         variables: input,
       })
       .pipe(map(r => r.data!.createPlatformPostsBatch));
+  }
+
+  createPlatformPost(input: ICreatePlatformPost) {
+    return this.apollo
+      .mutate<{ createPlatformPost: IPlatformPost }>({
+        mutation: CREATE_PLATFORM_POST_MUTATION,
+        variables: input,
+      })
+      .pipe(map(r => r.data!.createPlatformPost));
+  }
+
+  updatePlatformPost(input: IUpdatePlatformPost) {
+    return this.apollo
+      .mutate<{ updatePlatformPost: IPlatformPost }>({
+        mutation: UPDATE_PLATFORM_POST_MUTATION,
+        variables: input,
+      })
+      .pipe(map(r => r.data!.updatePlatformPost));
   }
 }

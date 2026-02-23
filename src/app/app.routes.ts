@@ -5,6 +5,7 @@ import { Signup } from './pages/auth/signup/signup';
 import { PostForm } from './pages/post/post-form/post-form';
 import { PostList } from './pages/post/post-list/post-list';
 import { PostDetail } from './pages/post/post-detail/post-detail';
+import { PostPublishWorkflow } from './pages/post/post-publish-workflow/post-publish-workflow';
 import { authGuard } from './core/guards/auth.guard';
 import { Dashboard } from './pages/dashboard/dashboard';
 import { DashboardHome } from './pages/dashboard/dashboard-home/dashboard-home';
@@ -60,6 +61,7 @@ export const routes: Routes = [
           { path: 'posts', component: PostList },
           { path: 'post/new', component: PostForm },
           { path: 'post/:postId', component: PostDetail },
+          { path: 'post/:postId/publish', component: PostPublishWorkflow },
           { path: 'post/:postId/edit', component: PostForm },
           { path: 'members', component: WorkspaceMembers },
           { path: 'analytics', component: WorkspaceAnalytics },

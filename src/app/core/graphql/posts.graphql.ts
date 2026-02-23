@@ -88,6 +88,7 @@ export const GET_POSTS = gql`
     $status: String
     $category: String
     $priority: String
+    $platform: String
     $isEvergreen: Boolean
     $sortBy: String
     $createdBy: String
@@ -100,6 +101,7 @@ export const GET_POSTS = gql`
       status: $status
       category: $category
       priority: $priority
+      platform: $platform
       isEvergreen: $isEvergreen
       sortBy: $sortBy
       createdBy: $createdBy

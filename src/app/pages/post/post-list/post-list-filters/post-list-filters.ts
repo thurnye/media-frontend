@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 
-export type FilterDropdownName = 'status' | 'category' | 'priority' | 'evergreen' | 'sort';
+export type FilterDropdownName = 'status' | 'category' | 'priority' | 'platform' | 'evergreen' | 'sort';
 export type FilterOption = { value: string; label: string };
 
 @Component({
@@ -14,12 +14,14 @@ export class PostListFilters {
   @Input() statusFilter = 'all';
   @Input() categoryFilter = 'all';
   @Input() priorityFilter = 'all';
+  @Input() platformFilter = 'all';
   @Input() evergreenFilter = 'all';
   @Input() sortBy = 'newest';
 
   @Input() statusOptions: FilterOption[] = [];
   @Input() categoryOptions: FilterOption[] = [];
   @Input() priorityOptions: FilterOption[] = [];
+  @Input() platformOptions: FilterOption[] = [];
   @Input() evergreenOptions: FilterOption[] = [];
   @Input() sortOptions: FilterOption[] = [];
 
@@ -27,6 +29,7 @@ export class PostListFilters {
   @Output() statusChanged = new EventEmitter<string>();
   @Output() categoryChanged = new EventEmitter<string>();
   @Output() priorityChanged = new EventEmitter<string>();
+  @Output() platformChanged = new EventEmitter<string>();
   @Output() evergreenChanged = new EventEmitter<string>();
   @Output() sortChanged = new EventEmitter<string>();
   @Output() clear = new EventEmitter<void>();
@@ -56,6 +59,11 @@ export class PostListFilters {
     this.priorityChanged.emit(value);
   }
 
+  selectPlatform(value: string): void {
+    this.closeDropdowns();
+    this.platformChanged.emit(value);
+  }
+
   selectEvergreen(value: string): void {
     this.closeDropdowns();
     this.evergreenChanged.emit(value);
@@ -72,5 +80,28 @@ export class PostListFilters {
 
   getOptionLabel(options: FilterOption[], value: string): string {
     return options.find((option) => option.value === value)?.label ?? options[0]?.label ?? '';
+  }
+
+  getPlatformInitial(value: string): string {
+    const map: Record<string, string> = {
+      all: 'A',
+      facebook: 'f',
+      instagram: 'i',
+      twitter: 'x',
+      linkedin: 'in',
+      tiktok: 't',
+      youtube: 'y',
+    };
+    return map[value] ?? '?';
+  }
+
+  getPriorityMark(value: string): string {
+    const map: Record<string, string> = {
+      all: '*',
+      high: '^',
+      medium: '=',
+      low: 'v',
+    };
+    return map[value] ?? '?';
   }
 }

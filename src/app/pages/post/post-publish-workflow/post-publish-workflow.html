@@ -1,0 +1,269 @@
+<div class="ppw-page">
+  <div class="ppw-container">
+    <a
+      class="ppw-back"
+      [routerLink]="['/dashboard/workspace', workspaceId(), 'post', postId()]"
+    >
+      Back to Post
+    </a>
+
+    @if (loading()) {
+      <div class="ppw-loading">Loading publish setup...</div>
+    } @else {
+      <header class="ppw-header">
+        <h1>Publish Workflow</h1>
+        <p>Phase 1: Customize per account. Phase 2: Schedule and publish.</p>
+      </header>
+
+      @if (hasInvalidTikTokMediaCount) {
+        <div class="ppw-alert">
+          TikTok allows only 1 media item. Fix these tabs:
+          @for (entry of invalidTikTokEntries; track entry.account.id; let isLast = $last) {
+            <strong>{{ entry.account.displayName }}</strong>@if (!isLast) {, }
+          }
+        </div>
+      }
+
+      <section class="ppw-section">
+        <div class="ppw-tabs-wrap">
+          <div class="ppw-tabs">
+            @for (entry of entries(); track entry.account.id; let i = $index) {
+              <button
+                type="button"
+                class="ppw-tab"
+                [class.ppw-tab--active]="activeTabIndex() === i"
+                (click)="selectTab(i)"
+              >
+                {{ entry.account.displayName }}
+                <span>{{ entry.account.platform }}</span>
+              </button>
+            }
+          </div>
+          @if (availableAccounts().length) {
+            <div class="ppw-add-account">
+              <button
+                type="button"
+                class="ppw-btn ppw-btn--primary"
+                (click)="openAddAccountsModal()"
+              >
+                Add Accounts
+              </button>
+            </div>
+          }
+        </div>
+
+        @if (activeEntry; as entry) {
+          <div class="ppw-card">
+            <label class="ppw-label">Caption</label>
+            <textarea
+              class="ppw-textarea"
+              rows="4"
+              [ngModel]="entry.caption"
+              (ngModelChange)="updateActiveCaption($event)"
+            ></textarea>
+
+            <label class="ppw-label">Hashtags (comma-separated)</label>
+            <input
+              class="ppw-input"
+              type="text"
+              [ngModel]="entry.hashtags"
+              (ngModelChange)="updateActiveHashtags($event)"
+            />
+
+            <div class="ppw-media-head">
+              <label class="ppw-label">Media</label>
+              <label class="ppw-add-media-btn">
+                Add Media
+                <input
+                  type="file"
+                  class="ppw-hidden-file"
+                  multiple
+                  accept="image/*,video/*"
+                  (change)="onEntryMediaSelected(activeTabIndex(), $event)"
+                />
+              </label>
+            </div>
+
+            @if (!entry.media.length) {
+              <p class="ppw-empty">No media selected for this account.</p>
+            } @else {
+              <div class="ppw-media-grid">
+                @for (mediaItem of getDisplayMedia(entry); track trackMediaItem($index, mediaItem)) {
+                  <div
+                    class="ppw-media-item"
+                    draggable="true"
+                    (dragstart)="onMediaDragStart(activeTabIndex(), mediaItem.id, $event)"
+                    (dragover)="onMediaDragOver($event)"
+                    (drop)="onMediaDrop(activeTabIndex(), mediaItem.id, $event)"
+                  >
+                    @if (mediaItem.type === 'video') {
+                      <video
+                        class="ppw-media-preview"
+                        [src]="getPreviewMediaUrl(mediaItem.url)"
+                        controls
+                        muted
+                        playsinline
+                      ></video>
+                    } @else {
+                      <img
+                        class="ppw-media-preview"
+                        [src]="getPreviewMediaUrl(mediaItem.url)"
+                        alt="Platform media"
+                      />
+                    }
+
+                    @if (mediaItem.source === 'post') {
+                      <span class="ppw-media-source">From Post</span>
+                    }
+
+                    @if (mediaItem.uploading) {
+                      <div class="ppw-overlay">Uploading {{ mediaItem.progress ?? 0 }}%</div>
+                    } @else if (mediaItem.error) {
+                      <div class="ppw-overlay ppw-overlay--error">{{ mediaItem.error }}</div>
+                    }
+
+                    <button
+                      type="button"
+                      class="ppw-remove-btn"
+                      [disabled]="mediaItem.uploading"
+                      (click)="removeEntryMedia(activeTabIndex(), mediaItem.id)"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                }
+              </div>
+              @if (entry.account.platform === 'tiktok' && entry.media.length > 1) {
+                <p class="ppw-empty ppw-empty--warn">
+                  TikTok supports only one media item. Remove extras to continue.
+                </p>
+              }
+            }
+
+            <section class="ppw-schedule-card">
+              <header class="ppw-schedule-header">
+                <h3>Schedule & Publish</h3>
+                <span>{{ entry.account.displayName }}</span>
+              </header>
+
+              <div class="ppw-schedule-options">
+                <button
+                  type="button"
+                  class="ppw-mode-btn"
+                  [class.ppw-mode-btn--active]="entry.publishMode === 'now'"
+                  (click)="updateActivePublishMode('now')"
+                >
+                  Publish Now
+                </button>
+                <button
+                  type="button"
+                  class="ppw-mode-btn"
+                  [class.ppw-mode-btn--active]="entry.publishMode === 'schedule'"
+                  (click)="updateActivePublishMode('schedule')"
+                >
+                  Schedule
+                </button>
+              </div>
+
+              @if (entry.publishMode === 'schedule') {
+                <div class="ppw-schedule-grid">
+                  <input
+                    class="ppw-input"
+                    type="date"
+                    [ngModel]="entry.scheduledDate"
+                    (ngModelChange)="updateActiveScheduledDate($event)"
+                  />
+                  <input
+                    class="ppw-input"
+                    type="time"
+                    [ngModel]="entry.scheduledTime"
+                    (ngModelChange)="updateActiveScheduledTime($event)"
+                  />
+                </div>
+              }
+
+              <p class="ppw-summary">Accounts selected: {{ entries().length }}</p>
+            </section>
+          </div>
+        }
+      </section>
+
+      <footer class="ppw-footer">
+        <button
+          type="button"
+          class="ppw-btn ppw-btn--draft"
+          [disabled]="!canSaveDraft || publishing()"
+          (click)="onSaveDraft()"
+        >
+          @if (publishing() && submitMode() === 'draft') {
+            Saving Draft...
+          } @else {
+            Save Draft
+          }
+        </button>
+        <button
+          type="button"
+          class="ppw-btn ppw-btn--publish"
+          [disabled]="!canPublish || publishing()"
+          (click)="onPublish()"
+        >
+          @if (publishing() && submitMode() === 'publish') {
+            Publishing...
+          } @else {
+            Create Platform Posts
+          }
+        </button>
+      </footer>
+
+      @if (showAddAccountsModal()) {
+        <div class="ppw-modal-backdrop" (click)="closeAddAccountsModal()">
+          <div class="ppw-modal" (click)="$event.stopPropagation()">
+            <div class="ppw-modal-header">
+              <h3>Select Accounts</h3>
+              <button type="button" class="ppw-modal-close" (click)="closeAddAccountsModal()">
+                ×
+              </button>
+            </div>
+            <p class="ppw-modal-hint">Choose accounts to add to this publish workflow.</p>
+            <div class="ppw-account-list">
+              @for (account of availableAccounts(); track account.id) {
+                <button
+                  type="button"
+                  class="ppw-account-item"
+                  [class.ppw-account-item--selected]="isPendingAddAccount(account.id)"
+                  (click)="togglePendingAddAccount(account.id)"
+                >
+                  <span class="ppw-account-icon">
+                    {{ account.platform.charAt(0).toUpperCase() }}
+                  </span>
+                  <div class="ppw-account-info">
+                    <span class="ppw-account-name">{{ account.displayName }}</span>
+                    <span class="ppw-account-platform">{{ account.platform }}</span>
+                  </div>
+                  <span class="ppw-account-check">
+                    @if (isPendingAddAccount(account.id)) {
+                      ✓
+                    }
+                  </span>
+                </button>
+              }
+            </div>
+            <div class="ppw-modal-actions">
+              <button type="button" class="ppw-btn ppw-btn--ghost" (click)="closeAddAccountsModal()">
+                Cancel
+              </button>
+              <button
+                type="button"
+                class="ppw-btn ppw-btn--primary"
+                [disabled]="!pendingAddAccountIds().length"
+                (click)="confirmAddAccounts()"
+              >
+                Add ({{ pendingAddAccountIds().length }})
+              </button>
+            </div>
+          </div>
+        </div>
+      }
+    }
+  </div>
+</div>

@@ -88,6 +88,12 @@ const PLATFORM_POST_FIELDS = `
     caption
     hashtags
     firstComment
+    media {
+      type
+      url
+      altText
+      thumbnailUrl
+    }
   }
   publishing {
     status
@@ -121,6 +127,58 @@ export const CREATE_PLATFORM_POSTS_BATCH_MUTATION = gql`
       entries: $entries
       scheduledAt: $scheduledAt
       timezone: $timezone
+    ) {
+      ${PLATFORM_POST_FIELDS}
+    }
+  }
+`;
+
+export const CREATE_PLATFORM_POST_MUTATION = gql`
+  mutation CreatePlatformPost(
+    $postId: ID!
+    $platform: String!
+    $accountId: String!
+    $caption: String!
+    $hashtags: [String]
+    $firstComment: String
+    $media: [PlatformMediaInput!]
+    $status: String
+    $scheduledAt: String
+    $timezone: String
+  ) {
+    createPlatformPost(
+      postId: $postId
+      platform: $platform
+      accountId: $accountId
+      caption: $caption
+      hashtags: $hashtags
+      firstComment: $firstComment
+      media: $media
+      status: $status
+      scheduledAt: $scheduledAt
+      timezone: $timezone
+    ) {
+      ${PLATFORM_POST_FIELDS}
+    }
+  }
+`;
+
+export const UPDATE_PLATFORM_POST_MUTATION = gql`
+  mutation UpdatePlatformPost(
+    $id: ID!
+    $caption: String
+    $hashtags: [String]
+    $media: [PlatformMediaInput!]
+    $scheduledAt: String
+    $status: String
+  ) {
+    updatePlatformPost(
+      id: $id
+      caption: $caption
+      hashtags: $hashtags
+      media: $media
+      scheduledAt: $scheduledAt
+      status: $status
     ) {
       ${PLATFORM_POST_FIELDS}
     }

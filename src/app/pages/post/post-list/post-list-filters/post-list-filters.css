@@ -155,3 +155,145 @@
   color: #3730a3;
   font-weight: 600;
 }
+
+.pl-option-value {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-width: 0;
+}
+
+.pl-pill-icon {
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.62rem;
+  font-weight: 700;
+  background: #e5e7eb;
+  color: #374151;
+  flex-shrink: 0;
+}
+
+.pl-pill-icon--green {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.pl-status-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: #9ca3af;
+  flex-shrink: 0;
+}
+
+.pl-status-dot--all,
+.pl-status-dot--draft {
+  background: #9ca3af;
+}
+
+.pl-status-dot--pending_approval {
+  background: #f59e0b;
+}
+
+.pl-status-dot--approved,
+.pl-status-dot--published {
+  background: #10b981;
+}
+
+.pl-status-dot--rejected,
+.pl-status-dot--failed {
+  background: #ef4444;
+}
+
+.pl-status-dot--cancelled,
+.pl-status-dot--archived {
+  background: #6b7280;
+}
+
+.pl-status-dot--scheduled,
+.pl-status-dot--publishing,
+.pl-status-dot--partially_published {
+  background: #3b82f6;
+}
+
+.pl-priority-chip {
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.62rem;
+  font-weight: 700;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.pl-priority-chip--all {
+  background: #6b7280;
+}
+
+.pl-priority-chip--high {
+  background: #dc2626;
+}
+
+.pl-priority-chip--medium {
+  background: #d97706;
+}
+
+.pl-priority-chip--low {
+  background: #16a34a;
+}
+
+.pl-platform-value {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-width: 0;
+}
+
+.pl-platform-chip {
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.pl-platform-chip--all {
+  background: #6b7280;
+}
+
+.pl-platform-chip--facebook {
+  background: #1877f2;
+}
+
+.pl-platform-chip--instagram {
+  background: #e1306c;
+}
+
+.pl-platform-chip--twitter {
+  background: #111827;
+}
+
+.pl-platform-chip--linkedin {
+  background: #0a66c2;
+}
+
+.pl-platform-chip--tiktok {
+  background: #111827;
+}
+
+.pl-platform-chip--youtube {
+  background: #ff0000;
+}

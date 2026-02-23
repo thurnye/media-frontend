@@ -28,6 +28,12 @@ export interface IPostContent {
   caption?: string;
   hashtags?: string[];
   firstComment?: string;
+  media?: Array<{
+    type: 'image' | 'video' | 'carousel';
+    url: string;
+    altText?: string;
+    thumbnailUrl?: string;
+  }>;
 }
 
 export interface IPublishingInfo {
@@ -58,7 +64,45 @@ export interface ICreatePlatformPostBatch {
     caption:      string;
     hashtags?:    string[];
     firstComment?: string;
+    media?: Array<{
+      type: 'image' | 'video' | 'carousel';
+      url: string;
+      altText?: string;
+      thumbnailUrl?: string;
+    }>;
   }>;
   scheduledAt?: string;
   timezone?:    string;
+}
+
+export interface ICreatePlatformPost {
+  postId: string;
+  platform: string;
+  accountId: string;
+  caption: string;
+  hashtags?: string[];
+  firstComment?: string;
+  status?: 'draft' | 'scheduled' | 'publishing' | 'published' | 'failed' | 'cancelled';
+  media?: Array<{
+    type: 'image' | 'video' | 'carousel';
+    url: string;
+    altText?: string;
+    thumbnailUrl?: string;
+  }>;
+  scheduledAt?: string;
+  timezone?: string;
+}
+
+export interface IUpdatePlatformPost {
+  id: string;
+  caption?: string;
+  hashtags?: string[];
+  scheduledAt?: string;
+  status?: 'draft' | 'scheduled' | 'publishing' | 'published' | 'failed' | 'cancelled';
+  media?: Array<{
+    type: 'image' | 'video' | 'carousel';
+    url: string;
+    altText?: string;
+    thumbnailUrl?: string;
+  }>;
 }

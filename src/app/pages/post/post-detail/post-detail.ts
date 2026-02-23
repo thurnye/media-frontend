@@ -17,6 +17,9 @@ import { ReviewerOption, ReviewerTypeahead } from './reviewer-typeahead/reviewer
 import { PostReviewComments } from './post-review-comments/post-review-comments';
 import { MediaService } from '../../../core/services/media.service';
 import { IUserSummary } from '../../../core/interfaces/post';
+import { IPlatformPost } from '../../../core/interfaces/platform';
+import { PlatformGqlService } from '../../../core/services/platform.gql.service';
+import { forkJoin } from 'rxjs';
 
 type ReviewerDecision = 'approved' | 'rejected' | 'cancelled' | 'archived';
 type ReviewerDecisionValue = ReviewerDecision | '';
@@ -24,6 +27,14 @@ type ReviewerDecisionItem = {
   userId: string;
   decision: ReviewerDecision;
   user?: IUserSummary;
+};
+type DraftScheduleMode = 'draft' | 'scheduled';
+type DraftEditModel = {
+  caption: string;
+  hashtags: string;
+  scheduleMode: DraftScheduleMode;
+  scheduledDate: string;
+  scheduledTime: string;
 };
 
 @Component({
@@ -37,6 +48,7 @@ export class PostDetail implements OnInit, OnDestroy {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private mediaService = inject(MediaService);
+  private platformGql = inject(PlatformGqlService);
 
   post = this.store.selectSignal(selectSelectedPost);
   loading = this.store.selectSignal(selectPostLoading);
@@ -52,6 +64,16 @@ export class PostDetail implements OnInit, OnDestroy {
   showReviewerDecisionMenu = signal(false);
   showMenu = signal(false);
   selectedReviewers = signal<ReviewerOption[]>([]);
+  platformPosts = signal<IPlatformPost[]>([]);
+  loadingPlatformPosts = signal(false);
+  platformPostsError = signal<string | null>(null);
+  private lastLoadedPlatformPostId: string | null = null;
+  editingDraftIds = signal<Set<string>>(new Set());
+  draftEdits = signal<Record<string, DraftEditModel>>({});
+  savingDraftIds = signal<Set<string>>(new Set());
+  bulkDraftEditMode = signal(false);
+  activePlatformPostMenuPostId = signal<string | null>(null);
+  retryingPlatformPostIds = signal<Set<string>>(new Set());
 
   reviewerDecisionOptions: { value: ReviewerDecision; label: string }[] = [
     { value: 'approved', label: 'Approved' },
@@ -83,6 +105,19 @@ export class PostDetail implements OnInit, OnDestroy {
       if (preselected.length) {
         this.selectedReviewers.set(preselected);
       }
+    });
+
+    effect(() => {
+      const postId = this.post()?.id;
+      if (!postId) {
+        this.platformPosts.set([]);
+        this.platformPostsError.set(null);
+        this.lastLoadedPlatformPostId = null;
+        return;
+      }
+      if (this.lastLoadedPlatformPostId === postId) return;
+      this.lastLoadedPlatformPostId = postId;
+      this.loadPlatformPosts(postId);
     });
 
   }
@@ -121,6 +156,23 @@ export class PostDetail implements OnInit, OnDestroy {
     this.showMenu.set(false);
   }
 
+  togglePlatformPostMenu(post: IPlatformPost): void {
+    const menuKey = this.getPlatformPostMenuKey(post);
+    this.activePlatformPostMenuPostId.update((current) => (current === menuKey ? null : menuKey));
+  }
+
+  closePlatformPostMenu(): void {
+    this.activePlatformPostMenuPostId.set(null);
+  }
+
+  isPlatformPostMenuOpen(post: IPlatformPost): boolean {
+    return this.activePlatformPostMenuPostId() === this.getPlatformPostMenuKey(post);
+  }
+
+  private getPlatformPostMenuKey(post: IPlatformPost): string {
+    return post.id || `${post.accountId}:${post.platform}:${post.createdAt ?? ''}`;
+  }
+
   onEdit(): void {
     this.router.navigate([
       '/dashboard/workspace',
@@ -136,6 +188,38 @@ export class PostDetail implements OnInit, OnDestroy {
     if (!post || !confirm('Delete this post? This cannot be undone.')) return;
     this.store.dispatch(PostActions.deletePost({ id: post.id, post }));
     this.router.navigate(['/dashboard/workspace', this.workspaceId(), 'posts']);
+  }
+
+  onPublishAccountsSelected(accountIds: string[]): void {
+    const post = this.post();
+    if (!post || !accountIds.length) return;
+
+    this.showPublishDialog.set(false);
+    this.router.navigate(
+      ['/dashboard/workspace', this.workspaceId(), 'post', post.id, 'publish'],
+      {
+        queryParams: { accounts: accountIds.join(',') },
+      },
+    );
+  }
+
+  goToPublishFlowForDraft(platformPost: IPlatformPost): void {
+    if (!platformPost?.accountId) return;
+    this.closePlatformPostMenu();
+    this.goToPublishFlowForAccounts([platformPost.accountId], true, [platformPost.id]);
+  }
+
+  goToPublishFlowForAllDrafts(): void {
+    const draftPosts = this.platformPosts().filter((item) => this.isDraftPlatformPost(item));
+    const accountIds = Array.from(
+      new Set(
+        draftPosts
+          .map((item) => item.accountId)
+          .filter(Boolean),
+      ),
+    );
+    if (!accountIds.length) return;
+    this.goToPublishFlowForAccounts(accountIds, true, draftPosts.map((item) => item.id));
   }
 
   onReject(): void {
@@ -244,6 +328,28 @@ export class PostDetail implements OnInit, OnDestroy {
     return status === 'pending_approval' || status === 'rejected';
   }
 
+  get canShowReadyForPublish(): boolean {
+    if (this.post()?.status !== 'approved') return false;
+
+    const me = this.currentUser()?.id;
+    const workspace = this.selectedWorkspace();
+    if (!me || !workspace) return false;
+
+    if (workspace.ownerId === me) return true;
+
+    const role = workspace.members?.find((member) => member.userId === me)?.role;
+    return role === 'admin' || role === 'manager';
+  }
+
+  get canManagePlatformDrafts(): boolean {
+    const me = this.currentUser()?.id;
+    const workspace = this.selectedWorkspace();
+    if (!me || !workspace) return false;
+    if (workspace.ownerId === me) return true;
+    const role = workspace.members?.find((member) => member.userId === me)?.role;
+    return role === 'admin' || role === 'manager';
+  }
+
   get reviewerDecisionValue(): ReviewerDecisionValue {
     return this.pendingReviewerDecision() || this.currentReviewerDecision || '';
   }
@@ -270,6 +376,326 @@ export class PostDetail implements OnInit, OnDestroy {
 
   isVideoUrl(url: string): boolean {
     return /\.(mp4|webm|mov|m4v|avi)$/i.test(url);
+  }
+
+  getPlatformPostMedia(post: IPlatformPost): Array<{ type?: string; url: string }> {
+    const media = post.content?.media ?? [];
+    if (media.length) return media;
+    return [];
+  }
+
+  get hasDraftPlatformPosts(): boolean {
+    return this.platformPosts().some((item) => this.isEditablePlatformPost(item));
+  }
+
+  isDraftPlatformPost(post: IPlatformPost): boolean {
+    return this.isEditablePlatformPost(post);
+  }
+
+  isEditablePlatformPost(post: IPlatformPost): boolean {
+    const status = post.publishing?.status ?? 'draft';
+    return status === 'draft' || status === 'failed';
+  }
+
+  getPlatformPostEditLabel(post: IPlatformPost): string {
+    return (post.publishing?.status ?? 'draft') === 'failed' ? 'Edit Failed' : 'Edit Draft';
+  }
+
+  retryFailedPlatformPost(platformPost: IPlatformPost): void {
+    if (!this.canManagePlatformDrafts) return;
+    if ((platformPost.publishing?.status ?? 'draft') !== 'failed') return;
+    if (this.retryingPlatformPostIds().has(platformPost.id)) return;
+
+    this.retryingPlatformPostIds.update((ids) => {
+      const next = new Set(ids);
+      next.add(platformPost.id);
+      return next;
+    });
+
+    this.platformGql
+      .updatePlatformPost({
+        id: platformPost.id,
+        status: 'publishing',
+      })
+      .subscribe({
+        next: (updated) => {
+          this.platformPosts.update((items) =>
+            items.map((item) => (item.id === updated.id ? updated : item)),
+          );
+          this.closePlatformPostMenu();
+          this.retryingPlatformPostIds.update((ids) => {
+            const next = new Set(ids);
+            next.delete(platformPost.id);
+            return next;
+          });
+        },
+        error: () => {
+          this.retryingPlatformPostIds.update((ids) => {
+            const next = new Set(ids);
+            next.delete(platformPost.id);
+            return next;
+          });
+        },
+      });
+  }
+
+  isRetryingPlatformPost(postId: string): boolean {
+    return this.retryingPlatformPostIds().has(postId);
+  }
+
+  isEditingDraft(postId: string): boolean {
+    return this.editingDraftIds().has(postId);
+  }
+
+  startEditDraft(post: IPlatformPost): void {
+    if (!this.canManagePlatformDrafts || !this.isDraftPlatformPost(post)) return;
+    const nextIds = new Set(this.editingDraftIds());
+    nextIds.add(post.id);
+    this.editingDraftIds.set(nextIds);
+    this.draftEdits.update((map) => ({
+      ...map,
+      [post.id]: this.createDraftEditModel(post),
+    }));
+  }
+
+  cancelEditDraft(postId: string): void {
+    this.editingDraftIds.update((ids) => {
+      const next = new Set(ids);
+      next.delete(postId);
+      return next;
+    });
+    this.draftEdits.update((map) => {
+      const next = { ...map };
+      delete next[postId];
+      return next;
+    });
+  }
+
+  startEditAllDrafts(): void {
+    if (!this.canManagePlatformDrafts) return;
+    const drafts = this.platformPosts().filter((post) => this.isDraftPlatformPost(post));
+    if (!drafts.length) return;
+
+    const ids = new Set(this.editingDraftIds());
+    const edits = { ...this.draftEdits() };
+    for (const post of drafts) {
+      ids.add(post.id);
+      edits[post.id] = this.createDraftEditModel(post);
+    }
+    this.editingDraftIds.set(ids);
+    this.draftEdits.set(edits);
+    this.bulkDraftEditMode.set(true);
+  }
+
+  cancelEditAllDrafts(): void {
+    const draftIds = new Set(
+      this.platformPosts().filter((post) => this.isDraftPlatformPost(post)).map((post) => post.id),
+    );
+    this.editingDraftIds.update((ids) => {
+      const next = new Set(ids);
+      for (const id of draftIds) next.delete(id);
+      return next;
+    });
+    this.draftEdits.update((map) => {
+      const next = { ...map };
+      for (const id of draftIds) delete next[id];
+      return next;
+    });
+    this.bulkDraftEditMode.set(false);
+  }
+
+  onDraftCaptionChange(postId: string, value: string): void {
+    this.patchDraftEdit(postId, { caption: value });
+  }
+
+  onDraftHashtagsChange(postId: string, value: string): void {
+    this.patchDraftEdit(postId, { hashtags: value });
+  }
+
+  onDraftScheduleModeChange(postId: string, mode: DraftScheduleMode): void {
+    this.patchDraftEdit(postId, {
+      scheduleMode: mode,
+      ...(mode === 'draft' ? { scheduledDate: '', scheduledTime: '' } : {}),
+    });
+  }
+
+  onDraftScheduledDateChange(postId: string, value: string): void {
+    this.patchDraftEdit(postId, { scheduledDate: value });
+  }
+
+  onDraftScheduledTimeChange(postId: string, value: string): void {
+    this.patchDraftEdit(postId, { scheduledTime: value });
+  }
+
+  getDraftEdit(postId: string): DraftEditModel | null {
+    return this.draftEdits()[postId] ?? null;
+  }
+
+  saveDraft(postId: string): void {
+    const edit = this.getDraftEdit(postId);
+    if (!edit) return;
+    if (edit.scheduleMode === 'scheduled' && (!edit.scheduledDate || !edit.scheduledTime)) return;
+
+    this.savingDraftIds.update((ids) => {
+      const next = new Set(ids);
+      next.add(postId);
+      return next;
+    });
+
+    this.platformGql
+      .updatePlatformPost({
+        id: postId,
+        caption: edit.caption.trim(),
+        hashtags: edit.hashtags
+          ? edit.hashtags.split(',').map((tag) => tag.trim()).filter(Boolean)
+          : [],
+        status: edit.scheduleMode === 'scheduled' ? 'scheduled' : 'draft',
+        ...(edit.scheduleMode === 'scheduled'
+          ? {
+            scheduledAt: new Date(`${edit.scheduledDate}T${edit.scheduledTime}`).toISOString(),
+          }
+          : {}),
+      })
+      .subscribe({
+        next: (updated) => {
+          this.platformPosts.update((items) =>
+            items.map((item) => (item.id === updated.id ? updated : item)),
+          );
+          this.cancelEditDraft(postId);
+          this.bulkDraftEditMode.set(false);
+          this.savingDraftIds.update((ids) => {
+            const next = new Set(ids);
+            next.delete(postId);
+            return next;
+          });
+        },
+        error: () => {
+          this.savingDraftIds.update((ids) => {
+            const next = new Set(ids);
+            next.delete(postId);
+            return next;
+          });
+        },
+      });
+  }
+
+  saveAllDrafts(): void {
+    const draftIds = Array.from(this.editingDraftIds()).filter((id) =>
+      this.platformPosts().some((post) => post.id === id && this.isDraftPlatformPost(post)),
+    );
+    if (!draftIds.length) return;
+
+    const requests = draftIds
+      .map((id) => {
+        const edit = this.getDraftEdit(id);
+        if (!edit) return null;
+        if (edit.scheduleMode === 'scheduled' && (!edit.scheduledDate || !edit.scheduledTime)) return null;
+        return this.platformGql.updatePlatformPost({
+          id,
+          caption: edit.caption.trim(),
+          hashtags: edit.hashtags
+            ? edit.hashtags.split(',').map((tag) => tag.trim()).filter(Boolean)
+            : [],
+          status: edit.scheduleMode === 'scheduled' ? 'scheduled' : 'draft',
+          ...(edit.scheduleMode === 'scheduled'
+            ? {
+              scheduledAt: new Date(`${edit.scheduledDate}T${edit.scheduledTime}`).toISOString(),
+            }
+            : {}),
+        });
+      })
+      .filter((req): req is ReturnType<PlatformGqlService['updatePlatformPost']> => !!req);
+
+    if (!requests.length) return;
+    this.savingDraftIds.set(new Set(draftIds));
+
+    forkJoin(requests).subscribe({
+      next: (updatedPosts) => {
+        const byId = new Map(updatedPosts.map((post) => [post.id, post]));
+        this.platformPosts.update((items) =>
+          items.map((item) => byId.get(item.id) ?? item),
+        );
+        this.savingDraftIds.set(new Set());
+        this.cancelEditAllDrafts();
+      },
+      error: () => {
+        this.savingDraftIds.set(new Set());
+      },
+    });
+  }
+
+  isSavingDraft(postId: string): boolean {
+    return this.savingDraftIds().has(postId);
+  }
+
+  get usedPlatforms(): string[] {
+    return Array.from(new Set(this.platformPosts().map((item) => item.platform)));
+  }
+
+  getPlatformIconLabel(platform: string): string {
+    const normalized = platform.toLowerCase();
+    if (normalized === 'linkedin') return 'in';
+    if (normalized === 'twitter') return 'X';
+    if (normalized === 'youtube') return '▶';
+    if (normalized === 'tiktok') return '♫';
+    return normalized.charAt(0).toUpperCase();
+  }
+
+  private loadPlatformPosts(postId: string): void {
+    this.loadingPlatformPosts.set(true);
+    this.platformPostsError.set(null);
+
+    this.platformGql.getPlatformPosts(postId).subscribe({
+      next: (posts) => {
+        this.platformPosts.set(posts);
+        this.editingDraftIds.set(new Set());
+        this.draftEdits.set({});
+        this.savingDraftIds.set(new Set());
+        this.bulkDraftEditMode.set(false);
+        this.activePlatformPostMenuPostId.set(null);
+        this.retryingPlatformPostIds.set(new Set());
+        this.loadingPlatformPosts.set(false);
+      },
+      error: (err) => {
+        this.platformPosts.set([]);
+        this.platformPostsError.set(err?.message ?? 'Failed to load platform posts');
+        this.activePlatformPostMenuPostId.set(null);
+        this.retryingPlatformPostIds.set(new Set());
+        this.loadingPlatformPosts.set(false);
+      },
+    });
+  }
+
+  private createDraftEditModel(post: IPlatformPost): DraftEditModel {
+    const scheduledAt = post.publishing?.scheduledAt ? new Date(post.publishing.scheduledAt) : null;
+    return {
+      caption: post.content?.caption ?? '',
+      hashtags: (post.content?.hashtags ?? []).join(', '),
+      scheduleMode: scheduledAt ? 'scheduled' : 'draft',
+      scheduledDate: scheduledAt ? this.toDateInputValue(scheduledAt) : '',
+      scheduledTime: scheduledAt ? this.toTimeInputValue(scheduledAt) : '',
+    };
+  }
+
+  private patchDraftEdit(postId: string, patch: Partial<DraftEditModel>): void {
+    this.draftEdits.update((map) => {
+      const current = map[postId];
+      if (!current) return map;
+      return { ...map, [postId]: { ...current, ...patch } };
+    });
+  }
+
+  private toDateInputValue(date: Date): string {
+    const year = date.getFullYear();
+    const month = `${date.getMonth() + 1}`.padStart(2, '0');
+    const day = `${date.getDate()}`.padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
+  private toTimeInputValue(date: Date): string {
+    const hours = `${date.getHours()}`.padStart(2, '0');
+    const minutes = `${date.getMinutes()}`.padStart(2, '0');
+    return `${hours}:${minutes}`;
   }
 
   get reviewerDecisionItems(): ReviewerDecisionItem[] {
@@ -315,5 +741,24 @@ export class PostDetail implements OnInit, OnDestroy {
   getDecisionDisplayName(item: ReviewerDecisionItem): string {
     const fullName = `${item.user?.firstName ?? ''} ${item.user?.lastName ?? ''}`.trim();
     return fullName || item.user?.email || item.userId;
+  }
+
+  private goToPublishFlowForAccounts(
+    accountIds: string[],
+    editDraft: boolean,
+    platformPostIds: string[] = [],
+  ): void {
+    const post = this.post();
+    if (!post || !accountIds.length) return;
+    this.router.navigate(
+      ['/dashboard/workspace', this.workspaceId(), 'post', post.id, 'publish'],
+      {
+        queryParams: {
+          accounts: accountIds.join(','),
+          editDraft: editDraft ? '1' : undefined,
+          platformPostIds: platformPostIds.length ? platformPostIds.join(',') : undefined,
+        },
+      },
+    );
   }
 }

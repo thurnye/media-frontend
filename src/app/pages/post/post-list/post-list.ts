@@ -11,7 +11,8 @@ import {
 } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { Subject, Subscription } from 'rxjs';
+import { Subject, Subscription, forkJoin, of } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { PostActions } from '../../../store/post/post.actions';
 import {
@@ -27,6 +28,7 @@ import {
 import { selectUser } from '../../../store/auth/auth.selectors';
 import { IPostListFilters } from '../../../core/interfaces/post';
 import { PostListFilters } from './post-list-filters/post-list-filters';
+import { PlatformGqlService } from '../../../core/services/platform.gql.service';
 
 @Component({
   selector: 'app-post-list',
@@ -38,6 +40,7 @@ export class PostList implements OnInit, AfterViewInit, OnDestroy {
   private store = inject(Store);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
+  private platformGql = inject(PlatformGqlService);
 
   posts = this.store.selectSignal(selectPosts);
   loading = this.store.selectSignal(selectPostLoading);
@@ -53,6 +56,7 @@ export class PostList implements OnInit, AfterViewInit, OnDestroy {
   selectedPostId = signal<string | null>(null);
   panelLoading = signal(false);
   workspaceId = signal('');
+  platformUsageByPostId = signal<Record<string, string[]>>({});
 
   readonly limit = 6;
   showMenu = signal(false);
@@ -60,6 +64,7 @@ export class PostList implements OnInit, AfterViewInit, OnDestroy {
   statusFilter = 'all';
   categoryFilter = 'all';
   priorityFilter = 'all';
+  platformFilter = 'all';
   evergreenFilter = 'all';
   sortBy = 'newest';
   private searchInput$ = new Subject<string>();
@@ -105,6 +110,16 @@ export class PostList implements OnInit, AfterViewInit, OnDestroy {
     { value: 'low', label: 'Low' },
   ];
 
+  readonly platformOptions = [
+    { value: 'all', label: 'All Platforms' },
+    { value: 'facebook', label: 'Facebook' },
+    { value: 'instagram', label: 'Instagram' },
+    { value: 'twitter', label: 'Twitter/X' },
+    { value: 'linkedin', label: 'LinkedIn' },
+    { value: 'tiktok', label: 'TikTok' },
+    { value: 'youtube', label: 'YouTube' },
+  ];
+
   readonly evergreenOptions = [
     { value: 'all', label: 'All Types' },
     { value: 'evergreen', label: 'Evergreen' },
@@ -137,6 +152,31 @@ export class PostList implements OnInit, AfterViewInit, OnDestroy {
     this.searchSub = this.searchInput$
       .pipe(debounceTime(500), distinctUntilChanged())
       .subscribe(() => this.refreshPosts());
+
+    effect(() => {
+      const posts = this.posts();
+      const postIds = posts.map((post) => post.id);
+      if (!postIds.length) {
+        this.platformUsageByPostId.set({});
+        return;
+      }
+
+      forkJoin(
+        postIds.map((postId) =>
+          this.platformGql.getPlatformPosts(postId).pipe(
+            map((platformPosts) => ({
+              postId,
+              platforms: Array.from(new Set(platformPosts.map((item) => item.platform))),
+            })),
+            catchError(() => of({ postId, platforms: [] })),
+          ),
+        ),
+      ).subscribe((rows) => {
+        const next: Record<string, string[]> = {};
+        for (const row of rows) next[row.postId] = row.platforms;
+        this.platformUsageByPostId.set(next);
+      });
+    });
   }
 
   ngOnInit(): void {
@@ -220,6 +260,11 @@ export class PostList implements OnInit, AfterViewInit, OnDestroy {
     this.refreshPosts();
   }
 
+  selectPlatform(value: string): void {
+    this.platformFilter = value;
+    this.refreshPosts();
+  }
+
   selectEvergreen(value: string): void {
     this.evergreenFilter = value;
     this.refreshPosts();
@@ -265,6 +310,7 @@ export class PostList implements OnInit, AfterViewInit, OnDestroy {
       status: this.statusFilter !== 'all' ? this.statusFilter : undefined,
       category: this.categoryFilter !== 'all' ? this.categoryFilter : undefined,
       priority: this.priorityFilter !== 'all' ? this.priorityFilter : undefined,
+      platform: this.platformFilter !== 'all' ? this.platformFilter : undefined,
       isEvergreen:
         this.evergreenFilter === 'all'
           ? undefined
@@ -289,8 +335,22 @@ export class PostList implements OnInit, AfterViewInit, OnDestroy {
     this.statusFilter = 'all';
     this.categoryFilter = 'all';
     this.priorityFilter = 'all';
+    this.platformFilter = 'all';
     this.evergreenFilter = 'all';
     this.sortBy = 'newest';
     this.refreshPosts();
+  }
+
+  getPostPlatforms(postId: string): string[] {
+    return this.platformUsageByPostId()[postId] ?? [];
+  }
+
+  getPlatformIconLabel(platform: string): string {
+    const normalized = platform.toLowerCase();
+    if (normalized === 'linkedin') return 'in';
+    if (normalized === 'twitter') return 'X';
+    if (normalized === 'youtube') return '▶';
+    if (normalized === 'tiktok') return '♫';
+    return normalized.charAt(0).toUpperCase();
   }
 }
