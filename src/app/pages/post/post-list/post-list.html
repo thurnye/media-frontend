@@ -418,3 +418,22 @@
   <!-- /.pl-split -->
 </div>
 <!-- /.pl-page -->
+
+@if (showDeleteDialog()) {
+  <div class="pl-delete-backdrop" (click)="cancelDelete()">
+    <div class="pl-delete-dialog" (click)="$event.stopPropagation()">
+      <h3 class="pl-delete-title">Delete Post</h3>
+      <p class="pl-delete-text">
+        Delete <strong>{{ pendingDeletePostTitle() }}</strong>? This action cannot be undone.
+      </p>
+      <div class="pl-delete-actions">
+        <button type="button" class="pl-delete-btn pl-delete-btn--cancel" (click)="cancelDelete()">
+          Cancel
+        </button>
+        <button type="button" class="pl-delete-btn pl-delete-btn--confirm" (click)="confirmDelete()">
+          Delete
+        </button>
+      </div>
+    </div>
+  </div>
+}

@@ -868,3 +868,63 @@
   border-color: #dc3545;
   color: #dc3545;
 }
+
+/* ── Delete dialog ── */
+.pl-delete-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 1200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.pl-delete-dialog {
+  width: min(440px, 100%);
+  background: #fff;
+  border: 1px solid #fecaca;
+  border-radius: 12px;
+  padding: 1rem;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.16);
+}
+
+.pl-delete-title {
+  margin: 0 0 0.45rem;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #b91c1c;
+}
+
+.pl-delete-text {
+  margin: 0 0 0.85rem;
+  color: #475569;
+  font-size: 0.88rem;
+}
+
+.pl-delete-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.pl-delete-btn {
+  border-radius: 8px;
+  padding: 0.44rem 0.82rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  border: 1px solid transparent;
+  cursor: pointer;
+}
+
+.pl-delete-btn--cancel {
+  background: #fff;
+  color: #334155;
+  border-color: #e2e8f0;
+}
+
+.pl-delete-btn--confirm {
+  background: #dc2626;
+  color: #fff;
+}

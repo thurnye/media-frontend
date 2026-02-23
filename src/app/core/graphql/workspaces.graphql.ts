@@ -35,6 +35,7 @@ export const GET_WORKSPACE_QUERY = gql`
         userId
         role
         joinedAt
+        email
         firstName
         lastName
         avatarUrl
@@ -117,6 +118,7 @@ export const ADD_WORKSPACE_MEMBER = gql`
         userId
         role
         joinedAt
+        email
         firstName
         lastName
         avatarUrl
@@ -133,6 +135,7 @@ export const REMOVE_WORKSPACE_MEMBER = gql`
         userId
         role
         joinedAt
+        email
         firstName
         lastName
         avatarUrl

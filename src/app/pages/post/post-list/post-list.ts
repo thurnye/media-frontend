@@ -61,6 +61,9 @@ export class PostList implements OnInit, AfterViewInit, OnDestroy {
 
   readonly limit = 6;
   showMenu = signal(false);
+  showDeleteDialog = signal(false);
+  pendingDeletePostId = signal<string | null>(null);
+  pendingDeletePostTitle = signal('');
   searchQuery = '';
   statusFilter = 'all';
   categoryFilter = 'all';
@@ -283,15 +286,33 @@ export class PostList implements OnInit, AfterViewInit, OnDestroy {
 
   onDelete(id: string, event: Event): void {
     event.stopPropagation();
-    if (!confirm('Delete this post? This cannot be undone.')) return;
-
     const post = this.posts().find((p) => p.id === id);
     if (!post) return;
+    this.pendingDeletePostId.set(id);
+    this.pendingDeletePostTitle.set(post.title);
+    this.showDeleteDialog.set(true);
+  }
+
+  cancelDelete(): void {
+    this.showDeleteDialog.set(false);
+    this.pendingDeletePostId.set(null);
+    this.pendingDeletePostTitle.set('');
+  }
+
+  confirmDelete(): void {
+    const id = this.pendingDeletePostId();
+    if (!id) return;
+    const post = this.posts().find((p) => p.id === id);
+    if (!post) {
+      this.cancelDelete();
+      return;
+    }
 
     this.store.dispatch(PostActions.deletePost({ id, post }));
     if (this.selectedPostId() === id) {
       this.onCloseDetail();
     }
+    this.cancelDelete();
   }
 
   onEdit(id: string, event: Event): void {

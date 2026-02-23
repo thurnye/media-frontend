@@ -562,6 +562,11 @@
   color: #166534;
 }
 
+.pd-platform-post-status--overdue {
+  background: #ffedd5;
+  color: #9a3412;
+}
+
 .pd-platform-post-status--failed {
   background: #fee2e2;
   color: #991b1b;
@@ -1038,6 +1043,13 @@
   border-color: #4f46e5;
 }
 
+.pd-btn-publish:disabled {
+  background: #cbd5e1;
+  border-color: #cbd5e1;
+  color: #f8fafc;
+  cursor: not-allowed;
+}
+
 .pd-publish-btn-group {
   display: inline-flex;
   align-items: center;
@@ -1063,6 +1075,12 @@
 
 .pd-publish-btn-group .pd-btn-publish {
   border-radius: 0 8px 8px 0;
+}
+
+.pd-publish-helper-text {
+  margin: 0.45rem 0 0;
+  font-size: 0.78rem;
+  color: #6b7280;
 }
 
 .pd-btn-reject {
@@ -1280,4 +1298,64 @@
 }
 .sk-line.short {
   width: 65%;
+}
+
+/* ── Delete dialog ── */
+.pd-delete-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 1300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.pd-delete-dialog {
+  width: min(460px, 100%);
+  background: #fff;
+  border: 1px solid #fecaca;
+  border-radius: 12px;
+  padding: 1rem;
+  box-shadow: 0 20px 44px rgba(0, 0, 0, 0.18);
+}
+
+.pd-delete-title {
+  margin: 0 0 0.45rem;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #b91c1c;
+}
+
+.pd-delete-text {
+  margin: 0 0 0.85rem;
+  color: #475569;
+  font-size: 0.88rem;
+}
+
+.pd-delete-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.pd-delete-btn {
+  border-radius: 8px;
+  padding: 0.44rem 0.84rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  border: 1px solid transparent;
+  cursor: pointer;
+}
+
+.pd-delete-btn--cancel {
+  background: #fff;
+  color: #334155;
+  border-color: #e2e8f0;
+}
+
+.pd-delete-btn--confirm {
+  background: #dc2626;
+  color: #fff;
 }

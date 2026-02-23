@@ -12,6 +12,7 @@ export interface IWorkspaceMember {
   userId:    string;
   role:      WorkspaceRole;
   joinedAt?: string;
+  email?:    string;
   firstName?: string;
   lastName?:  string;
   avatarUrl?: string;

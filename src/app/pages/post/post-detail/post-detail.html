@@ -99,10 +99,11 @@
                           </svg>
                           Edit
                         </a>
-                        @if (post()!.status === 'approved') {
+                        @if (canShowReadyForPublish) {
                           <button
                             type="button"
                             class="pd-menu-item"
+                            [disabled]="!canActivateReadyForPublish"
                             (click)="showPublishDialog.set(true); closeMenu()"
                           >
                             <svg
@@ -271,6 +272,25 @@
               (close)="showPublishDialog.set(false)"
             />
           }
+
+          @if (showDeleteDialog()) {
+            <div class="pd-delete-backdrop" (click)="cancelDelete()">
+              <div class="pd-delete-dialog" (click)="$event.stopPropagation()">
+                <h3 class="pd-delete-title">Delete Post</h3>
+                <p class="pd-delete-text">
+                  Delete <strong>{{ post()!.title }}</strong>? This action cannot be undone.
+                </p>
+                <div class="pd-delete-actions">
+                  <button type="button" class="pd-delete-btn pd-delete-btn--cancel" (click)="cancelDelete()">
+                    Cancel
+                  </button>
+                  <button type="button" class="pd-delete-btn pd-delete-btn--confirm" (click)="confirmDelete()">
+                    Delete
+                  </button>
+                </div>
+              </div>
+            </div>
+          }
         }
       </section>
 
@@ -282,14 +302,24 @@
               <span class="pd-publish-status-badge">
                 {{ getStatusLabel(post()?.status) }}
               </span>
-              <button type="button" class="pd-btn-publish" (click)="showPublishDialog.set(true)">
+              <button
+                type="button"
+                class="pd-btn-publish"
+                [disabled]="!canActivateReadyForPublish"
+                (click)="showPublishDialog.set(true)"
+              >
                 Ready For Publish
               </button>
             </div>
+            @if (!canActivateReadyForPublish) {
+              <p class="pd-publish-helper-text">
+                Approval-required workflow enforces <strong>High</strong> priority before publishing.
+              </p>
+            }
           </div>
         }
 
-        @if (canSeeReviewerDecision) {
+        @if (isApprovalWorkflowEnabled && canSeeReviewerDecision) {
           <div class="pd-reviewer-select-wrap">
             <label class="pd-reviewer-select-label" for="reviewerDecision">Review Decision</label>
             <div class="pd-reviewer-dropdown">
@@ -334,38 +364,40 @@
           </div>
         }
 
-        <app-reviewer-typeahead
-          [options]="availableReviewers"
-          [selected]="selectedReviewers()"
-          (selectedChange)="onSelectedReviewersChange($event)"
-        />
+        @if (isApprovalWorkflowEnabled) {
+          <app-reviewer-typeahead
+            [options]="availableReviewers"
+            [selected]="selectedReviewers()"
+            (selectedChange)="onSelectedReviewersChange($event)"
+          />
 
-        <div class="pd-reviewer-decisions">
-          <h4>Reviewer Decisions</h4>
-          @if (!reviewerDecisionItems.length) {
-            <p class="pd-reviewer-decisions-empty">No decisions yet.</p>
-          } @else {
-            <div class="pd-reviewer-decisions-list">
-              @for (item of reviewerDecisionItems; track item.userId) {
-                <div class="pd-reviewer-decision-item">
-                  <div class="pd-reviewer-decision-user">
-                    @if (item.user?.avatarUrl) {
-                      <img [src]="item.user!.avatarUrl!" [alt]="getDecisionDisplayName(item)" />
-                    } @else {
-                      <span>{{ getUserInitials(item) }}</span>
-                    }
-                    <strong>{{ getDecisionDisplayName(item) }}</strong>
+          <div class="pd-reviewer-decisions">
+            <h4>Reviewer Decisions</h4>
+            @if (!reviewerDecisionItems.length) {
+              <p class="pd-reviewer-decisions-empty">No decisions yet.</p>
+            } @else {
+              <div class="pd-reviewer-decisions-list">
+                @for (item of reviewerDecisionItems; track item.userId) {
+                  <div class="pd-reviewer-decision-item">
+                    <div class="pd-reviewer-decision-user">
+                      @if (item.user?.avatarUrl) {
+                        <img [src]="item.user!.avatarUrl!" [alt]="getDecisionDisplayName(item)" />
+                      } @else {
+                        <span>{{ getUserInitials(item) }}</span>
+                      }
+                      <strong>{{ getDecisionDisplayName(item) }}</strong>
+                    </div>
+                    <span
+                      class="pd-reviewer-decision-badge pd-reviewer-decision--{{ item.decision }}"
+                    >
+                      {{ item.decision }}
+                    </span>
                   </div>
-                  <span
-                    class="pd-reviewer-decision-badge pd-reviewer-decision--{{ item.decision }}"
-                  >
-                    {{ item.decision }}
-                  </span>
-                </div>
-              }
-            </div>
-          }
-        </div>
+                }
+              </div>
+            }
+          </div>
+        }
       </section>
     </div>
 
@@ -389,7 +421,7 @@
                 class="pd-platform-btn pd-platform-btn--primary"
                 (click)="goToPublishFlowForAllDrafts()"
               >
-                Edit All Drafts/Failed
+                Edit All Drafts/Failed/Overdue
               </button>
             </div>
           }
@@ -474,12 +506,12 @@
                               </svg>
                               {{ getPlatformPostEditLabel(platformPost) }}
                             </button>
-                            @if (platformPost.publishing.status === 'failed') {
+                            @if (canRetryPlatformPost(platformPost)) {
                               <button
                                 type="button"
                                 class="pd-menu-item"
                                 [disabled]="isRetryingPlatformPost(platformPost.id)"
-                                (click)="retryFailedPlatformPost(platformPost)"
+                                (click)="retryPlatformPost(platformPost)"
                               >
                                 <svg
                                   xmlns="http://www.w3.org/2000/svg"

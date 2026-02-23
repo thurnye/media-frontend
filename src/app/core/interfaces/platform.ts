@@ -22,7 +22,7 @@ export interface IPlatformAccount {
   updatedAt?:        string;
 }
 
-export type PublishingStatus = 'draft' | 'scheduled' | 'publishing' | 'published' | 'failed' | 'cancelled';
+export type PublishingStatus = 'draft' | 'scheduled' | 'publishing' | 'published' | 'overdue' | 'failed' | 'cancelled';
 
 export interface IPostContent {
   caption?: string;
@@ -40,6 +40,7 @@ export interface IPublishingInfo {
   status?: PublishingStatus;
   scheduledAt?: string;
   publishedAt?: string;
+  reminderSentAt?: string;
   timezone?: string;
   platformPostId?: string;
 }
@@ -82,7 +83,7 @@ export interface ICreatePlatformPost {
   caption: string;
   hashtags?: string[];
   firstComment?: string;
-  status?: 'draft' | 'scheduled' | 'publishing' | 'published' | 'failed' | 'cancelled';
+  status?: 'draft' | 'scheduled' | 'publishing' | 'published' | 'overdue' | 'failed' | 'cancelled';
   media?: Array<{
     type: 'image' | 'video' | 'carousel';
     url: string;
@@ -98,7 +99,7 @@ export interface IUpdatePlatformPost {
   caption?: string;
   hashtags?: string[];
   scheduledAt?: string;
-  status?: 'draft' | 'scheduled' | 'publishing' | 'published' | 'failed' | 'cancelled';
+  status?: 'draft' | 'scheduled' | 'publishing' | 'published' | 'overdue' | 'failed' | 'cancelled';
   media?: Array<{
     type: 'image' | 'video' | 'carousel';
     url: string;

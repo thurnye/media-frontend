@@ -59,6 +59,7 @@ export class PostDetail implements OnInit, OnDestroy {
   workspaceId = signal('');
 
   showRejectDialog = signal(false);
+  showDeleteDialog = signal(false);
   showPublishDialog = signal(false);
   rejectReason = signal('');
   pendingReviewerDecision = signal<ReviewerDecisionValue>('');
@@ -98,7 +99,7 @@ export class PostDetail implements OnInit, OnDestroy {
         .map((member) => ({
           id: member.userId,
           name: `${member.firstName ?? ''} ${member.lastName ?? ''}`.trim() || member.userId,
-          email: `${member.userId}@workspace.local`,
+          email: member.email ?? member.userId,
           role: member.role,
           avatarUrl: member.avatarUrl,
         }));
@@ -186,8 +187,19 @@ export class PostDetail implements OnInit, OnDestroy {
 
   onDelete(): void {
     const post = this.post();
-    if (!post || !confirm('Delete this post? This cannot be undone.')) return;
+    if (!post) return;
+    this.showDeleteDialog.set(true);
+  }
+
+  cancelDelete(): void {
+    this.showDeleteDialog.set(false);
+  }
+
+  confirmDelete(): void {
+    const post = this.post();
+    if (!post) return;
     this.store.dispatch(PostActions.deletePost({ id: post.id, post }));
+    this.showDeleteDialog.set(false);
     this.router.navigate(['/dashboard/workspace', this.workspaceId(), 'posts']);
   }
 
@@ -311,13 +323,14 @@ export class PostDetail implements OnInit, OnDestroy {
       .map((member) => ({
         id: member.userId,
         name: `${member.firstName ?? ''} ${member.lastName ?? ''}`.trim() || member.userId,
-        email: `${member.userId}@workspace.local`,
+        email: member.email ?? member.userId,
         role: member.role,
         avatarUrl: member.avatarUrl,
       }));
   }
 
   get canSeeReviewerDecision(): boolean {
+    if (!this.isApprovalWorkflowEnabled) return false;
     const me = this.currentUser()?.id;
     if (!me) return false;
     const requiredApprovers = this.post()?.approvalWorkflow?.requiredApprovers ?? [];
@@ -325,12 +338,19 @@ export class PostDetail implements OnInit, OnDestroy {
   }
 
   get canSubmitReviewerDecision(): boolean {
+    if (!this.isApprovalWorkflowEnabled) return false;
     const status = this.post()?.status;
     return status === 'pending_approval' || status === 'rejected';
   }
 
+  get isApprovalWorkflowEnabled(): boolean {
+    return !!this.selectedWorkspace()?.settings?.approvalRequired;
+  }
+
   get canShowReadyForPublish(): boolean {
-    if (this.post()?.status !== 'approved') return false;
+    const post = this.post();
+    if (!post) return false;
+    if (this.isApprovalWorkflowEnabled && post.status !== 'approved') return false;
 
     const me = this.currentUser()?.id;
     const workspace = this.selectedWorkspace();
@@ -340,6 +360,14 @@ export class PostDetail implements OnInit, OnDestroy {
 
     const role = workspace.members?.find((member) => member.userId === me)?.role;
     return role === 'admin' || role === 'manager';
+  }
+
+  get canActivateReadyForPublish(): boolean {
+    const post = this.post();
+    const workspace = this.selectedWorkspace();
+    if (!post || !workspace) return false;
+    if (!workspace.settings?.approvalRequired) return true;
+    return (post.priority ?? 'medium') === 'high';
   }
 
   get canManagePlatformDrafts(): boolean {
@@ -395,16 +423,24 @@ export class PostDetail implements OnInit, OnDestroy {
 
   isEditablePlatformPost(post: IPlatformPost): boolean {
     const status = post.publishing?.status ?? 'draft';
-    return status === 'draft' || status === 'failed';
+    return status === 'draft' || status === 'failed' || status === 'overdue';
   }
 
   getPlatformPostEditLabel(post: IPlatformPost): string {
-    return (post.publishing?.status ?? 'draft') === 'failed' ? 'Edit Failed' : 'Edit Draft';
+    const status = post.publishing?.status ?? 'draft';
+    if (status === 'failed') return 'Edit Failed';
+    if (status === 'overdue') return 'Edit Overdue';
+    return 'Edit Draft';
   }
 
-  retryFailedPlatformPost(platformPost: IPlatformPost): void {
+  canRetryPlatformPost(platformPost: IPlatformPost): boolean {
+    const status = platformPost.publishing?.status ?? 'draft';
+    return status === 'failed' || status === 'draft' || status === 'overdue';
+  }
+
+  retryPlatformPost(platformPost: IPlatformPost): void {
     if (!this.canManagePlatformDrafts) return;
-    if ((platformPost.publishing?.status ?? 'draft') !== 'failed') return;
+    if (!this.canRetryPlatformPost(platformPost)) return;
     if (this.retryingPlatformPostIds().has(platformPost.id)) return;
 
     this.retryingPlatformPostIds.update((ids) => {
