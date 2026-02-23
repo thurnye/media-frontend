@@ -75,7 +75,7 @@
           </svg>
         </div>
         <div class="wh-stat-body">
-          <div class="wh-stat-value">0</div>
+          <div class="wh-stat-value">{{ ws.postCount ?? 0 }}</div>
           <div class="wh-stat-label">Posts</div>
         </div>
       </div>
@@ -96,7 +96,7 @@
           </svg>
         </div>
         <div class="wh-stat-body">
-          <div class="wh-stat-value">1</div>
+          <div class="wh-stat-value">{{ memberCount() }}</div>
           <div class="wh-stat-label">Members</div>
         </div>
       </div>
@@ -118,7 +118,7 @@
           </svg>
         </div>
         <div class="wh-stat-body">
-          <div class="wh-stat-value wh-stat-value--cap">{{ ws.plan ?? 'free' }}</div>
+          <div class="wh-stat-value wh-stat-value--cap">{{ planLabel() }}</div>
           <div class="wh-stat-label">Plan</div>
         </div>
       </div>

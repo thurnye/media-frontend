@@ -39,33 +39,27 @@
     </div>
     <div class="wst-plan-row">
       <div class="wst-plan-info">
-        <span class="wst-plan-badge">{{ ws.plan ?? 'free' }}</span>
-        <span class="wst-plan-desc">
-          @switch (ws.plan) {
-            @case ('pro') { Advanced features and more storage. }
-            @case ('enterprise') { Custom limits and dedicated support. }
-            @default { For individuals and small teams. }
-          }
-        </span>
+        <span class="wst-plan-badge">{{ getPlanLabel(ws.plan) }}</span>
+        <span class="wst-plan-desc">{{ getPlanDescription(ws.plan) }}</span>
       </div>
-      <button class="btn wst-btn-outline" disabled>Upgrade plan</button>
+      <a class="btn wst-btn-outline" [routerLink]="['/dashboard/workspace', ws.id, 'edit']">Manage plan</a>
     </div>
     <div class="wst-billing-grid">
       <div class="wst-billing-item">
         <span class="wst-billing-label">Members</span>
-        <span class="wst-billing-value">1 / unlimited</span>
+        <span class="wst-billing-value">{{ memberCount() }} / {{ getPlanLimitLabel(ws.plan, 'members') }}</span>
       </div>
       <div class="wst-billing-item">
         <span class="wst-billing-label">Posts</span>
-        <span class="wst-billing-value">0 / unlimited</span>
+        <span class="wst-billing-value">{{ postCount() }} / {{ getPlanLimitLabel(ws.plan, 'posts') }}</span>
       </div>
       <div class="wst-billing-item">
         <span class="wst-billing-label">Social accounts</span>
-        <span class="wst-billing-value">{{ activeCount() }} / 3</span>
+        <span class="wst-billing-value">{{ activeCount() }} / {{ getPlanLimitLabel(ws.plan, 'accounts') }}</span>
       </div>
       <div class="wst-billing-item">
         <span class="wst-billing-label">Storage used</span>
-        <span class="wst-billing-value">0 MB</span>
+        <span class="wst-billing-value">—</span>
       </div>
     </div>
   </div>
@@ -173,9 +167,9 @@
       <div class="wst-danger-row">
         <div class="wst-danger-text">
           <span class="wst-danger-name">Delete workspace</span>
-          <span class="wst-danger-desc">Permanently delete this workspace and all its data. This action cannot be undone.</span>
+          <span class="wst-danger-desc">Soft delete this workspace. It will be hidden and can be restored from the database if needed.</span>
         </div>
-        <button class="btn wst-btn-danger" disabled>Delete</button>
+        <button class="btn wst-btn-danger" [disabled]="!canDeleteWorkspace()" (click)="onDeleteWorkspace()">Delete</button>
       </div>
     </div>
   </div>
@@ -186,6 +180,38 @@
       [workspaceId]="ws.id"
       (close)="showConnectDialog.set(false)"
     />
+  }
+
+  <!-- ── Delete Workspace Dialog ── -->
+  @if (showDeleteDialog()) {
+    <div class="wst-delete-backdrop" (click)="closeDeleteDialog()">
+      <div class="wst-delete-dialog" (click)="$event.stopPropagation()">
+        <h3 class="wst-delete-title">Delete Workspace</h3>
+        <p class="wst-delete-text">
+          Type <strong>{{ ws.name }}</strong> to confirm deletion.
+        </p>
+
+        <input
+          type="text"
+          class="wst-delete-input"
+          [value]="deleteConfirmText()"
+          (input)="onDeleteConfirmInput($event)"
+          [placeholder]="ws.name"
+        />
+
+        <div class="wst-delete-actions">
+          <button type="button" class="btn wst-btn-danger-outline" (click)="closeDeleteDialog()">Cancel</button>
+          <button
+            type="button"
+            class="btn wst-btn-danger"
+            [disabled]="!canConfirmDelete()"
+            (click)="confirmDeleteWorkspace()"
+          >
+            Delete
+          </button>
+        </div>
+      </div>
+    </div>
   }
 
 }

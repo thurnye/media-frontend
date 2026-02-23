@@ -54,11 +54,37 @@ export class WorkspaceMembers {
     return !!ws && ws.ownerId === this.currentUser()?.id;
   }
 
-  formatDate(dateStr?: string): string {
-    if (!dateStr) return '—';
-    return new Date(dateStr).toLocaleDateString('en-US', {
+  formatDate(value?: string | number | Date): string {
+    const date = this.toDate(value);
+    if (!date) return '—';
+    return date.toLocaleDateString('en-US', {
       month: 'short', day: 'numeric', year: 'numeric',
     });
+  }
+
+  private toDate(value?: string | number | Date): Date | null {
+    if (value === null || value === undefined || value === '') return null;
+    if (value instanceof Date) return Number.isNaN(value.getTime()) ? null : value;
+
+    if (typeof value === 'number') {
+      const date = new Date(value);
+      return Number.isNaN(date.getTime()) ? null : date;
+    }
+
+    const trimmed = value.trim();
+    if (!trimmed) return null;
+
+    // Some backend fields may arrive as epoch milliseconds encoded as strings.
+    if (/^\d+$/.test(trimmed)) {
+      const asNumber = Number(trimmed);
+      if (Number.isFinite(asNumber)) {
+        const epochDate = new Date(asNumber);
+        if (!Number.isNaN(epochDate.getTime())) return epochDate;
+      }
+    }
+
+    const parsed = new Date(trimmed);
+    return Number.isNaN(parsed.getTime()) ? null : parsed;
   }
 
   getInitials(member: IWorkspaceMember): string {

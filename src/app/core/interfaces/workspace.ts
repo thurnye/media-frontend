@@ -40,6 +40,7 @@ export interface IWorkspace {
   name:             string;
   slug:             string;
   description?:     string;
+  postCount?:       number;
   ownerId?:         string;
   members?:         IWorkspaceMember[];
   settings?:        IWorkspaceSettings;

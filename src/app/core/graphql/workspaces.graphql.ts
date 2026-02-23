@@ -27,6 +27,7 @@ export const GET_WORKSPACE_QUERY = gql`
       name
       slug
       description
+      postCount
       defaultTimezone
       plan
       ownerId
@@ -180,6 +181,18 @@ export const GET_WORKSPACE_INVITATIONS_QUERY = gql`
 export const REVOKE_INVITATION_MUTATION = gql`
   mutation RevokeInvitation($workspaceId: ID!, $email: String!) {
     revokeInvitation(workspaceId: $workspaceId, email: $email)
+  }
+`;
+
+export const DELETE_WORKSPACE_MUTATION = gql`
+  mutation DeleteWorkspace($id: ID!) {
+    deleteWorkspace(id: $id) {
+      id
+      name
+      slug
+      ownerId
+      isActive
+    }
   }
 `;
 

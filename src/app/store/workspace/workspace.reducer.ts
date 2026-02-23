@@ -32,6 +32,16 @@ export const workspaceReducer = createReducer(
   })),
   on(WorkspaceActions.updateWorkspaceFailure, (state, { error })     => ({ ...state, saving: false, error })),
 
+  // Delete (soft delete)
+  on(WorkspaceActions.deleteWorkspace,        state                  => ({ ...state, saving: true, error: null })),
+  on(WorkspaceActions.deleteWorkspaceSuccess, (state, { workspace }) => ({
+    ...state,
+    saving: false,
+    workspaces: state.workspaces.filter(w => w.id !== workspace.id),
+    selectedWorkspace: state.selectedWorkspace?.id === workspace.id ? null : state.selectedWorkspace,
+  })),
+  on(WorkspaceActions.deleteWorkspaceFailure, (state, { error })     => ({ ...state, saving: false, error })),
+
   // Add member
   on(WorkspaceActions.addMember,        state              => ({ ...state, saving: true,  error: null })),
   on(WorkspaceActions.addMemberSuccess, (state, { workspace }) => ({

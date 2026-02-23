@@ -7,6 +7,7 @@ import {
   ACCEPT_INVITATION_MUTATION,
   ADD_WORKSPACE_MEMBER,
   CREATE_WORKSPACE_MUTATION,
+  DELETE_WORKSPACE_MUTATION,
   GET_WORKSPACE_INVITATIONS_QUERY,
   GET_WORKSPACE_QUERY,
   GET_WORKSPACES_QUERY,
@@ -140,5 +141,14 @@ export class WorkspaceGqlService {
         variables: { token },
       })
       .pipe(map(r => r.data!.acceptInvitation));
+  }
+
+  deleteWorkspace(id: string) {
+    return this.apollo
+      .mutate<{ deleteWorkspace: IWorkspace }>({
+        mutation: DELETE_WORKSPACE_MUTATION,
+        variables: { id },
+      })
+      .pipe(map(r => r.data!.deleteWorkspace));
   }
 }

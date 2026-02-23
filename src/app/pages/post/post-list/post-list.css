@@ -685,6 +685,10 @@
   margin: 0 0 1rem;
   line-height: 1.3;
 }
+.pl-panel-title:hover {
+  cursor: pointer;
+  color: #4f46e5;
+}
 
 .pl-redirect-btn {
   border: none;

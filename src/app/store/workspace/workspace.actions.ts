@@ -24,6 +24,11 @@ export const WorkspaceActions = createActionGroup({
     'Update Workspace Success': props<{ workspace: IWorkspace }>(),
     'Update Workspace Failure': props<{ error: string }>(),
 
+    // Soft delete
+    'Delete Workspace':         props<{ id: string }>(),
+    'Delete Workspace Success': props<{ workspace: IWorkspace }>(),
+    'Delete Workspace Failure': props<{ error: string }>(),
+
     // Add member
     'Add Member':         props<{ workspaceId: string; userId: string; role: string }>(),
     'Add Member Success': props<{ workspace: IWorkspace }>(),

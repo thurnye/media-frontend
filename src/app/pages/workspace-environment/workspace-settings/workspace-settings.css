@@ -365,6 +365,61 @@
   color: #6c757d;
 }
 
+/* ── Delete dialog ─────────────────────────────────────────── */
+.wst-delete-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1200;
+  padding: 1rem;
+}
+
+.wst-delete-dialog {
+  width: min(480px, 100%);
+  background: #fff;
+  border: 1px solid #fee2e2;
+  border-radius: 0.875rem;
+  padding: 1.125rem;
+  box-shadow: 0 24px 56px rgba(15, 23, 42, 0.2);
+}
+
+.wst-delete-title {
+  margin: 0 0 0.5rem;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #b91c1c;
+}
+
+.wst-delete-text {
+  margin: 0 0 0.875rem;
+  color: #475569;
+  font-size: 0.875rem;
+}
+
+.wst-delete-input {
+  width: 100%;
+  border: 1px solid #fecaca;
+  border-radius: 0.625rem;
+  padding: 0.55rem 0.7rem;
+  font-size: 0.875rem;
+  outline: none;
+  margin-bottom: 0.9rem;
+}
+
+.wst-delete-input:focus {
+  border-color: #ef4444;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15);
+}
+
+.wst-delete-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
 .wst-account-status--active       { background: #ecfdf5; color: #16a34a; }
 .wst-account-status--disconnected { background: #f3f4f6; color: #6c757d; }
 .wst-account-status--suspended    { background: #fef2f2; color: #dc2626; }

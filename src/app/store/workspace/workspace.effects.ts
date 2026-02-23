@@ -58,7 +58,7 @@ export class WorkspaceEffects {
   createWorkspaceSuccess$ = createEffect(
     () => this.actions$.pipe(
       ofType(WorkspaceActions.createWorkspaceSuccess),
-      tap(() => this.router.navigate(['/dashboard/workspaces'])),
+      tap(({ workspace }) => this.router.navigate(['/dashboard/workspace', workspace.id])),
     ),
     { dispatch: false },
   );
@@ -78,7 +78,38 @@ export class WorkspaceEffects {
   updateWorkspaceSuccess$ = createEffect(
     () => this.actions$.pipe(
       ofType(WorkspaceActions.updateWorkspaceSuccess),
-      tap(() => this.router.navigate(['/dashboard/workspaces'])),
+      tap(({ workspace }) => this.router.navigate(['/dashboard/workspace', workspace.id])),
+    ),
+    { dispatch: false },
+  );
+
+  deleteWorkspace$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(WorkspaceActions.deleteWorkspace),
+      switchMap(({ id }) =>
+        this.workspaceGql.deleteWorkspace(id).pipe(
+          map(workspace => WorkspaceActions.deleteWorkspaceSuccess({ workspace })),
+          catchError(err => of(WorkspaceActions.deleteWorkspaceFailure({ error: err.message }))),
+        ),
+      ),
+    ),
+  );
+
+  deleteWorkspaceSuccess$ = createEffect(
+    () => this.actions$.pipe(
+      ofType(WorkspaceActions.deleteWorkspaceSuccess),
+      tap(() => {
+        this.toast.show('Workspace deleted.', 'success');
+        this.router.navigate(['/dashboard']);
+      }),
+    ),
+    { dispatch: false },
+  );
+
+  deleteWorkspaceFailure$ = createEffect(
+    () => this.actions$.pipe(
+      ofType(WorkspaceActions.deleteWorkspaceFailure),
+      tap(({ error }) => this.toast.show(error || 'Failed to delete workspace.', 'error')),
     ),
     { dispatch: false },
   );
@@ -196,7 +227,7 @@ export class WorkspaceEffects {
       ofType(WorkspaceActions.acceptInvitationSuccess),
       tap(({ workspace }) => {
         this.toast.show(`Joined workspace "${workspace.name}".`, 'success');
-        this.router.navigate(['/dashboard/workspaces', workspace.id]);
+        this.router.navigate(['/dashboard/workspace', workspace.id]);
       }),
     ),
     { dispatch: false },

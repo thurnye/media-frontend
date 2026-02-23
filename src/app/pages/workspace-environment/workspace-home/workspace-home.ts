@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { selectSelectedWorkspace, selectWorkspaceLoading } from '../../../store/workspace/workspace.selectors';
@@ -17,6 +17,8 @@ export class WorkspaceHome {
 
   workspace = this.store.selectSignal(selectSelectedWorkspace);
   loading = this.store.selectSignal(selectWorkspaceLoading);
+  memberCount = computed(() => this.workspace()?.members?.length ?? 0);
+  planLabel = computed(() => (this.workspace()?.plan ?? 'free').toUpperCase());
 
   showInviteDialog = signal(false);
   showConnectDialog = signal(false);
