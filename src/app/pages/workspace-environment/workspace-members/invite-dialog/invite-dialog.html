@@ -49,17 +49,22 @@
         }
       </div>
 
-      <label class="id-label id-label--role" for="role">Role</label>
-      <select
-        id="role"
-        class="id-select"
-        [ngModel]="role()"
-        (ngModelChange)="role.set($event)"
-      >
-        <option value="member">Member</option>
-        <option value="manager">Manager</option>
-        <option value="admin">Admin</option>
-      </select>
+      @if (canAssignRoles()) {
+        <label class="id-label id-label--role" for="role">Role</label>
+        <select
+          id="role"
+          class="id-select"
+          [ngModel]="role()"
+          (ngModelChange)="role.set($event)"
+        >
+          <option value="admin">Admin</option>
+          <option value="manager">Manager</option>
+          <option value="member">Member</option>
+        </select>
+      } @else {
+        <label class="id-label id-label--role">Role</label>
+        <input class="id-input" type="text" value="Member" readonly />
+      }
     </div>
 
     <div class="id-footer">

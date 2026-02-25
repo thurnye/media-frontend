@@ -129,11 +129,20 @@
   flex: 1;
 }
 
+.pl-card-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.35rem;
+}
+
 .pl-card-title {
   font-size: 1rem;
   font-weight: 600;
   color: #111;
   margin: 0;
+  flex: 1;
   line-height: 1.4;
   display: -webkit-box;
   -webkit-line-clamp: 3;
@@ -149,6 +158,42 @@
   padding: 0.75rem 1.25rem;
   border-top: 1px solid #f3f4f6;
   gap: 0.5rem;
+}
+
+.pl-failed-info-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  border: 1px solid #fecaca;
+  background: #fff1f2;
+  color: #dc2626;
+  cursor: pointer;
+}
+
+.pl-failed-info-btn:hover {
+  background: #ffe4e6;
+  border-color: #f87171;
+}
+
+.pl-scheduled-info-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  border: 1px solid #bfdbfe;
+  background: #eff6ff;
+  color: #1d4ed8;
+  cursor: pointer;
+}
+
+.pl-scheduled-info-btn:hover {
+  background: #dbeafe;
+  border-color: #93c5fd;
 }
 
 .pl-platform-icons {
@@ -533,6 +578,16 @@
 .pl-card--active {
   border-color: #212529 !important;
   box-shadow: 0 0 0 2px rgba(33, 37, 41, 0.12) !important;
+}
+
+.pl-card--failed {
+  border-color: #dc3545 !important;
+  box-shadow: 0 0 0 2px rgba(220, 53, 69, 0.16);
+}
+
+.pl-card--scheduled {
+  border-color: #0d6efd !important;
+  box-shadow: 0 0 0 2px rgba(13, 110, 253, 0.16);
 }
 
 /* ── Split layout ── */
@@ -927,4 +982,72 @@
 .pl-delete-btn--confirm {
   background: #dc2626;
   color: #fff;
+}
+
+.pl-failed-dialog {
+  border-color: #fca5a5;
+}
+
+.pl-scheduled-dialog {
+  border-color: #93c5fd;
+}
+
+.pl-scheduled-title {
+  color: #1d4ed8;
+}
+
+.pl-failed-list {
+  margin: 0 0 0.9rem;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.pl-failed-list-item {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: 0.5rem;
+  align-items: center;
+  padding: 0.5rem 0.6rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: #f8fafc;
+  font-size: 0.82rem;
+}
+
+.pl-failed-list-item--scheduled {
+  grid-template-columns: 1fr 1fr 1.4fr;
+}
+
+.pl-failed-list-item--with-time {
+  grid-template-columns: 1fr 1fr auto 1.4fr;
+}
+
+.pl-failed-platform {
+  font-weight: 700;
+  color: #1f2937;
+  text-transform: capitalize;
+}
+
+.pl-failed-account {
+  color: #475569;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, monospace;
+  font-size: 0.76rem;
+}
+
+.pl-failed-status {
+  color: #b91c1c;
+  font-weight: 700;
+}
+
+.pl-failed-at {
+  color: #334155;
+  font-size: 0.78rem;
+}
+
+.pl-scheduled-at {
+  color: #334155;
+  font-size: 0.78rem;
 }

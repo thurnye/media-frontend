@@ -31,6 +31,21 @@ import { PostListFilters } from './post-list-filters/post-list-filters';
 import { PlatformGqlService } from '../../../core/services/platform.gql.service';
 import { SocialIcon } from '../../../shared/icons/social-icon/social-icon';
 
+type FailedPlatformSummary = {
+  platform: string;
+  accountId: string;
+  status: string;
+  failedAt?: string;
+};
+
+type ScheduledPlatformSummary = {
+  platform: string;
+  accountId: string;
+  status: string;
+  scheduledAt?: string;
+  timezone?: string;
+};
+
 @Component({
   selector: 'app-post-list',
   imports: [RouterLink, PostListFilters, SocialIcon],
@@ -58,12 +73,22 @@ export class PostList implements OnInit, AfterViewInit, OnDestroy {
   panelLoading = signal(false);
   workspaceId = signal('');
   platformUsageByPostId = signal<Record<string, string[]>>({});
+  platformFailedByPostId = signal<Record<string, boolean>>({});
+  platformScheduledByPostId = signal<Record<string, boolean>>({});
+  platformFailedDetailsByPostId = signal<Record<string, FailedPlatformSummary[]>>({});
+  platformScheduledDetailsByPostId = signal<Record<string, ScheduledPlatformSummary[]>>({});
 
   readonly limit = 6;
   showMenu = signal(false);
   showDeleteDialog = signal(false);
   pendingDeletePostId = signal<string | null>(null);
   pendingDeletePostTitle = signal('');
+  showFailedInfoDialog = signal(false);
+  pendingFailedPostTitle = signal('');
+  pendingFailedItems = signal<FailedPlatformSummary[]>([]);
+  showScheduledInfoDialog = signal(false);
+  pendingScheduledPostTitle = signal('');
+  pendingScheduledItems = signal<ScheduledPlatformSummary[]>([]);
   searchQuery = '';
   statusFilter = 'all';
   categoryFilter = 'all';
@@ -162,23 +187,72 @@ export class PostList implements OnInit, AfterViewInit, OnDestroy {
       const postIds = posts.map((post) => post.id);
       if (!postIds.length) {
         this.platformUsageByPostId.set({});
+        this.platformFailedByPostId.set({});
+        this.platformScheduledByPostId.set({});
+        this.platformFailedDetailsByPostId.set({});
+        this.platformScheduledDetailsByPostId.set({});
         return;
       }
 
       forkJoin(
         postIds.map((postId) =>
           this.platformGql.getPlatformPosts(postId).pipe(
-            map((platformPosts) => ({
-              postId,
-              platforms: Array.from(new Set(platformPosts.map((item) => item.platform))),
-            })),
-            catchError(() => of({ postId, platforms: [] })),
+            map((platformPosts) => {
+              const failedItems = platformPosts
+                .filter((item) => item.publishing?.status === 'failed')
+                .map((item) => ({
+                  platform: item.platform,
+                  accountId: item.accountId,
+                  status: item.publishing?.status ?? 'failed',
+                  failedAt: item.updatedAt ?? item.createdAt,
+                }));
+              const scheduledItems = platformPosts
+                .filter((item) => item.publishing?.status === 'scheduled')
+                .map((item) => ({
+                  platform: item.platform,
+                  accountId: item.accountId,
+                  status: item.publishing?.status ?? 'scheduled',
+                  scheduledAt: item.publishing?.scheduledAt,
+                  timezone: item.publishing?.timezone,
+                }));
+
+              return {
+                postId,
+                platforms: Array.from(new Set(platformPosts.map((item) => item.platform))),
+                hasFailed: failedItems.length > 0,
+                hasScheduled: scheduledItems.length > 0,
+                failedItems,
+                scheduledItems,
+              };
+            }),
+            catchError(() =>
+              of({
+                postId,
+                platforms: [],
+                hasFailed: false,
+                hasScheduled: false,
+                failedItems: [],
+                scheduledItems: [],
+              }),
+            ),
           ),
         ),
       ).subscribe((rows) => {
         const next: Record<string, string[]> = {};
+        const failedByPostId: Record<string, boolean> = {};
+        const scheduledByPostId: Record<string, boolean> = {};
+        const failedDetailsByPostId: Record<string, FailedPlatformSummary[]> = {};
+        const scheduledDetailsByPostId: Record<string, ScheduledPlatformSummary[]> = {};
         for (const row of rows) next[row.postId] = row.platforms;
+        for (const row of rows) failedByPostId[row.postId] = row.hasFailed;
+        for (const row of rows) scheduledByPostId[row.postId] = row.hasScheduled;
+        for (const row of rows) failedDetailsByPostId[row.postId] = row.failedItems;
+        for (const row of rows) scheduledDetailsByPostId[row.postId] = row.scheduledItems;
         this.platformUsageByPostId.set(next);
+        this.platformFailedByPostId.set(failedByPostId);
+        this.platformScheduledByPostId.set(scheduledByPostId);
+        this.platformFailedDetailsByPostId.set(failedDetailsByPostId);
+        this.platformScheduledDetailsByPostId.set(scheduledDetailsByPostId);
       });
     });
   }
@@ -315,6 +389,32 @@ export class PostList implements OnInit, AfterViewInit, OnDestroy {
     this.cancelDelete();
   }
 
+  openFailedInfo(postId: string, postTitle: string, event: Event): void {
+    event.stopPropagation();
+    this.pendingFailedPostTitle.set(postTitle);
+    this.pendingFailedItems.set(this.platformFailedDetailsByPostId()[postId] ?? []);
+    this.showFailedInfoDialog.set(true);
+  }
+
+  closeFailedInfo(): void {
+    this.showFailedInfoDialog.set(false);
+    this.pendingFailedPostTitle.set('');
+    this.pendingFailedItems.set([]);
+  }
+
+  openScheduledInfo(postId: string, postTitle: string, event: Event): void {
+    event.stopPropagation();
+    this.pendingScheduledPostTitle.set(postTitle);
+    this.pendingScheduledItems.set(this.platformScheduledDetailsByPostId()[postId] ?? []);
+    this.showScheduledInfoDialog.set(true);
+  }
+
+  closeScheduledInfo(): void {
+    this.showScheduledInfoDialog.set(false);
+    this.pendingScheduledPostTitle.set('');
+    this.pendingScheduledItems.set([]);
+  }
+
   onEdit(id: string, event: Event): void {
     event.stopPropagation();
     this.router.navigate(['/dashboard/workspace', this.workspaceId(), 'post', id, 'edit']);
@@ -365,6 +465,28 @@ export class PostList implements OnInit, AfterViewInit, OnDestroy {
 
   getPostPlatforms(postId: string): string[] {
     return this.platformUsageByPostId()[postId] ?? [];
+  }
+
+  hasFailedPlatformPost(postId: string): boolean {
+    return this.platformFailedByPostId()[postId] ?? false;
+  }
+
+  hasScheduledPlatformPost(postId: string): boolean {
+    if (this.hasFailedPlatformPost(postId)) return false;
+    return this.platformScheduledByPostId()[postId] ?? false;
+  }
+
+  formatDateTime(value?: string): string {
+    if (!value) return 'N/A';
+    const d = new Date(value);
+    if (Number.isNaN(d.getTime())) return 'N/A';
+    return d.toLocaleString(undefined, {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit',
+    });
   }
 
   getPlatformIconLabel(platform: string): string {

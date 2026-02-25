@@ -167,7 +167,6 @@ export class WorkspaceCalendar implements OnInit, OnDestroy {
     this.loadingEvents.set(true);
 
     const monthStart = this.startOfMonth(targetMonth);
-    const targetMonthKey = this.getMonthKey(monthStart);
 
     this.platformGql
       .getWorkspacePlatformPostsByMonth(workspaceId, this.formatMonthForQuery(monthStart))
@@ -179,7 +178,6 @@ export class WorkspaceCalendar implements OnInit, OnDestroy {
           const monthEvents = this.mapPlatformPostsToEvents(platformPosts, monthStart);
           const nextByDay = this.groupEventsByDay(monthEvents);
           this.eventsByDay.set(nextByDay);
-          this.ensureSelectedDateHasData(targetMonthKey, nextByDay);
           this.loadingEvents.set(false);
         },
         error: () => {
@@ -261,13 +259,6 @@ export class WorkspaceCalendar implements OnInit, OnDestroy {
     return `${y}-${m}-${d}`;
   }
 
-  private getMonthKey(date: Date): string {
-    const day = this.startOfDay(date);
-    const year = day.getFullYear();
-    const month = `${day.getMonth() + 1}`.padStart(2, '0');
-    return `${year}-${month}`;
-  }
-
   private formatMonthForQuery(date: Date): string {
     const day = this.startOfDay(date);
     const year = day.getFullYear();
@@ -283,22 +274,6 @@ export class WorkspaceCalendar implements OnInit, OnDestroy {
       byDay[dayKey].push(event);
     }
     return byDay;
-  }
-
-  private ensureSelectedDateHasData(
-    targetMonthKey: string,
-    byDay: Record<string, CalendarEvent[]>,
-  ): void {
-    const selectedDayKey = this.getDayKey(this.selectedDate());
-    const selectedMonthKey = this.getMonthKey(this.selectedDate());
-    const hasSelectedData = (byDay[selectedDayKey] ?? []).length > 0;
-    if (selectedMonthKey === targetMonthKey && hasSelectedData) return;
-
-    const firstEventDayKey = Object.keys(byDay).sort()[0];
-    if (!firstEventDayKey) return;
-    const [year, month, day] = firstEventDayKey.split('-').map(Number);
-    if (!year || !month || !day) return;
-    this.selectedDate.set(new Date(year, month - 1, day));
   }
 
   private startOfMonth(date: Date): Date {

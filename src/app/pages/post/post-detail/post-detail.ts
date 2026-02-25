@@ -367,7 +367,7 @@ export class PostDetail implements OnInit, OnDestroy {
     const workspace = this.selectedWorkspace();
     if (!post || !workspace) return false;
     if (!workspace.settings?.approvalRequired) return true;
-    return (post.priority ?? 'medium') === 'high';
+    return post.status === 'approved';
   }
 
   get canManagePlatformDrafts(): boolean {

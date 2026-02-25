@@ -144,6 +144,23 @@ export const REMOVE_WORKSPACE_MEMBER = gql`
   }
 `;
 
+export const UPDATE_MEMBER_ROLE = gql`
+  mutation UpdateMemberRole($workspaceId: ID!, $userId: String!, $role: String!) {
+    updateMemberRole(workspaceId: $workspaceId, userId: $userId, role: $role) {
+      id
+      members {
+        userId
+        role
+        joinedAt
+        email
+        firstName
+        lastName
+        avatarUrl
+      }
+    }
+  }
+`;
+
 export const SUGGEST_MEMBERS_QUERY = gql`
   query SuggestMembers($workspaceId: ID!, $query: String!) {
     suggestMembers(workspaceId: $workspaceId, query: $query) {

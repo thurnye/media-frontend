@@ -1,11 +1,12 @@
-import { Component, EventEmitter, Input, Output, inject, signal, OnDestroy } from '@angular/core';
+import { Component, EventEmitter, Input, Output, inject, signal, OnDestroy, computed } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { Subject, debounceTime, distinctUntilChanged, switchMap, of, takeUntil } from 'rxjs';
 import { WorkspaceActions } from '../../../../store/workspace/workspace.actions';
-import { selectWorkspaceSaving } from '../../../../store/workspace/workspace.selectors';
+import { selectSelectedWorkspace, selectWorkspaceSaving } from '../../../../store/workspace/workspace.selectors';
 import { WorkspaceGqlService } from '../../../../core/services/workspace.gql.service';
 import { IMemberSuggestion } from '../../../../core/interfaces/workspace';
+import { selectUser } from '../../../../store/auth/auth.selectors';
 
 @Component({
   selector: 'app-invite-dialog',
@@ -21,11 +22,20 @@ export class InviteDialog implements OnDestroy {
   private workspaceGql = inject(WorkspaceGqlService);
   private destroy$     = new Subject<void>();
 
+  workspace = this.store.selectSignal(selectSelectedWorkspace);
+  currentUser = this.store.selectSignal(selectUser);
   saving      = this.store.selectSignal(selectWorkspaceSaving);
   email       = signal('');
   role        = signal('member');
   suggestions = signal<IMemberSuggestion[]>([]);
   showDropdown = signal(false);
+  canAssignRoles = computed(() => {
+    const ws = this.workspace();
+    const userId = this.currentUser()?.id;
+    if (!ws || !userId) return false;
+    if (ws.ownerId === userId) return true;
+    return ws.members?.find((member) => member.userId === userId)?.role === 'admin';
+  });
 
   private search$ = new Subject<string>();
 
@@ -86,10 +96,11 @@ export class InviteDialog implements OnDestroy {
   onInvite(): void {
     const emailVal = this.email().trim();
     if (!emailVal) return;
+    const inviteRole = this.canAssignRoles() ? this.role() : 'member';
     this.store.dispatch(WorkspaceActions.inviteToWorkspace({
       workspaceId: this.workspaceId,
       email: emailVal,
-      role: this.role(),
+      role: inviteRole,
     }));
     this.close.emit();
   }

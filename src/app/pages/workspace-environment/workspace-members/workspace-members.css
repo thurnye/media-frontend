@@ -44,13 +44,13 @@
   background: #fff;
   border: 1px solid #e9ecef;
   border-radius: 0.75rem;
-  overflow: hidden;
+  overflow: visible;
   margin-bottom: 1.5rem;
 }
 
 .wm-table-head {
   display: grid;
-  grid-template-columns: 1fr 120px 130px 50px;
+  grid-template-columns: 1fr 120px 130px 180px;
   align-items: center;
   padding: 0.75rem 1.25rem;
   background: #f8f9fa;
@@ -67,10 +67,12 @@
 
 .wm-row {
   display: grid;
-  grid-template-columns: 1fr 120px 130px 50px;
+  grid-template-columns: 1fr 120px 130px 180px;
   align-items: center;
   padding: 0.875rem 1.25rem;
   border-bottom: 1px solid #f5f5f5;
+  position: relative;
+  overflow: visible;
 }
 
 .wm-row:last-child {
@@ -136,6 +138,74 @@
 .wm-role-badge--admin   { background: #ede9fe; color: #6d28d9; }
 .wm-role-badge--manager { background: #dbeafe; color: #1d4ed8; }
 .wm-role-badge--member  { background: #f3f4f6; color: #4b5563; }
+
+.wm-cell--actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  position: relative;
+  overflow: visible;
+}
+
+.wm-role-dropdown {
+  position: relative;
+}
+
+.wm-role-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  border: 1px solid #d0d5dd;
+  border-radius: 0.45rem;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: capitalize;
+  color: #374151;
+  background: #fff;
+  cursor: pointer;
+}
+
+.wm-role-trigger:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.wm-role-trigger-caret {
+  color: #6b7280;
+  font-size: 0.72rem;
+}
+
+.wm-role-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  min-width: 120px;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.14);
+  z-index: 2000;
+  overflow: hidden;
+}
+
+.wm-role-menu-item {
+  width: 100%;
+  border: none;
+  background: transparent;
+  text-align: left;
+  padding: 0.45rem 0.65rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: capitalize;
+  color: #374151;
+  cursor: pointer;
+}
+
+.wm-role-menu-item:hover {
+  background: #f3f4f6;
+}
 
 /* ── Date & actions ──────────────────────────────────────────── */
 .wm-date {

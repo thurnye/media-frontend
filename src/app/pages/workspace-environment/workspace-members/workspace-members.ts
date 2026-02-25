@@ -1,6 +1,6 @@
 import { Component, computed, effect, inject, signal } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { selectSelectedWorkspace, selectWorkspaceInvitations } from '../../../store/workspace/workspace.selectors';
+import { selectSelectedWorkspace, selectWorkspaceInvitations, selectWorkspaceSaving } from '../../../store/workspace/workspace.selectors';
 import { selectUser } from '../../../store/auth/auth.selectors';
 import { WorkspaceActions } from '../../../store/workspace/workspace.actions';
 import { IWorkspaceMember } from '../../../core/interfaces/workspace';
@@ -18,8 +18,10 @@ export class WorkspaceMembers {
 
   workspace   = this.store.selectSignal(selectSelectedWorkspace);
   currentUser = this.store.selectSignal(selectUser);
+  saving      = this.store.selectSignal(selectWorkspaceSaving);
   invitations = this.store.selectSignal(selectWorkspaceInvitations);
   showInviteDialog = signal(false);
+  activeRoleMenuUserId = signal<string | null>(null);
 
   /** Load pending invitations when workspace is available. */
   private wsEffect = effect(() => {
@@ -49,9 +51,13 @@ export class WorkspaceMembers {
     this.invitations().filter(inv => inv.status === 'pending'),
   );
 
-  isOwner(): boolean {
+  isAdmin(): boolean {
     const ws = this.workspace();
-    return !!ws && ws.ownerId === this.currentUser()?.id;
+    const userId = this.currentUser()?.id;
+    if (!ws || !userId) return false;
+    if (ws.ownerId === userId) return true;
+    const role = ws.members?.find(m => m.userId === userId)?.role;
+    return role === 'admin';
   }
 
   formatDate(value?: string | number | Date): string {
@@ -108,5 +114,20 @@ export class WorkspaceMembers {
     const ws = this.workspace();
     if (!ws || !confirm(`Cancel invitation for ${email}?`)) return;
     this.store.dispatch(WorkspaceActions.revokeInvitation({ workspaceId: ws.id, email }));
+  }
+
+  onUpdateMemberRole(userId: string, role: string): void {
+    const ws = this.workspace();
+    if (!ws) return;
+    this.activeRoleMenuUserId.set(null);
+    this.store.dispatch(WorkspaceActions.updateMemberRole({ workspaceId: ws.id, userId, role }));
+  }
+
+  toggleRoleMenu(userId: string): void {
+    this.activeRoleMenuUserId.update(current => current === userId ? null : userId);
+  }
+
+  closeRoleMenu(): void {
+    this.activeRoleMenuUserId.set(null);
   }
 }

@@ -127,6 +127,8 @@
                     class="pl-card"
                     role="listitem"
                     [class.pl-card--active]="selectedPostId() === post.id"
+                    [class.pl-card--failed]="hasFailedPlatformPost(post.id)"
+                    [class.pl-card--scheduled]="hasScheduledPlatformPost(post.id)"
                     [attr.aria-selected]="selectedPostId() === post.id"
                     tabindex="0"
                     (click)="onCardClick(post.id)"
@@ -135,7 +137,52 @@
                     [attr.aria-label]="'View post: ' + post.title"
                   >
                     <div class="pl-card-body">
-                      <h2 class="pl-card-title">{{ post.title }}</h2>
+                      <div class="pl-card-title-row">
+                        <h2 class="pl-card-title">{{ post.title }}</h2>
+                        @if (hasFailedPlatformPost(post.id)) {
+                          <button
+                            type="button"
+                            class="pl-failed-info-btn"
+                            (click)="openFailedInfo(post.id, post.title, $event)"
+                            [attr.aria-label]="'Show failure details for ' + post.title"
+                            title="Show failed platform post details"
+                          >
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="14"
+                              height="14"
+                              fill="currentColor"
+                              viewBox="0 0 16 16"
+                              aria-hidden="true"
+                            >
+                              <path
+                                d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16m.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.399l-.254.014-.051-.248 1.544-.374z"
+                              />
+                              <path d="M8 5.5a1 1 0 1 0 0-2 1 1 0 0 0 0 2" />
+                            </svg>
+                          </button>
+                        } @else if (hasScheduledPlatformPost(post.id)) {
+                          <button
+                            type="button"
+                            class="pl-scheduled-info-btn"
+                            (click)="openScheduledInfo(post.id, post.title, $event)"
+                            [attr.aria-label]="'Show schedule details for ' + post.title"
+                            title="Show scheduled platform post details"
+                          >
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="14"
+                              height="14"
+                              fill="currentColor"
+                              viewBox="0 0 16 16"
+                              aria-hidden="true"
+                            >
+                              <path d="M8 3.5a.5.5 0 0 1 .5.5v4.293l2.146 2.147a.5.5 0 0 1-.708.707L7.646 8.854A.5.5 0 0 1 7.5 8.5V4a.5.5 0 0 1 .5-.5" />
+                              <path d="M8 16A8 8 0 1 1 8 0a8 8 0 0 1 0 16m0-1A7 7 0 1 0 8 1a7 7 0 0 0 0 14" />
+                            </svg>
+                          </button>
+                        }
+                      </div>
                       @if (post.description) {
                         <p class="pl-card-desc">{{ post.description }}</p>
                       }
@@ -432,6 +479,70 @@
         </button>
         <button type="button" class="pl-delete-btn pl-delete-btn--confirm" (click)="confirmDelete()">
           Delete
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+@if (showFailedInfoDialog()) {
+  <div class="pl-delete-backdrop" (click)="closeFailedInfo()">
+    <div class="pl-delete-dialog pl-failed-dialog" (click)="$event.stopPropagation()">
+      <h3 class="pl-delete-title">Failed Platform Posts</h3>
+      <p class="pl-delete-text">
+        <strong>{{ pendingFailedPostTitle() }}</strong> has failed platform post entries.
+      </p>
+      @if (pendingFailedItems().length) {
+        <ul class="pl-failed-list">
+          @for (item of pendingFailedItems(); track $index) {
+            <li class="pl-failed-list-item pl-failed-list-item--with-time">
+              <span class="pl-failed-platform">{{ item.platform }}</span>
+              <span class="pl-failed-account">{{ item.accountId }}</span>
+              <span class="pl-failed-status">{{ getStatusLabel(item.status) }}</span>
+              <span class="pl-failed-at">Date & time: {{ formatDateTime(item.failedAt) }}</span>
+            </li>
+          }
+        </ul>
+      } @else {
+        <p class="pl-delete-text">No detailed failure records found.</p>
+      }
+      <div class="pl-delete-actions">
+        <button type="button" class="pl-delete-btn pl-delete-btn--cancel" (click)="closeFailedInfo()">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+@if (showScheduledInfoDialog()) {
+  <div class="pl-delete-backdrop" (click)="closeScheduledInfo()">
+    <div class="pl-delete-dialog pl-scheduled-dialog" (click)="$event.stopPropagation()">
+      <h3 class="pl-delete-title pl-scheduled-title">Scheduled Platform Posts</h3>
+      <p class="pl-delete-text">
+        <strong>{{ pendingScheduledPostTitle() }}</strong> has scheduled platform post entries.
+      </p>
+      @if (pendingScheduledItems().length) {
+        <ul class="pl-failed-list">
+          @for (item of pendingScheduledItems(); track $index) {
+            <li class="pl-failed-list-item pl-failed-list-item--scheduled">
+              <span class="pl-failed-platform">{{ item.platform }}</span>
+              <span class="pl-failed-account">{{ item.accountId }}</span>
+              <span class="pl-scheduled-at">
+                Scheduled for: {{ formatDateTime(item.scheduledAt) }}
+                @if (item.timezone) {
+                  ({{ item.timezone }})
+                }
+              </span>
+            </li>
+          }
+        </ul>
+      } @else {
+        <p class="pl-delete-text">No scheduled details found.</p>
+      }
+      <div class="pl-delete-actions">
+        <button type="button" class="pl-delete-btn pl-delete-btn--cancel" (click)="closeScheduledInfo()">
+          Close
         </button>
       </div>
     </div>

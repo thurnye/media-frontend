@@ -70,7 +70,25 @@
         <span class="wm-date">{{ formatDate(member.joinedAt) }}</span>
       </div>
       <div class="wm-cell wm-cell--actions">
-        @if (isOwner()) {
+        @if (isAdmin()) {
+          <div class="wm-role-dropdown">
+            <button
+              type="button"
+              class="wm-role-trigger"
+              [disabled]="saving()"
+              (click)="toggleRoleMenu(member.userId)"
+            >
+              <span>{{ member.role }}</span>
+              <span class="wm-role-trigger-caret">▾</span>
+            </button>
+            @if (activeRoleMenuUserId() === member.userId) {
+              <div class="wm-role-menu">
+                <button type="button" class="wm-role-menu-item" (click)="onUpdateMemberRole(member.userId, 'admin')">Admin</button>
+                <button type="button" class="wm-role-menu-item" (click)="onUpdateMemberRole(member.userId, 'manager')">Manager</button>
+                <button type="button" class="wm-role-menu-item" (click)="onUpdateMemberRole(member.userId, 'member')">Member</button>
+              </div>
+            }
+          </div>
           <button class="wm-action-btn wm-action-btn--remove" title="Remove member" (click)="onRemoveMember(member.userId)">
             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
               <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"/>
@@ -123,7 +141,7 @@
           <span class="wm-date">{{ formatDate(inv.createdAt) }}</span>
         </div>
         <div class="wm-cell wm-cell--actions">
-          @if (isOwner()) {
+          @if (isAdmin()) {
             <button
               class="wm-action-btn wm-action-btn--remove"
               title="Cancel invitation"

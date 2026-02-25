@@ -138,6 +138,18 @@ export class WorkspaceEffects {
     ),
   );
 
+  updateMemberRole$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(WorkspaceActions.updateMemberRole),
+      switchMap(({ workspaceId, userId, role }) =>
+        this.workspaceGql.updateMemberRole(workspaceId, userId, role).pipe(
+          map(workspace => WorkspaceActions.updateMemberRoleSuccess({ workspace })),
+          catchError(err => of(WorkspaceActions.updateMemberRoleFailure({ error: err.message }))),
+        ),
+      ),
+    ),
+  );
+
   // Invite to workspace
   inviteToWorkspace$ = createEffect(() =>
     this.actions$.pipe(

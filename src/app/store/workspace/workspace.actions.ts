@@ -39,6 +39,11 @@ export const WorkspaceActions = createActionGroup({
     'Remove Member Success': props<{ workspace: IWorkspace }>(),
     'Remove Member Failure': props<{ error: string }>(),
 
+    // Update member role
+    'Update Member Role':         props<{ workspaceId: string; userId: string; role: string }>(),
+    'Update Member Role Success': props<{ workspace: IWorkspace }>(),
+    'Update Member Role Failure': props<{ error: string }>(),
+
     // Invite to workspace
     'Invite To Workspace':         props<{ workspaceId: string; email: string; role: string }>(),
     'Invite To Workspace Success': props<{ workspaceId: string }>(),

@@ -13,6 +13,7 @@ import {
   GET_WORKSPACES_QUERY,
   INVITE_TO_WORKSPACE_MUTATION,
   REMOVE_WORKSPACE_MEMBER,
+  UPDATE_MEMBER_ROLE,
   REVOKE_INVITATION_MUTATION,
   SUGGEST_MEMBERS_QUERY,
   UPDATE_WORKSPACE_MUTATION,
@@ -94,6 +95,15 @@ export class WorkspaceGqlService {
         variables: { workspaceId, userId },
       })
       .pipe(map(r => r.data!.removeWorkspaceMember));
+  }
+
+  updateMemberRole(workspaceId: string, userId: string, role: string) {
+    return this.apollo
+      .mutate<{ updateMemberRole: IWorkspace }>({
+        mutation: UPDATE_MEMBER_ROLE,
+        variables: { workspaceId, userId, role },
+      })
+      .pipe(map(r => r.data!.updateMemberRole));
   }
 
   suggestMembers(workspaceId: string, query: string) {

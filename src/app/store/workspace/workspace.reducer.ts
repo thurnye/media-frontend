@@ -62,6 +62,16 @@ export const workspaceReducer = createReducer(
   })),
   on(WorkspaceActions.removeMemberFailure, (state, { error }) => ({ ...state, saving: false, error })),
 
+  // Update member role
+  on(WorkspaceActions.updateMemberRole,        state              => ({ ...state, saving: true,  error: null })),
+  on(WorkspaceActions.updateMemberRoleSuccess, (state, { workspace }) => ({
+    ...state, saving: false,
+    selectedWorkspace: state.selectedWorkspace?.id === workspace.id
+      ? { ...state.selectedWorkspace, members: workspace.members }
+      : state.selectedWorkspace,
+  })),
+  on(WorkspaceActions.updateMemberRoleFailure, (state, { error }) => ({ ...state, saving: false, error })),
+
   // Invite to workspace
   on(WorkspaceActions.inviteToWorkspace,        state          => ({ ...state, saving: true,  error: null })),
   on(WorkspaceActions.inviteToWorkspaceSuccess, state          => ({ ...state, saving: false })),
