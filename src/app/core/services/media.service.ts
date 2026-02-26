@@ -8,6 +8,10 @@ import { environment } from '../../../environments/environment.development';
 export class MediaService {
   private http = inject(HttpClient);
   private baseUrl = environment.SERVER_URL;
+  private getCsrfToken(): string | null {
+    const match = document.cookie.match(/(?:^|;\s*)csrf_token=([^;]+)/);
+    return match ? decodeURIComponent(match[1]) : null;
+  }
 
   uploadFile(
     file: File,
@@ -22,6 +26,7 @@ export class MediaService {
         reportProgress: true,
         observe: 'events',
         withCredentials: true,
+        headers: this.getCsrfToken() ? { 'x-csrf-token': this.getCsrfToken()! } : {},
       })
       .pipe(
         filter(
@@ -45,6 +50,7 @@ export class MediaService {
   deleteMedia(mediaId: string): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/api/media/${mediaId}`, {
       withCredentials: true,
+      headers: this.getCsrfToken() ? { 'x-csrf-token': this.getCsrfToken()! } : {},
     });
   }
 

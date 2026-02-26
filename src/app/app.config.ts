@@ -5,7 +5,8 @@ import { provideStore } from '@ngrx/store';
 import { provideEffects } from '@ngrx/effects';
 import { provideApollo } from 'apollo-angular';
 import { HttpLink } from 'apollo-angular/http';
-import { InMemoryCache } from '@apollo/client/core';
+import { InMemoryCache, ApolloLink } from '@apollo/client/core';
+import { setContext } from '@apollo/client/link/context';
 
 import { routes } from './app.routes';
 import { authReducer } from './store/auth/auth.reducer';
@@ -20,6 +21,12 @@ import { errorInterceptor } from './core/interceptors/error.interceptor';
 import { GlobalErrorHandler } from './core/errors/global-error-handler';
 import { environment } from '../environments/environment.development';
 
+const getCookie = (name: string): string | null => {
+  const escaped = name.replace(/[-[\]/{}()*+?.\\^$|]/g, '\\$&');
+  const match = document.cookie.match(new RegExp(`(?:^|; )${escaped}=([^;]*)`));
+  return match ? decodeURIComponent(match[1]) : null;
+};
+
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
@@ -30,11 +37,23 @@ export const appConfig: ApplicationConfig = {
     provideEffects(AuthEffects, PostEffects, WorkspaceEffects, PlatformEffects),
     provideApollo(() => {
       const httpLink = inject(HttpLink);
+      const csrfLink = setContext((_, { headers }) => {
+        const csrfToken = getCookie('csrf_token');
+        if (!csrfToken) {
+          return { headers };
+        }
+        return {
+          headers: { 'x-csrf-token': csrfToken } as any,
+        };
+      });
       return {
-        link: httpLink.create({
-          uri: environment.API_URL,
-          withCredentials: true, // sends the HttpOnly cookie on every request
-        }),
+        link: ApolloLink.from([
+          csrfLink,
+          httpLink.create({
+            uri: environment.API_URL,
+            withCredentials: true, // sends the HttpOnly cookie on every request
+          }),
+        ]),
         cache: new InMemoryCache(),
       };
     }),
