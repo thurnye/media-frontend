@@ -58,7 +58,7 @@ export class AuthEffects {
       ofType(AuthActions.signup),
       switchMap(({ input }) =>
         this.authGql.signup(input).pipe(
-          map(user => AuthActions.signupSuccess({ user })),
+          map(() => AuthActions.signupSuccess()),
           catchError(err => of(AuthActions.signupFailure({ error: err.message }))),
         ),
       ),
@@ -71,9 +71,11 @@ export class AuthEffects {
       tap(() => {
         const invite = this.getQueryParam('invite');
         if (invite) {
-          this.store.dispatch(WorkspaceActions.acceptInvitation({ token: invite }));
+          this.router.navigate(['/login'], {
+            queryParams: { invite, signup: 'success' },
+          });
         } else {
-          this.router.navigate(['/dashboard']);
+          this.router.navigate(['/login'], { queryParams: { signup: 'success' } });
         }
       }),
     ),

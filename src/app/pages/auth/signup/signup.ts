@@ -26,9 +26,14 @@ export class Signup {
 
   loading = this.store.selectSignal(selectLoading);
   error   = this.store.selectSignal(selectError);
+  showPassword = signal(false);
 
   onSignup() {
     if (this.signupForm().invalid()) return;
     this.store.dispatch(AuthActions.signup({ input: this.signupModel() }));
+  }
+
+  toggleShowPassword() {
+    this.showPassword.update((value) => !value);
   }
 }

@@ -14,9 +14,6 @@ export function loginFormValidation(schemaPath: { [K in keyof ILogin]: SchemaPat
 
   // password
   required(schemaPath.password, { message: 'Password is required' });
-  minLength(schemaPath.password, 5, {
-    message: GLOBAL_CONSTANTS.VALIDATION.CUSTOMER_NAME_LENGTH_MESSAGE(5),
-  });
 }
 export function signupFormValidation(schemaPath: { [K in keyof ISignUp]: SchemaPath<ISignUp[K]> }) {
   // firstName
@@ -33,7 +30,7 @@ export function signupFormValidation(schemaPath: { [K in keyof ISignUp]: SchemaP
 
   // password
   required(schemaPath.password, { message: GLOBAL_CONSTANTS.VALIDATION.PASSWORD });
-  minLength(schemaPath.password, 5, { message: GLOBAL_CONSTANTS.VALIDATION.PASSWORD_LENGTH(5) });
+  minLength(schemaPath.password, 10, { message: GLOBAL_CONSTANTS.VALIDATION.PASSWORD_LENGTH(10) });
 
   // dateOfBirth
   required(schemaPath.dateOfBirth, { message: 'Date of birth is required' });

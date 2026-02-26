@@ -6,6 +6,7 @@ import { WorkspaceGqlService } from '../../core/services/workspace.gql.service';
 import { ToastService } from '../../core/services/toast.service';
 import { WorkspaceActions } from './workspace.actions';
 import { AuthActions } from '../auth/auth.actions';
+import type { IUserWorkspace } from '../../core/interfaces/auth';
 
 @Injectable()
 export class WorkspaceEffects {
@@ -17,10 +18,10 @@ export class WorkspaceEffects {
   // Populate sidebar list directly from the auth payload — no extra API call
   loadWorkspacesOnAuth$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(AuthActions.loginSuccess, AuthActions.signupSuccess, AuthActions.restoreSessionSuccess),
+      ofType(AuthActions.loginSuccess, AuthActions.restoreSessionSuccess),
       map(({ user }) =>
         WorkspaceActions.loadWorkspacesSuccess({
-          workspaces: (user.workspaces ?? []).map(ws => ({
+          workspaces: (user.workspaces ?? []).map((ws: IUserWorkspace) => ({
             id:   ws.workspaceId,
             name: ws.name,
             slug: '',

@@ -10,7 +10,7 @@ export const AuthActions = createActionGroup({
     'Login Success':  props<{ user: IUser }>(),
     'Login Failure':  props<{ error: string }>(),
     'Signup':         props<{ input: ISignUp }>(),
-    'Signup Success': props<{ user: IUser }>(),
+    'Signup Success': emptyProps(),
     'Signup Failure': props<{ error: string }>(),
     'Logout':         emptyProps(),
   },

@@ -1,0 +1,19 @@
+<div class="auth-wrapper">
+  <div class="auth-form-panel">
+    <div class="auth-form-inner">
+      <h1 class="fw-bold h2 mb-3">Email Verification</h1>
+
+      @if (loading()) {
+        <div class="alert alert-info rounded-3 py-2 small">{{ message() }}</div>
+      } @else if (success()) {
+        <div class="alert alert-success rounded-3 py-2 small">{{ message() }}</div>
+      } @else {
+        <div class="alert alert-danger rounded-3 py-2 small">{{ message() }}</div>
+      }
+
+      <p class="mt-3">
+        <a routerLink="/login" class="text-primary fw-semibold text-decoration-none">Go to login</a>
+      </p>
+    </div>
+  </div>
+</div>

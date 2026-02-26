@@ -2,6 +2,9 @@ import { Routes } from '@angular/router';
 import { Home } from './pages/home/home';
 import { Login } from './pages/auth/login/login';
 import { Signup } from './pages/auth/signup/signup';
+import { ForgotPassword } from './pages/auth/forgot-password/forgot-password';
+import { ResetPassword } from './pages/auth/reset-password/reset-password';
+import { VerifyEmail } from './pages/auth/verify-email/verify-email';
 import { PostForm } from './pages/post/post-form/post-form';
 import { PostList } from './pages/post/post-list/post-list';
 import { PostDetail } from './pages/post/post-detail/post-detail';
@@ -36,6 +39,18 @@ export const routes: Routes = [
   {
     path: 'signup',
     component: Signup,
+  },
+  {
+    path: 'forgot-password',
+    component: ForgotPassword,
+  },
+  {
+    path: 'reset-password',
+    component: ResetPassword,
+  },
+  {
+    path: 'verify-email',
+    component: VerifyEmail,
   },
   {
     path: 'invite/accept',

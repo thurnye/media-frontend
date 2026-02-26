@@ -23,12 +23,20 @@ export class Login {
 
   loading = this.store.selectSignal(selectLoading);
   error   = this.store.selectSignal(selectError);
+  showPassword = signal(false);
 
   /** Preserve invite token for signup link */
   inviteToken = this.route.snapshot.queryParamMap.get('invite');
+  signupSuccess = this.route.snapshot.queryParamMap.get('signup') === 'success';
+  passwordResetRequested = this.route.snapshot.queryParamMap.get('reset') === 'requested';
+  passwordResetDone = this.route.snapshot.queryParamMap.get('reset') === 'done';
 
   onLogin() {
     if (this.loginForm().invalid()) return;
     this.store.dispatch(AuthActions.login({ credentials: this.loginModel() }));
+  }
+
+  toggleShowPassword() {
+    this.showPassword.update((value) => !value);
   }
 }

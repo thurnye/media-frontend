@@ -2,7 +2,14 @@ import { inject, Injectable } from '@angular/core';
 import { Apollo } from 'apollo-angular';
 import { map } from 'rxjs';
 import { ILogin, ISignUp, IUser } from '../interfaces/auth';
-import { LOGIN_MUTATION, ME_QUERY, SIGNUP_MUTATION } from '../graphql/auths.graphql';
+import {
+  LOGIN_MUTATION,
+  ME_QUERY,
+  REQUEST_PASSWORD_RESET_MUTATION,
+  RESET_PASSWORD_MUTATION,
+  SIGNUP_MUTATION,
+  VERIFY_EMAIL_MUTATION,
+} from '../graphql/auths.graphql';
 
 @Injectable({ providedIn: 'root' })
 export class AuthGqlService {
@@ -30,5 +37,32 @@ export class AuthGqlService {
     return this.apollo
       .query<{ me: IUser }>({ query: ME_QUERY, fetchPolicy: 'no-cache' })
       .pipe(map((r) => r.data!.me));
+  }
+
+  verifyEmail(token: string) {
+    return this.apollo
+      .mutate<{ verifyEmail: boolean }>({
+        mutation: VERIFY_EMAIL_MUTATION,
+        variables: { token },
+      })
+      .pipe(map((r) => r.data?.verifyEmail ?? false));
+  }
+
+  requestPasswordReset(email: string) {
+    return this.apollo
+      .mutate<{ requestPasswordReset: boolean }>({
+        mutation: REQUEST_PASSWORD_RESET_MUTATION,
+        variables: { email },
+      })
+      .pipe(map((r) => r.data?.requestPasswordReset ?? false));
+  }
+
+  resetPassword(token: string, newPassword: string) {
+    return this.apollo
+      .mutate<{ resetPassword: boolean }>({
+        mutation: RESET_PASSWORD_MUTATION,
+        variables: { token, newPassword },
+      })
+      .pipe(map((r) => r.data?.resetPassword ?? false));
   }
 }
